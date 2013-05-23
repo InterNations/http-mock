@@ -1,7 +1,6 @@
-h1. EOS Fake API
+# EOS Fake API
 
-h3. Setting up expectation for request recording
-
+### Setting up expectation for request recording
 ```
 POST /_expectation
 {
@@ -12,7 +11,7 @@ POST /_expectation
 }
 ```
 
-h3. Accessing recorded request
+### Accessing recorded request
 ```
 GET /_request/latest
 Content-Type: text/plain
