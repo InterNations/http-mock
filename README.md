@@ -11,9 +11,17 @@ POST /_expectation
 }
 ```
 
-### Accessing recorded request
+### Accessing latest recorded request
 ```
 GET /_request/latest
+Content-Type: text/plain
+
+RECORDED REQUEST
+```
+
+### Accessing recorded request by index
+```
+GET /_request/{{index}}
 Content-Type: text/plain
 
 RECORDED REQUEST
