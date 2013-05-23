@@ -1,0 +1,18 @@
+{
+    "name": "internations/eos-fake-api",
+    "description": "A fake API implementation for EOS",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lars Strojny",
+            "email": "lars.strojny@internations.org"
+        }
+    ],
+    "require": {
+        "silex/silex": "1.0.*@dev",
+        "phpunit/phpunit": "3.*",
+        "guzzle/guzzle": "3.*",
+        "symfony/property-access": "2.3.*@dev",
+        "symfony/process": "2.3.*@dev"
+    }
+}

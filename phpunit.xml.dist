@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupGlobals="false"
+         convertErrorsToExceptions="true"
+         convertWarningsToExceptions="true"
+         convertNoticesToExceptions="true"
+         mapTestClassNameToCoveredClassName="true"
+         bootstrap="vendor/autoload.php"
+         strict="true"
+         verbose="true"
+         colors="true"
+         timeoutForLargeTests="100">
+
+    <testsuites>
+        <testsuite name="internations/eos-fake-api">
+            <directory>./src/tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <ini name="error_reporting" value="-1"/>
+        <const name="EOS_FAKE_API_SERVER1_PORT" value="38080"/>
+        <const name="EOS_FAKE_API_SERVER2_PORT" value="38081"/>
+    </php>
+</phpunit>
