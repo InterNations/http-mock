@@ -1,4 +1,4 @@
-# EOS Fake API
+# EOS Fake API [![Build Status](https://travis-ci.org/InterNations/eos-fake-api.png?branch=master)](https://travis-ci.org/InterNations/eos-fake-api)
 
 ### Setting up expectation for request recording
 ```
