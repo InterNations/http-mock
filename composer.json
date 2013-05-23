@@ -13,6 +13,12 @@
         "phpunit/phpunit": "3.*",
         "guzzle/guzzle": "3.*",
         "symfony/property-access": "2.3.*@dev",
-        "symfony/process": "2.3.*@dev"
+        "symfony/process": "2.3.*@dev",
+        "jeremeamia/superclosure": "dev-master",
+        "jeremeamia/functionparser": "*"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": {"InterNations": "src/"}
     }
 }

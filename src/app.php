@@ -1,6 +1,7 @@
 <?php
 namespace InterNations\Eos\FakeApi;
 
+use Guzzle\Http\Message\RequestFactory;
 use RuntimeException;
 use Exception;
 use Guzzle\Http\Client;
@@ -12,7 +13,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-
 
 function store(Request $request, $name, $data) {
     file_put_contents(storage_file_name($request, $name), serialize($data));
@@ -47,60 +47,42 @@ function clear(Request $request, $name) {
 $app = new Application();
 $app['debug'] = true;
 
-$app->post('/_expectation', function (Request $request) {
-    clear($request, 'expectation');
-    clear($request, 'latest');
+$app->delete('/_expectation', function (Request $request) {
+    clear($request, 'expectations');
 
-    store($request, 'expectation', $request->request->all());
+    return new Response('', 200);
+});
+
+$app->post('/_expectation', function (Request $request) {
+
+    append($request, 'expectations', $request->request->all());
 
     return new Response('', 201);
 });
-
-
 
 $app->error(function (Exception $e) use ($app) {
     /** @var Request $request */
     $request = $app['request'];
 
     if ($e instanceof NotFoundHttpException) {
-        $expectation = read($request, 'expectation');
 
         append($request, 'latest', (string) $request);
 
-        $response = new Response();
+        $expectations = read($request, 'expectations');
 
-        if (isset($expectation['sleepMs'])) {
-            usleep($expectation['sleepMs'] * 1000);
-        }
+        $guzzleRequest = RequestFactory::getInstance()->fromMessage((string) $request);
 
-        if (isset($expectation['body'])) {
-            $response->setContent($expectation['body']);
-        }
-
-        if (isset($expectation['statusCode'])) {
-            $response->setStatusCode($expectation['statusCode']);
-        }
-
-        if (isset($expectation['callbackUrlPropertyPath'])) {
-            $accessor = PropertyAccess::createPropertyAccessor();
-            $callbackUrl = $accessor->getValue(
-                ['request' => $request->request->all()],
-                $expectation['callbackUrlPropertyPath']
-            );
-
-            if (empty($callbackUrl)) {
-                throw new RuntimeException(
-                    sprintf(
-                        'Could not extract property from path "%s"', $expectation['callbackUrlPropertyPath']
-                    )
-                );
+        foreach ($expectations as $expectation) {
+            foreach (unserialize($expectation['matchers']) as $matcher) {
+                if (!$matcher($guzzleRequest)) {
+                    break 2;
+                }
             }
 
-            $client = new Client('http://127.0.0.1:8080');
-            $client->get($callbackUrl)->send();
+            return unserialize($expectation['response']);
         }
 
-        return $response;
+        return new Response('No expectation found', 404);
     }
 
     $code = ($e instanceof HttpException) ? $e->getStatusCode() : 500;

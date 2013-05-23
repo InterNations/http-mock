@@ -1,5 +1,7 @@
 # EOS Fake API [![Build Status](https://travis-ci.org/InterNations/eos-fake-api.png?branch=master)](https://travis-ci.org/InterNations/eos-fake-api)
 
+*BIG FAT WARNING:* software like this is inherently insecure. Only use in trusted, controlled environments.
+
 ### Setting up expectation for request recording
 ```
 POST /_expectation
