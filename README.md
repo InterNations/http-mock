@@ -18,7 +18,7 @@ class ExampleTest extends PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        static::setUpHttpMockBeforeClass();
+        static::setUpHttpMockBeforeClass('localhost', '8082');
     }
 
     public static function tearDownAfterClass()
@@ -40,14 +40,14 @@ class ExampleTest extends PHPUnit_Framework_TestCase
     {
         $this->http->mock
             ->when()
-                ->methodIs('POST')
+                ->methodIs('GET')
                 ->pathIs('/foo')
             ->then()
                 ->body('mocked body')
             ->end();
         $this->http->setUp();
 
-        $this->assertSame('mocked body', (string) $this->http->client->post('/foo')->send()->getBody());
+        $this->assertSame('mocked body', file_get_contents('http://localhost:8082/foo'));
     }
 }
 ```
