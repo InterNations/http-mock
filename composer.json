@@ -1,6 +1,6 @@
 {
     "name": "internations/http-mock",
-    "description": "A fake API implementation for EOS",
+    "description": "Mock HTTP requests on the server side in your PHP unit tests",
     "license": "MIT",
     "authors": [
         {
