@@ -82,6 +82,9 @@ $app->post(
             return new Response('POST data key "response" must be a serialized Symfony response', 417);
         }
 
+        // Fix issue with silex default error handling
+        $response->headers->set('X-Status-Code', $response->getStatusCode());
+
         append($request, 'expectations', ['matcher' => $matcher, 'response' => $response]);
 
         return new Response('', 201);

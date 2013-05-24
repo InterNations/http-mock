@@ -54,7 +54,7 @@ class AppIntegrationTest extends TestCase
                         return $request instanceof \Symfony\Component\HttpFoundation\Request;
                     }
                 ],
-                new Response('fake body', 403)
+                new Response('fake body', 200)
             )
         )->send();
         $this->assertSame('', (string) $response->getBody());
@@ -62,7 +62,7 @@ class AppIntegrationTest extends TestCase
 
         $response = $this->client->post('/foobar', ['X-Special' => 1], ['post' => 'data'])->send();
 
-        $this->assertSame(403, $response->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('fake body', (string) $response->getBody());
 
         $response = $this->client->get('/_request/latest')->send();
