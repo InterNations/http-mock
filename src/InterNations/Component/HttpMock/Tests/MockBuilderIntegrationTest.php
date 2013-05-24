@@ -27,10 +27,21 @@ class MockBuilderIntegrationTest extends TestCase
     /** @var MatcherFactory */
     private $matches;
 
+    /** @var Server */
+    private $server;
+
     public function setUp()
     {
         $this->matches = new MatcherFactory();
         $this->builder = new MockBuilder($this->matches);
+        $this->server = new Server(HTTP_MOCK_PORT, HTTP_MOCK_HOST);
+        $this->server->start();
+        $this->server->clean();
+    }
+
+    public function tearDown()
+    {
+        $this->server->stop();
     }
 
     public function testCreateExpectation()
@@ -76,17 +87,13 @@ class MockBuilderIntegrationTest extends TestCase
         $response = "HTTP/1.0 401 Unauthorized\r\nCache-Control: no-cache\r\nDate:          Sat, 10 Nov 2012 09:08:07 GMT\r\nX-Foo:         Bar\r\n\r\nresponse body";
         $this->assertSame($response, (string)$expectation->getResponse());
 
-        $server = new Server(HTTP_MOCK_PORT, HTTP_MOCK_HOST);
-        $server->start();
-        $server->clean();
-        $server->setUp($this->builder->getExpectations());
 
-        $client = $server->getClient();
+        $this->server->setUp($this->builder->getExpectations());
+
+        $client = $this->server->getClient();
 
         $this->assertSame('response body', (string) $client->post('/foo')->send()->getBody());
 
-        $this->assertContains('CLOSURE MATCHER: POST /foo', $server->getErrorOutput());
-
-        $server->stop();
+        $this->assertContains('CLOSURE MATCHER: POST /foo', $this->server->getErrorOutput());
     }
 }

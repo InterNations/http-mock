@@ -12,7 +12,7 @@ use SuperClosure\SuperClosure;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Process\Process;
 
-class AppTest extends TestCase
+class AppIntegrationTest extends TestCase
 {
     /**
      * @var Server

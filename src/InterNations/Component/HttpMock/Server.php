@@ -34,7 +34,6 @@ class Server extends Process
     public function stop($timeout = 10, $signal = null)
     {
         $exitCode = parent::stop($timeout, $signal);
-        sleep(1);
 
         return $exitCode;
     }
