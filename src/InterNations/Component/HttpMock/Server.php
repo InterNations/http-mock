@@ -20,9 +20,10 @@ class Server extends Process
         $this->port = $port;
         $this->host = $host;
         parent::__construct(
-            sprintf('php -S %s public/index.php public', $this->getConnectionString()),
+            sprintf('exec php -S %s public/index.php public', $this->getConnectionString()),
             __DIR__ . '/../../../../'
         );
+        $this->setTimeout(null);
     }
 
     public function start($callback = null)
