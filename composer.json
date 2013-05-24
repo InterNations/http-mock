@@ -15,7 +15,7 @@
     "require": {
         "silex/silex": "1.0.*@dev",
         "guzzle/guzzle": "3.*",
-        "symfony/process": "2.3.*@dev",
+        "symfony/process": "2.*@dev",
         "jeremeamia/superclosure": "dev-master",
         "jeremeamia/functionparser": "*"
     },
