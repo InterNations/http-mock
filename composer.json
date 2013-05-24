@@ -1,5 +1,5 @@
 {
-    "name": "internations/eos-fake-api",
+    "name": "internations/http-mock",
     "description": "A fake API implementation for EOS",
     "license": "MIT",
     "authors": [
