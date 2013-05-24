@@ -1,11 +1,6 @@
 <?php
 namespace InterNations\Component\HttpMock\PHPUnit;
 
-use InterNations\Component\HttpMock\Matcher\MatcherFactory;
-use InterNations\Component\HttpMock\MockBuilder;
-use InterNations\Component\HttpMock\Server;
-use stdClass;
-
 trait HttpMockTrait
 {
     /**

@@ -1,7 +1,6 @@
 <?php
 namespace InterNations\Component\HttpMock;
 
-use Guzzle\Http\Client;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 
 class MockBuilder

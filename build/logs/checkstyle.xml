@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="@package_version@">
+ <file name="/Users/lstrojny/Projects/http-mock/src/InterNations/Component/HttpMock/Expectation.php">
+  <error line="44" column="19" severity="error" message="Opening parenthesis of a multi-line function call must be the last content on the line" source="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+  <error line="44" column="50" severity="error" message="Fully qualified namespaces are prohibited (\Symfony\Component\HttpFoundation\Request). Introduce a &quot;use&quot;-statement" source="InterNations.Naming.AlwaysUse.FullyQualifiedNamespace.TypeHint"/>
+  <error line="46" column="10" severity="error" message="Closing parenthesis of a multi-line function call must be on a line by itself" source="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+  <error line="57" column="19" severity="error" message="Opening parenthesis of a multi-line function call must be the last content on the line" source="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+  <error line="57" column="50" severity="error" message="Fully qualified namespaces are prohibited (\Symfony\Component\HttpFoundation\Request). Introduce a &quot;use&quot;-statement" source="InterNations.Naming.AlwaysUse.FullyQualifiedNamespace.TypeHint"/>
+  <error line="59" column="10" severity="error" message="Closing parenthesis of a multi-line function call must be on a line by itself" source="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+ </file>
+ <file name="/Users/lstrojny/Projects/http-mock/src/InterNations/Component/HttpMock/Matcher/AbstractMatcher.php">
+  <error line="19" column="38" severity="error" message="Fully qualified namespaces are prohibited (\Symfony\Component\HttpFoundation\Request). Introduce a &quot;use&quot;-statement" source="InterNations.Naming.AlwaysUse.FullyQualifiedNamespace.TypeHint"/>
+  <error line="35" column="13" severity="error" message="Closure does not reference $this. Add &quot;static&quot; qualifier" source="InterNations.Syntax.Closure.closureStatic"/>
+  <error line="35" column="24" severity="error" message="Fully qualified namespaces are prohibited (\Symfony\Component\HttpFoundation\Request). Introduce a &quot;use&quot;-statement" source="InterNations.Naming.AlwaysUse.FullyQualifiedNamespace.TypeHint"/>
+ </file>
+ <file name="/Users/lstrojny/Projects/http-mock/src/InterNations/Component/HttpMock/Matcher/ClosureMatcher.php">
+  <error line="4" column="24" severity="error" message="Superfluous use-statement found for symbol &quot;Request&quot;, but no further reference" source="InterNations.Waste.SuperfluousUseStatements.SuperfluousUseStatement"/>
+ </file>
+ <file name="/Users/lstrojny/Projects/http-mock/src/InterNations/Component/HttpMock/Matcher/RegexMatcher.php">
+  <error line="4" column="24" severity="error" message="Superfluous use-statement found for symbol &quot;Request&quot;, but no further reference" source="InterNations.Waste.SuperfluousUseStatements.SuperfluousUseStatement"/>
+ </file>
+ <file name="/Users/lstrojny/Projects/http-mock/src/InterNations/Component/HttpMock/Matcher/StringMatcher.php">
+  <error line="4" column="24" severity="error" message="Superfluous use-statement found for symbol &quot;Request&quot;, but no further reference" source="InterNations.Waste.SuperfluousUseStatements.SuperfluousUseStatement"/>
+ </file>
+ <file name="/Users/lstrojny/Projects/http-mock/src/InterNations/Component/HttpMock/MockBuilder.php">
+  <error line="4" column="16" severity="error" message="Superfluous use-statement found for symbol &quot;Client&quot;, but no further reference" source="InterNations.Waste.SuperfluousUseStatements.SuperfluousUseStatement"/>
+ </file>
+ <file name="/Users/lstrojny/Projects/http-mock/src/InterNations/Component/HttpMock/PHPUnit/HttpMockTrait.php">
+  <error line="4" column="44" severity="error" message="Superfluous use-statement found for symbol &quot;MatcherFactory&quot;, but no further reference" source="InterNations.Waste.SuperfluousUseStatements.SuperfluousUseStatement"/>
+  <error line="5" column="36" severity="error" message="Superfluous use-statement found for symbol &quot;MockBuilder&quot;, but no further reference" source="InterNations.Waste.SuperfluousUseStatements.SuperfluousUseStatement"/>
+  <error line="6" column="36" severity="error" message="Superfluous use-statement found for symbol &quot;Server&quot;, but no further reference" source="InterNations.Waste.SuperfluousUseStatements.SuperfluousUseStatement"/>
+  <error line="7" column="4" severity="error" message="Superfluous use-statement found for symbol &quot;stdClass&quot;, but no further reference" source="InterNations.Waste.SuperfluousUseStatements.SuperfluousUseStatement"/>
+ </file>
+ <file name="/Users/lstrojny/Projects/http-mock/src/InterNations/Component/HttpMock/Server.php">
+  <error line="1" column="1" severity="error" message="Expected &quot;function (...) use (...)&quot;, found &quot;function(...) use(...) " source="InterNations.Syntax.Closure.useWhitespace"/>
+  <error line="48" column="17" severity="error" message="Closure does not reference $this. Add &quot;static&quot; qualifier" source="InterNations.Syntax.Closure.closureStatic"/>
+ </file>
+ <file name="/Users/lstrojny/Projects/http-mock/src/app.php">
+  <error line="1" column="1" severity="warning" message="A file should declare new symbols (classes, functions, constants, etc.) and cause no other side effects, or it should execute logic with side effects, but should not do both. The first symbol is defined on line 16 and the first side effect is on line 14." source="PSR1.Files.SideEffects.FoundWithSymbols"/>
+  <error line="5" column="16" severity="error" message="Superfluous use-statement found for symbol &quot;Client&quot;, but no further reference" source="InterNations.Waste.SuperfluousUseStatements.SuperfluousUseStatement"/>
+  <error line="7" column="17" severity="error" message="Superfluous use-statement found for symbol &quot;SuperClosure&quot;, but no further reference" source="InterNations.Waste.SuperfluousUseStatements.SuperfluousUseStatement"/>
+  <error line="12" column="37" severity="error" message="Superfluous use-statement found for symbol &quot;PropertyAccess&quot;, but no further reference" source="InterNations.Waste.SuperfluousUseStatements.SuperfluousUseStatement"/>
+  <error line="49" column="7" severity="error" message="Opening parenthesis of a multi-line function call must be the last content on the line" source="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+  <error line="49" column="31" severity="error" message="Only one argument is allowed per line in a multi-line function call" source="PEAR.Functions.FunctionCallSignature.MultipleArguments"/>
+  <error line="49" column="31" severity="error" message="Closure does not reference $this. Add &quot;static&quot; qualifier" source="InterNations.Syntax.Closure.closureStatic"/>
+  <error line="53" column="2" severity="error" message="Closing parenthesis of a multi-line function call must be on a line by itself" source="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+  <error line="55" column="7" severity="error" message="Opening parenthesis of a multi-line function call must be the last content on the line" source="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+  <error line="55" column="29" severity="error" message="Only one argument is allowed per line in a multi-line function call" source="PEAR.Functions.FunctionCallSignature.MultipleArguments"/>
+  <error line="55" column="29" severity="error" message="Closure does not reference $this. Add &quot;static&quot; qualifier" source="InterNations.Syntax.Closure.closureStatic"/>
+  <error line="58" column="20" severity="warning" message="Silencing errors is discouraged" source="Generic.PHP.NoSilencedErrors.Discouraged"/>
+  <error line="73" column="17" severity="warning" message="Silencing errors is discouraged" source="Generic.PHP.NoSilencedErrors.Discouraged"/>
+  <error line="81" column="2" severity="error" message="Closing parenthesis of a multi-line function call must be on a line by itself" source="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+  <error line="83" column="7" severity="error" message="Opening parenthesis of a multi-line function call must be the last content on the line" source="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+  <error line="83" column="13" severity="error" message="Closure does not reference $this. Add &quot;static&quot; qualifier" source="InterNations.Syntax.Closure.closureStatic"/>
+  <error line="106" column="2" severity="error" message="Closing parenthesis of a multi-line function call must be on a line by itself" source="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+  <error line="108" column="7" severity="error" message="Opening parenthesis of a multi-line function call must be the last content on the line" source="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+  <error line="108" column="31" severity="error" message="Only one argument is allowed per line in a multi-line function call" source="PEAR.Functions.FunctionCallSignature.MultipleArguments"/>
+  <error line="108" column="31" severity="error" message="Closure does not reference $this. Add &quot;static&quot; qualifier" source="InterNations.Syntax.Closure.closureStatic"/>
+  <error line="117" column="2" severity="error" message="Closing parenthesis of a multi-line function call must be on a line by itself" source="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+  <error line="119" column="7" severity="error" message="Opening parenthesis of a multi-line function call must be the last content on the line" source="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+  <error line="119" column="32" severity="error" message="Only one argument is allowed per line in a multi-line function call" source="PEAR.Functions.FunctionCallSignature.MultipleArguments"/>
+  <error line="119" column="32" severity="error" message="Closure does not reference $this. Add &quot;static&quot; qualifier" source="InterNations.Syntax.Closure.closureStatic"/>
+  <error line="126" column="2" severity="error" message="Closing parenthesis of a multi-line function call must be on a line by itself" source="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+  <error line="128" column="7" severity="error" message="Opening parenthesis of a multi-line function call must be the last content on the line" source="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+  <error line="128" column="27" severity="error" message="Only one argument is allowed per line in a multi-line function call" source="PEAR.Functions.FunctionCallSignature.MultipleArguments"/>
+  <error line="128" column="27" severity="error" message="Closure does not reference $this. Add &quot;static&quot; qualifier" source="InterNations.Syntax.Closure.closureStatic"/>
+  <error line="132" column="2" severity="error" message="Closing parenthesis of a multi-line function call must be on a line by itself" source="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+  <error line="134" column="7" severity="error" message="Opening parenthesis of a multi-line function call must be the last content on the line" source="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+  <error line="134" column="23" severity="error" message="Only one argument is allowed per line in a multi-line function call" source="PEAR.Functions.FunctionCallSignature.MultipleArguments"/>
+  <error line="134" column="23" severity="error" message="Closure does not reference $this. Add &quot;static&quot; qualifier" source="InterNations.Syntax.Closure.closureStatic"/>
+  <error line="139" column="2" severity="error" message="Closing parenthesis of a multi-line function call must be on a line by itself" source="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+  <error line="141" column="7" severity="error" message="Opening parenthesis of a multi-line function call must be the last content on the line" source="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+  <error line="141" column="19" severity="error" message="Only one argument is allowed per line in a multi-line function call" source="PEAR.Functions.FunctionCallSignature.MultipleArguments"/>
+  <error line="141" column="19" severity="error" message="Closure does not reference $this. Add &quot;static&quot; qualifier" source="InterNations.Syntax.Closure.closureStatic"/>
+  <error line="143" column="2" severity="error" message="Closing parenthesis of a multi-line function call must be on a line by itself" source="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+ </file>
+</checkstyle>

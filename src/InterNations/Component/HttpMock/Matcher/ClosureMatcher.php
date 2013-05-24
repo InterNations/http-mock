@@ -1,7 +1,6 @@
 <?php
 namespace InterNations\Component\HttpMock\Matcher;
 
-use Guzzle\Http\Message\Request;
 use Closure;
 
 class ClosureMatcher extends AbstractMatcher

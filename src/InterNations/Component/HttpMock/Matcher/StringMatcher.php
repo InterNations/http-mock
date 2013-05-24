@@ -1,8 +1,6 @@
 <?php
 namespace InterNations\Component\HttpMock\Matcher;
 
-use Guzzle\Http\Message\Request;
-
 class StringMatcher extends AbstractMatcher
 {
     private $string;

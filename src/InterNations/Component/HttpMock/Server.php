@@ -31,13 +31,21 @@ class Server extends Process
         sleep(1);
     }
 
+    public function stop($timeout = 10, $signal = null)
+    {
+        $exitCode = parent::stop($timeout, $signal);
+        sleep(1);
+
+        return $exitCode;
+    }
+
     public function getClient()
     {
         if (!$this->client) {
             $this->client = new Client($this->getBaseUrl());
             $this->client->getEventDispatcher()->addListener(
                 'request.error',
-                function(Event $event) {
+                static function (Event $event) {
                     $event->stopPropagation();
                 }
             );

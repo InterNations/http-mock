@@ -20,6 +20,7 @@
         "jeremeamia/functionparser": "*"
     },
     "require-dev": {
+        "internations/kodierungsregelwerksammlung": "dev-master",
         "phpunit/phpunit": "3.*"
     },
     "minimum-stability": "dev",

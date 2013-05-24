@@ -41,9 +41,13 @@ class Expectation
         if (!$matcher instanceof MatcherInterface) {
             $matcher = $this->matcherFactory->str($matcher);
         }
-        $matcher->setExtractor(static function (\Symfony\Component\HttpFoundation\Request $request) {
-            return $request->getPathInfo();
-        });
+        $matcher->setExtractor(
+            // @codingStandardsIgnoreStart
+            static function (\Symfony\Component\HttpFoundation\Request $request) {
+            // @codingStandardsIgnoreEnd
+                return $request->getPathInfo();
+            }
+        );
         $this->matcher[] = $matcher;
 
         return $this;
@@ -54,9 +58,13 @@ class Expectation
         if (!$matcher instanceof MatcherInterface) {
             $matcher = $this->matcherFactory->str($matcher);
         }
-        $matcher->setExtractor(static function (\Symfony\Component\HttpFoundation\Request $request) {
-            return $request->getMethod();
-        });
+        $matcher->setExtractor(
+            // @codingStandardsIgnoreStart
+            static function (\Symfony\Component\HttpFoundation\Request $request) {
+            // @codingStandardsIgnoreEnd
+                return $request->getMethod();
+            }
+        );
         $this->matcher[] = $matcher;
 
         return $this;
