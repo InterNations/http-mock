@@ -2,6 +2,8 @@
 namespace InterNations\Component\HttpMock\PHPUnit;
 
 use Guzzle\Http\Client;
+use Guzzle\Http\Message\RequestFactory;
+use Guzzle\Http\Message\RequestInterface;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\Server;
@@ -38,6 +40,15 @@ class HttpMockFacade
     public function setUp()
     {
         $this->server->setUp($this->mock->getExpectations());
+    }
+
+    /**
+     * @return RequestInterface
+     */
+    public function getLatestRequest()
+    {
+        $latestRequestAsString = $this->server->getClient()->get('/_request/latest')->send()->getBody();
+        return RequestFactory::getInstance()->fromMessage($latestRequestAsString);
     }
 
     private function initBuilder()
