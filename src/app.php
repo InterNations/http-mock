@@ -1,6 +1,6 @@
 <?php // @codingStandardsIgnoreStart
 // @codingStandardsIgnoreEnd
-namespace InterNations\Eos\FakeApi;
+namespace InterNations\Component\HttpMock;
 
 use Exception;
 use Silex\Application;
