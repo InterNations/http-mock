@@ -11,14 +11,14 @@
          timeoutForLargeTests="100">
 
     <testsuites>
-        <testsuite name="internations/eos-fake-api">
-            <directory>./src/tests</directory>
+        <testsuite name="internations/http-mock">
+            <directory>./src/</directory>
         </testsuite>
     </testsuites>
 
     <php>
         <ini name="error_reporting" value="-1"/>
-        <const name="EOS_FAKE_API_SERVER1_PORT" value="38080"/>
-        <const name="EOS_FAKE_API_SERVER2_PORT" value="38081"/>
+        <const name="HTTP_MOCK_PORT" value="38080"/>
+        <const name="HTTP_MOCK_HOST" value="localhost"/>
     </php>
 </phpunit>

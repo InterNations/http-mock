@@ -1,11 +1,10 @@
 <?php
 namespace InterNations\Eos\FakeApi;
 
-use Guzzle\Http\Message\RequestFactory;
-use RuntimeException;
 use Exception;
 use Guzzle\Http\Client;
 use Silex\Application;
+use SuperClosure\SuperClosure;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -55,7 +54,28 @@ $app->delete('/_expectation', function (Request $request) {
 
 $app->post('/_expectation', function (Request $request) {
 
-    append($request, 'expectations', $request->request->all());
+    if ($request->request->has('matcher')) {
+        $matcher = @unserialize($request->request->get('matcher'));
+        $validator = static function ($closure) {
+            return is_callable($closure);
+        };
+        if (!is_array($matcher) || count(array_filter($matcher, $validator)) !== count($matcher)) {
+            return new Response('POST data key "matcher" must be a serialized list of closures', 417);
+        }
+    } else {
+        $matcher = [];
+    }
+
+    if (!$request->request->has('response')) {
+        return new Response('POST data key "response" not found in POST data', 417);
+    }
+
+    $response = @unserialize($request->request->get('response'));
+    if (!$response instanceof Response) {
+        return new Response('POST data key "response" must be a serialized Symfony response', 417);
+    }
+
+    append($request, 'expectations', ['matcher' => $matcher, 'response' => $response]);
 
     return new Response('', 201);
 });
@@ -65,24 +85,20 @@ $app->error(function (Exception $e) use ($app) {
     $request = $app['request'];
 
     if ($e instanceof NotFoundHttpException) {
-
-        append($request, 'latest', (string) $request);
+        append($request, 'requests', (string) $request);
 
         $expectations = read($request, 'expectations');
-
-        $guzzleRequest = RequestFactory::getInstance()->fromMessage((string) $request);
-
         foreach ($expectations as $expectation) {
-            foreach (unserialize($expectation['matchers']) as $matcher) {
-                if (!$matcher($guzzleRequest)) {
+            foreach ($expectation['matcher'] as $pos => $matcher) {
+                if (!$matcher($request)) {
                     break 2;
                 }
             }
 
-            return unserialize($expectation['response']);
+            return $expectation['response'];
         }
 
-        return new Response('No expectation found', 404);
+        return new Response('No matching expectation found', 404);
     }
 
     $code = ($e instanceof HttpException) ? $e->getStatusCode() : 500;
@@ -90,7 +106,8 @@ $app->error(function (Exception $e) use ($app) {
 });
 
 $app->get('/_request/latest', function (Request $request) {
-    $requestData = end(read($request, 'latest'));
+    $requests = read($request, 'requests');
+    $requestData = end($requests);
 
     if ($request === null) {
         return new Response('No request recorded', 404);
@@ -100,12 +117,29 @@ $app->get('/_request/latest', function (Request $request) {
 });
 
 $app->get('/_request/{index}', function (Request $request, $index) {
-    $requestData = read($request, 'latest');
+    $requestData = read($request, 'requests');
     if (!isset($requestData[$index])) {
         return new Response('Index ' . $index . ' not found', 404);
     }
 
     return new Response($requestData[$index], 200, ['Content-Type' => 'text/plain']);
 })->assert('index', '\d+');
+
+$app->delete('/_request', function (Request $request) {
+    store($request, 'requests', []);
+
+    return new Response('', 200);
+});
+
+$app->delete('/_all', function (Request $request) {
+    store($request, 'requests', []);
+    store($request, 'expectations', []);
+
+    return new Response('', 200);
+});
+
+$app->get('/_me', function () {
+    return new Response('O RLY?', 418, ['Content-Type' => 'text/plain']);
+});
 
 return $app;

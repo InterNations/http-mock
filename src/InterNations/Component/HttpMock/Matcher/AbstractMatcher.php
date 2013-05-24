@@ -16,7 +16,7 @@ abstract class AbstractMatcher implements MatcherInterface
     protected function createExtractor()
     {
         if (!$this->extractor) {
-            return static function (\Guzzle\Http\Message\Request $request) {
+            return static function (\Symfony\Component\HttpFoundation\Request $request) {
                 return $request;
             };
         }
@@ -32,7 +32,7 @@ abstract class AbstractMatcher implements MatcherInterface
         $extractor = new SuperClosure($this->createExtractor());
 
         return new SuperClosure(
-            function (\Guzzle\Http\Message\Request $request) use ($matcher, $extractor) {
+            function (\Symfony\Component\HttpFoundation\Request $request) use ($matcher, $extractor) {
                 return $matcher($extractor($request));
             }
         );

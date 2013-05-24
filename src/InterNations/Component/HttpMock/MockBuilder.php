@@ -29,25 +29,4 @@ class MockBuilder
     {
         return $this->expectations;
     }
-
-    public function setUp(Server $server)
-    {
-        $server->start();
-
-
-        $client = new Client('http://localhost:28080');
-        $client->delete('/_expectation')->send();
-
-        /** @var Expectation $expectation */
-        foreach ($this->expectations as $expectation) {
-            $client->post(
-                '/_expectation',
-                null,
-                [
-                    'matchers' => serialize($expectation->getMatcherClosures()),
-                    'response' => serialize($expectation->getResponse())
-                ]
-            )->send();
-        }
-    }
 }

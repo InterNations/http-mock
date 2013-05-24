@@ -12,7 +12,7 @@ class Expectation
     /**
      * @var MatcherInterface[]
      */
-    private $matchers = [];
+    private $matcher = [];
 
     /**
      * @var MockBuilder
@@ -41,10 +41,10 @@ class Expectation
         if (!$matcher instanceof MatcherInterface) {
             $matcher = $this->matcherFactory->str($matcher);
         }
-        $matcher->setExtractor(static function (\Guzzle\Http\Message\Request $request) {
-            return $request->getPath();
+        $matcher->setExtractor(static function (\Symfony\Component\HttpFoundation\Request $request) {
+            return $request->getPathInfo();
         });
-        $this->matchers[] = $matcher;
+        $this->matcher[] = $matcher;
 
         return $this;
     }
@@ -54,17 +54,17 @@ class Expectation
         if (!$matcher instanceof MatcherInterface) {
             $matcher = $this->matcherFactory->str($matcher);
         }
-        $matcher->setExtractor(static function (\Guzzle\Http\Message\Request $request) {
+        $matcher->setExtractor(static function (\Symfony\Component\HttpFoundation\Request $request) {
             return $request->getMethod();
         });
-        $this->matchers[] = $matcher;
+        $this->matcher[] = $matcher;
 
         return $this;
     }
 
     public function callback(Closure $callback)
     {
-        $this->matchers[] = $this->matcherFactory->closure($callback);
+        $this->matcher[] = $this->matcherFactory->closure($callback);
 
         return $this;
     }
@@ -76,7 +76,7 @@ class Expectation
     {
         $closures = [];
 
-        foreach ($this->matchers as $matcher) {
+        foreach ($this->matcher as $matcher) {
             $closures[] = $matcher->getMatcher();
         }
 

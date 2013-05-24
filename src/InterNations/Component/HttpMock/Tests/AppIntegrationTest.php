@@ -1,5 +1,6 @@
 <?php
-namespace InterNations\Eos\FakeApi;
+namespace InterNations\Component\HttpMock\Tests;
+
 
 use InterNations\Component\HttpMock\Server;
 use PHPUnit_Framework_TestCase as TestCase;
