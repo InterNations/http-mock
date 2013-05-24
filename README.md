@@ -18,7 +18,7 @@ class ExampleTest extends PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        static::setUpHttpMockBeforeClass('localhost', '8082');
+        static::setUpHttpMockBeforeClass('8082', 'localhost');
     }
 
     public static function tearDownAfterClass()
