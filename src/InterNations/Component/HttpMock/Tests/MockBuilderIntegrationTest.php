@@ -9,6 +9,7 @@ use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\Server;
 use PHPUnit_Framework_TestCase as TestCase;
 use DateTime;
+use DateTimeZone;
 
 class TestableRequest extends Request
 {
@@ -71,8 +72,8 @@ class MockBuilderIntegrationTest extends TestCase
         }
         $this->assertSame(3, $run);
 
-        $expectation->getResponse()->setDate(new DateTime('2012-11-10 09:08:07'));
-        $response = "HTTP/1.0 401 Unauthorized\r\nCache-Control: no-cache\r\nDate:          Sat, 10 Nov 2012 08:08:07 GMT\r\nX-Foo:         Bar\r\n\r\nresponse body";
+        $expectation->getResponse()->setDate(new DateTime('2012-11-10 09:08:07', new DateTimeZone('UTC')));
+        $response = "HTTP/1.0 401 Unauthorized\r\nCache-Control: no-cache\r\nDate:          Sat, 10 Nov 2012 09:08:07 GMT\r\nX-Foo:         Bar\r\n\r\nresponse body";
         $this->assertSame($response, (string)$expectation->getResponse());
 
         $server = new Server(HTTP_MOCK_PORT, HTTP_MOCK_HOST);
