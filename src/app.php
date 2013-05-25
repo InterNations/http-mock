@@ -65,6 +65,7 @@ $app->post(
     '/_expectation',
     static function (Request $request) {
 
+        $matcher = [];
         if ($request->request->has('matcher')) {
             // @codingStandardsIgnoreStart
             $matcher = @unserialize($request->request->get('matcher'));
@@ -75,8 +76,6 @@ $app->post(
             if (!is_array($matcher) || count(array_filter($matcher, $validator)) !== count($matcher)) {
                 return new Response('POST data key "matcher" must be a serialized list of closures', 417);
             }
-        } else {
-            $matcher = [];
         }
 
         if (!$request->request->has('response')) {
@@ -109,7 +108,7 @@ $app->error(
 
             $expectations = read($request, 'expectations');
             foreach ($expectations as $expectation) {
-                foreach ($expectation['matcher'] as $pos => $matcher) {
+                foreach ($expectation['matcher'] as $matcher) {
                     if (!$matcher($request)) {
                         break 2;
                     }
