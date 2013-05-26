@@ -2,6 +2,7 @@
 namespace InterNations\Component\HttpMock;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherInterface;
 use Jeremeamia\SuperClosure\SerializableClosure;
@@ -42,9 +43,7 @@ class Expectation
             $matcher = $this->matcherFactory->str($matcher);
         }
         $matcher->setExtractor(
-            // @codingStandardsIgnoreStart
-            static function (\Symfony\Component\HttpFoundation\Request $request) {
-            // @codingStandardsIgnoreEnd
+            static function (Request $request) {
                 return $request->getRequestUri();
             }
         );
@@ -59,9 +58,7 @@ class Expectation
             $matcher = $this->matcherFactory->str($matcher);
         }
         $matcher->setExtractor(
-            // @codingStandardsIgnoreStart
-            static function (\Symfony\Component\HttpFoundation\Request $request) {
-            // @codingStandardsIgnoreEnd
+            static function (Request $request) {
                 return $request->getMethod();
             }
         );

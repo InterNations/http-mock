@@ -26,14 +26,14 @@
         "silex/silex": "1.0.*@dev",
         "guzzle/guzzle": "dev-master#c7c1def18b4ee83dc9dc8328b67b9da7837947b7",
         "symfony/process": "2.*@dev",
-        "jeremeamia/superclosure": "dev-master#223b9a639f8526748111621b75a8c74010c00e6f"
+        "jeremeamia/superclosure": "dev-master#223b9a639f8526748111621b75a8c74010c00e6f",
+        "nikic/php-parser": "dev-master"
     },
     "require-dev": {
         "internations/kodierungsregelwerksammlung": "dev-master",
         "internations/testing-component": "dev-master",
         "phpunit/phpunit": "3.*"
     },
-    "minimum-stability": "dev",
     "autoload": {
         "psr-0": {"InterNations\\Component\\HttpMock\\": "src/"}
     }
