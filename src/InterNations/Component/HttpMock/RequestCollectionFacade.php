@@ -2,10 +2,11 @@
 namespace InterNations\Component\HttpMock;
 
 use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\EntityEnclosingRequest;
 use Guzzle\Http\Message\Request;
 use Guzzle\Http\Message\RequestFactory;
+use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\Message\Response;
+use InterNations\Component\HttpMock\Request\UnifiedRequest;
 
 class RequestCollectionFacade
 {
@@ -17,7 +18,7 @@ class RequestCollectionFacade
     }
 
     /**
-     * @return EntityEnclosingRequest
+     * @return UnifiedRequest
      */
     public function latest()
     {
@@ -26,13 +27,13 @@ class RequestCollectionFacade
 
     /**
      * @param Response $response
-     * @return bool|\Guzzle\Http\Message\RequestInterface
+     * @return RequestInterface
      */
     private function parseRequestFromResponse(Response $response)
     {
         $requestFactory = RequestFactory::getInstance();
 
-        return $requestFactory->fromMessage($response->getBody());
+        return new UnifiedRequest($requestFactory->fromMessage($response->getBody()));
     }
 
     private function getRecordedRequest($path)
