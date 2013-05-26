@@ -100,8 +100,27 @@ class AppIntegrationTest extends TestCase
         );
         $this->assertSame(
             '/req/3',
-            $this->parseRequestFromResponse($this->client->get('/_request/3')->setAuth('foo', 'bar')->send())->getPath()
+            $this->parseRequestFromResponse($this->client->get('/_request/3')->send())->getPath()
         );
+        $this->assertSame(404, $this->client->get('/_request/4')->send()->getStatusCode());
+
+        $this->assertSame(
+            '/req/3',
+            $this->parseRequestFromResponse($this->client->get('/_request/pop')->send())->getPath()
+        );
+        $this->assertSame(
+            '/req/0',
+            $this->parseRequestFromResponse($this->client->get('/_request/shift')->send())->getPath()
+        );
+        $this->assertSame(
+            '/req/1',
+            $this->parseRequestFromResponse($this->client->get('/_request/0')->send())->getPath()
+        );
+        $this->assertSame(
+            '/req/2',
+            $this->parseRequestFromResponse($this->client->get('/_request/1')->send())->getPath()
+        );
+        $this->assertSame(404, $this->client->get('/_request/2')->send()->getStatusCode());
     }
 
     public function testErrorWhenNoMatchersPassed()

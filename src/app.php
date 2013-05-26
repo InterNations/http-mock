@@ -154,6 +154,21 @@ $app->get(
     }
 )->assert('index', '\d+');
 
+$app->get(
+    '/_request/{action}',
+    static function (Request $request, $action) {
+        $requestData = read($request, 'requests');
+        $fn = 'array_' . $action;
+        $requestString = $fn($requestData);
+        store($request, 'requests', $requestData);
+        if (!$requestString) {
+            return new Response($action . ' not possible', 404);
+        }
+
+        return new Response($requestString, 200, ['Content-Type' => 'text/plain']);
+    }
+)->assert('action', '(pop|shift)');
+
 $app->delete(
     '/_request',
     static function (Request $request) {
