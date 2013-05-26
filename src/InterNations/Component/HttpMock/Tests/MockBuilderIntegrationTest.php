@@ -73,6 +73,7 @@ class MockBuilderIntegrationTest extends TestCase
         $request->setPathInfo('/foo');
 
         $run = 0;
+        $oldValue = ini_set('error_log', 0);
         foreach ($expectation->getMatcherClosures() as $closure) {
             $this->assertTrue($closure($request));
 
@@ -81,6 +82,7 @@ class MockBuilderIntegrationTest extends TestCase
 
             $run++;
         }
+        ini_set('error_log', $oldValue);
         $this->assertSame(3, $run);
 
         $expectation->getResponse()->setDate(new DateTime('2012-11-10 09:08:07', new DateTimeZone('UTC')));
