@@ -49,6 +49,23 @@ class ExampleTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame('mocked body', file_get_contents('http://localhost:8082/foo'));
     }
+
+    public function testAccessingRecordedRequests()
+    {
+        $this->http->mock
+            ->when()
+                ->methodIs('POST')
+                ->pathIs('/foo')
+            ->then()
+                ->body('mocked body')
+            ->end();
+        $this->http->setUp();
+
+        $this->assertSame('mocked body', $this->http->client->post('http://localhost:8082/foo')->send());
+
+        $this->assertSame('GET', $this->http->requests->latest()->getMethod());
+        $this->assertSame('/foo', $this->http->requests->latest()->getPath());
+    }
 }
 ```
 
