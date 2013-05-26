@@ -10,14 +10,7 @@ use InterNations\Component\HttpMock\Server;
 use PHPUnit_Framework_TestCase as TestCase;
 use DateTime;
 use DateTimeZone;
-
-class TestableRequest extends Request
-{
-    public function setPathInfo($pathInfo)
-    {
-        $this->pathInfo = $pathInfo;
-    }
-}
+use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 
 class MockBuilderIntegrationTest extends TestCase
 {
@@ -68,12 +61,12 @@ class MockBuilderIntegrationTest extends TestCase
         /** @var Expectation $expectation */
         $expectation = current($expectations);
 
-        $request = new TestableRequest();
+        $request = new TestRequest();
         $request->setMethod('POST');
         $request->setPathInfo('/foo');
 
         $run = 0;
-        $oldValue = ini_set('error_log', 0);
+        $oldValue = ini_set('error_log', '/dev/null');
         foreach ($expectation->getMatcherClosures() as $closure) {
             $this->assertTrue($closure($request));
 
