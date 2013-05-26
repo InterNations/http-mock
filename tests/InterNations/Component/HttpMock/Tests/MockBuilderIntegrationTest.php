@@ -12,6 +12,8 @@ use DateTime;
 use DateTimeZone;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 
+require_once __DIR__ . '/Fixtures/Request.php';
+
 class MockBuilderIntegrationTest extends TestCase
 {
     /** @var MockBuilder */
@@ -63,7 +65,7 @@ class MockBuilderIntegrationTest extends TestCase
 
         $request = new TestRequest();
         $request->setMethod('POST');
-        $request->setPathInfo('/foo');
+        $request->setRequestUri('/foo');
 
         $run = 0;
         $oldValue = ini_set('error_log', '/dev/null');

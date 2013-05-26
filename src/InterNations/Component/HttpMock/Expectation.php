@@ -45,7 +45,7 @@ class Expectation
             // @codingStandardsIgnoreStart
             static function (\Symfony\Component\HttpFoundation\Request $request) {
             // @codingStandardsIgnoreEnd
-                return $request->getPathInfo();
+                return $request->getRequestUri();
             }
         );
         $this->matcher[] = $matcher;

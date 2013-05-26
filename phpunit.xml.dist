@@ -12,7 +12,7 @@
 
     <testsuites>
         <testsuite name="internations/http-mock">
-            <directory>./src/</directory>
+            <directory>./tests/</directory>
         </testsuite>
     </testsuites>
 
