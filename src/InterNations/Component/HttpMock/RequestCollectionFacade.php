@@ -35,6 +35,22 @@ class RequestCollectionFacade
     }
 
     /**
+     * @return UnifiedRequest
+     */
+    public function pop()
+    {
+        return $this->getRecordedRequest('/_request/pop');
+    }
+
+    /**
+     * @return UnifiedRequest
+     */
+    public function shift()
+    {
+        return $this->getRecordedRequest('/_request/shift');
+    }
+
+    /**
      * @param Response $response
      * @param string $path
      * @throws UnexpectedValueException

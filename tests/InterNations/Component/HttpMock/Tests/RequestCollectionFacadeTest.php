@@ -39,6 +39,8 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         return [
             ['latest', '/_request/latest'],
             ['at', '/_request/0', [0]],
+            ['shift', '/_request/shift'],
+            ['pop', '/_request/pop'],
         ];
     }
 
