@@ -91,7 +91,7 @@ class UnifiedRequest
      * Retrieve an HTTP header by name. Performs a case-insensitive search of all headers.
      *
      * @param string $header Header to retrieve.
-     * @param bool $string Set to true to get the header as a string
+     * @param boolean $string Set to true to get the header as a string
      *
      * @return string|Header|null Returns NULL if no matching header is found. Returns a string if $string is set to
      *                            TRUE. Returns a Header object if a matching header is found.
@@ -117,7 +117,7 @@ class UnifiedRequest
     /**
      * Get all headers as a collection
      *
-     * @param bool $asObjects Set to true to retrieve a collection of Header objects
+     * @param boolean $asObjects Set to true to retrieve a collection of Header objects
      *
      * @return Collection Returns a {@see Collection} of all headers
      */
@@ -141,7 +141,7 @@ class UnifiedRequest
      *
      * @param string $header The header to check.
      *
-     * @return bool Returns TRUE or FALSE if the header is present
+     * @return boolean Returns TRUE or FALSE if the header is present
      */
     public function hasHeader($header)
     {
@@ -175,7 +175,7 @@ class UnifiedRequest
      *
      * @param string $directive Directive to check
      *
-     * @return bool
+     * @return boolean
      */
     public function hasCacheControlDirective($directive)
     {
@@ -246,7 +246,7 @@ class UnifiedRequest
     /**
      * Get the port that the request will be sent on if it has been set
      *
-     * @return int|null
+     * @return integer|null
      */
     public function getPort()
     {
@@ -277,7 +277,7 @@ class UnifiedRequest
      * Get the full URL of the request (e.g. 'http://www.guzzle-project.com/')
      * scheme://username:password@domain:port/path?query_string#fragment
      *
-     * @param bool $asObject Set to TRUE to retrieve the URL as a clone of the URL object owned by the request.
+     * @param boolean $asObject Set to TRUE to retrieve the URL as a clone of the URL object owned by the request.
      *
      * @return string|Url
      */
@@ -311,7 +311,7 @@ class UnifiedRequest
     /**
      * Check whether or not the request is a request that resulted from a redirect
      *
-     * @return bool
+     * @return boolean
      */
     public function isRedirect()
     {
@@ -323,7 +323,8 @@ class UnifiedRequest
         if (!$this->wrapped instanceof EntityEnclosingRequestInterface) {
             throw new BadMethodCallException(
                 sprintf(
-                    'Cannot call method "%s" on a request that does not enclose an entity. Did you expect a POST/PUT request instead of %s %s?',
+                    'Cannot call method "%s" on a request that does not enclose an entity.'
+                    . ' Did you expect a POST/PUT request instead of %s %s?',
                     $method,
                     $this->wrapped->getMethod(),
                     $this->wrapped->getPath()
