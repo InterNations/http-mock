@@ -1,7 +1,6 @@
 <?php
 namespace InterNations\Component\HttpMock\PHPUnit;
 
-use Guzzle\Http\Client;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
@@ -58,6 +57,7 @@ class HttpMockFacade
 
             default:
                 throw new RuntimeException(sprintf('Invalid property "%s" read', $property));
+                break;
         }
 
         return $this->services[$property];

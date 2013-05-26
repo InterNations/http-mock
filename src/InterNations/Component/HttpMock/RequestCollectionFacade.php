@@ -4,7 +4,6 @@ namespace InterNations\Component\HttpMock;
 use Guzzle\Http\ClientInterface;
 use Guzzle\Http\Message\Request;
 use Guzzle\Http\Message\RequestFactory;
-use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\Message\Response;
 use InterNations\Component\HttpMock\Request\UnifiedRequest;
 use UnexpectedValueException;
@@ -43,7 +42,9 @@ class RequestCollectionFacade
      */
     private function parseRequestFromResponse(Response $response, $path)
     {
+        // @codingStandardsIgnoreStart
         $requestInfo = @unserialize($response->getBody());
+        // @codingStandardsIgnoreEnd
 
         if ($requestInfo === false) {
             throw new UnexpectedValueException(
