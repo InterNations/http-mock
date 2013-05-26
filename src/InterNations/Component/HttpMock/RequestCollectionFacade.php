@@ -7,6 +7,7 @@ use Guzzle\Http\Message\RequestFactory;
 use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\Message\Response;
 use InterNations\Component\HttpMock\Request\UnifiedRequest;
+use UnexpectedValueException;
 
 class RequestCollectionFacade
 {
@@ -26,14 +27,62 @@ class RequestCollectionFacade
     }
 
     /**
-     * @param Response $response
-     * @return RequestInterface
+     * @param integer $position
+     * @return UnifiedRequest
      */
-    private function parseRequestFromResponse(Response $response)
+    public function at($position)
     {
-        $requestFactory = RequestFactory::getInstance();
+       return $this->getRecordedRequest('/_request/' . $position);
+    }
 
-        return new UnifiedRequest($requestFactory->fromMessage($response->getBody()));
+    /**
+     * @param Response $response
+     * @param string $path
+     * @throws UnexpectedValueException
+     * @return UnifiedRequest
+     */
+    private function parseRequestFromResponse(Response $response, $path)
+    {
+        $requestInfo = @unserialize($response->getBody());
+
+        if ($requestInfo === false) {
+            throw new UnexpectedValueException(
+                sprintf(
+                    'Cannot deserialize response from "%s": "%s"',
+                    $path,
+                    $response->getBody()
+                )
+            );
+
+        }
+
+        $requestAsString = $requestInfo['request'];
+        $server = $requestInfo['server'];
+
+        $requestFactory = RequestFactory::getInstance();
+        $request = $requestFactory->fromMessage($requestAsString);
+
+        if (isset($server['HTTP_HOST'])) {
+            $request->setHost($server['HTTP_HOST']);
+        }
+
+        if (isset($server['HTTP_PORT'])) {
+            $request->setPort($server['HTTP_PORT']);
+        }
+
+        if (isset($server['PHP_AUTH_USER'])) {
+            $request->setAuth(
+                $server['PHP_AUTH_USER'],
+                isset($server['PHP_AUTH_PW']) ? $server['PHP_AUTH_PW'] : null
+            );
+        }
+
+        $params = [];
+        if (isset($server['HTTP_USER_AGENT'])) {
+            $params['userAgent'] = $server['HTTP_USER_AGENT'];
+        }
+
+        return new UnifiedRequest($request, $params);
     }
 
     private function getRecordedRequest($path)
@@ -42,6 +91,30 @@ class RequestCollectionFacade
             ->get($path)
             ->send();
 
-        return $this->parseRequestFromResponse($response);
+        $statusCode = $response->getStatusCode();
+        if ($statusCode !== 200) {
+            throw new UnexpectedValueException(
+                sprintf(
+                    'Expected status code 200 from "%s", got %d',
+                    $path,
+                    $statusCode
+                )
+            );
+        }
+
+        $contentType = $response->hasHeader('Content-Type')
+            ? $response->getTokenizedHeader('content-type')->get(0)
+            : '';
+        if ($contentType !== 'text/plain') {
+            throw new UnexpectedValueException(
+                sprintf(
+                    'Expected content type "text/plain" from "%s", got "%s"',
+                    $path,
+                    $contentType
+                )
+            );
+        }
+
+        return $this->parseRequestFromResponse($response, $path);
     }
 }

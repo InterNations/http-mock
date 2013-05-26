@@ -100,11 +100,14 @@ $app->post(
 
 $app->error(
     static function (Exception $e) use ($app) {
-        /** @var Request $request */
-        $request = $app['request'];
-
         if ($e instanceof NotFoundHttpException) {
-            append($request, 'requests', (string) $request);
+            /** @var Request $request */
+            $request = $app['request'];
+            append(
+                $request,
+                'requests',
+                serialize(['server' => $request->server->all(), 'request' => (string) $request])
+            );
 
             $expectations = read($request, 'expectations');
             foreach ($expectations as $expectation) {

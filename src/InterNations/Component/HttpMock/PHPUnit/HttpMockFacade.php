@@ -2,39 +2,30 @@
 namespace InterNations\Component\HttpMock\PHPUnit;
 
 use Guzzle\Http\Client;
-use Guzzle\Http\Message\RequestFactory;
-use Guzzle\Http\Message\RequestInterface;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
+use InterNations\Component\HttpMock\RequestCollectionFacade;
 use InterNations\Component\HttpMock\Server;
+use RuntimeException;
 
+/**
+ * @property-read Server $server The HTTP mock server that is currently running
+ * @property-read MatcherFactory $matches An instance of the matcher factory
+ * @property-read MockBuilder $mock An instance of the mock builder
+ * @property-read RequestCollectionFacade $requests Convenient access to recorded requests
+ * @property-read Client $client A pre configured HTTP for client for the currently running server
+ */
 class HttpMockFacade
 {
     /**
-     * @var Server
+     * @var array
      */
-    public $server;
-
-    /**
-     * @var MatcherFactory
-     */
-    public $matches;
-
-    /**
-     * @var MockBuilder
-     */
-    public $mock;
-
-    /**
-     * @var Client
-     */
-    public $client;
+    private $services = [];
 
     public function __construct($port, $host)
     {
-        $this->server = new Server($port, $host);
-        $this->server->start();
-        $this->initBuilder();
+        $this->services['server'] = new Server($port, $host);
+        $this->services['server']->start();
     }
 
     public function setUp()
@@ -42,25 +33,38 @@ class HttpMockFacade
         $this->server->setUp($this->mock->getExpectations());
     }
 
-    /**
-     * @return RequestInterface
-     */
-    public function getLatestRequest()
+    public function __get($property)
     {
-        $latestRequestAsString = $this->server->getClient()->get('/_request/latest')->send()->getBody();
-        return RequestFactory::getInstance()->fromMessage($latestRequestAsString);
-    }
+        if (isset($this->services[$property])) {
+            return $this->services[$property];
+        }
 
-    private function initBuilder()
-    {
-        $this->matches = new MatcherFactory();
-        $this->mock = new MockBuilder($this->matches);
-        $this->client = $this->server->getClient();
+        switch ($property) {
+            case 'matches':
+                $this->services['matches'] = new MatcherFactory();
+                break;
+
+            case 'mock':
+                $this->services['mock'] = new MockBuilder($this->matches);
+                break;
+
+            case 'client':
+                $this->services['client'] = $this->server->getClient();
+                break;
+
+            case 'requests':
+                $this->services['requests'] = new RequestCollectionFacade($this->client);
+                break;
+
+            default:
+                throw new RuntimeException(sprintf('Invalid property "%s" read', $property));
+        }
+
+        return $this->services[$property];
     }
 
     public function __clone()
     {
-        $this->initBuilder();
         $this->server->clean();
     }
 }

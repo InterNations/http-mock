@@ -8,6 +8,7 @@ use Guzzle\Http\Message\RequestFactory;
 use Guzzle\Http\Message\Response as GuzzleResponse;
 use Guzzle\Http\Message\EntityEnclosingRequest;
 use Jeremeamia\SuperClosure\SerializableClosure;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Process\Process;
 
@@ -50,7 +51,7 @@ class AppIntegrationTest extends TestCase
             $this->createExpectationParams(
                 [
                     static function ($request) {
-                        return $request instanceof \Symfony\Component\HttpFoundation\Request;
+                        return $request instanceof Request;
                     }
                 ],
                 new Response('fake body', 200)
@@ -99,7 +100,7 @@ class AppIntegrationTest extends TestCase
         );
         $this->assertSame(
             '/req/3',
-            $this->parseRequestFromResponse($this->client->get('/_request/3')->send())->getPath()
+            $this->parseRequestFromResponse($this->client->get('/_request/3')->setAuth('foo', 'bar')->send())->getPath()
         );
     }
 
@@ -124,9 +125,32 @@ class AppIntegrationTest extends TestCase
         $this->assertSame('POST data key "response" must be a serialized Symfony response', (string) $response->getBody());
     }
 
+    public function testServerParamsAreRecorded()
+    {
+        $this->client
+            ->setUserAgent('CUSTOM UA')
+            ->get('/foo')
+            ->setAuth('username', 'password')
+            ->setProtocolVersion('1.0')
+            ->send();
+
+        $latestRequest = unserialize($this->client->get('/_request/latest')->send()->getBody());
+
+        $this->assertSame(HTTP_MOCK_HOST, $latestRequest['server']['SERVER_NAME']);
+        $this->assertSame(HTTP_MOCK_PORT, $latestRequest['server']['SERVER_PORT']);
+        $this->assertSame('username', $latestRequest['server']['PHP_AUTH_USER']);
+        $this->assertSame('password', $latestRequest['server']['PHP_AUTH_PW']);
+        $this->assertSame('HTTP/1.0', $latestRequest['server']['SERVER_PROTOCOL']);
+        $this->assertSame('CUSTOM UA', $latestRequest['server']['HTTP_USER_AGENT']);
+    }
+
     private function parseRequestFromResponse(GuzzleResponse $response)
     {
-        return RequestFactory::getInstance()->fromMessage($response->getBody());
+        $body = unserialize($response->getBody());
+
+        $request = RequestFactory::getInstance()->fromMessage($body['request']);
+
+        return $request;
     }
 
     private function createExpectationParams(array $closures, Response $response)
@@ -136,7 +160,7 @@ class AppIntegrationTest extends TestCase
         }
 
         return [
-            'matcher' => serialize($closures),
+            'matcher'  => serialize($closures),
             'response' => serialize($response),
         ];
     }

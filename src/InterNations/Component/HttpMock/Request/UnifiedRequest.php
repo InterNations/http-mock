@@ -18,9 +18,25 @@ class UnifiedRequest
      */
     private $wrapped;
 
-    public function __construct(RequestInterface $wrapped)
+    /**
+     * @var string
+     */
+    private $userAgent;
+
+    public function __construct(RequestInterface $wrapped, array $params = [])
     {
         $this->wrapped = $wrapped;
+        $this->init($params);
+    }
+
+    /**
+     * Get the user agent of the request
+     *
+     * @return string
+     */
+    public function getUserAgent()
+    {
+        return $this->userAgent;
     }
 
     /**
@@ -333,5 +349,14 @@ class UnifiedRequest
         }
 
         return call_user_func_array([$this->wrapped, $method], $params);
+    }
+
+    private function init(array $params)
+    {
+        foreach ($params as $property => $value) {
+            if (property_exists($this, $property)) {
+                $this->{$property} = $value;
+            }
+        }
     }
 }

@@ -129,4 +129,12 @@ class UnifiedRequestTest extends AbstractTestCase
         );
         call_user_func_array([$this->unifiedRequest, $method], $params);
     }
+
+    public function testUserAgent()
+    {
+        $this->assertNull($this->unifiedRequest->getUserAgent());
+
+        $unifiedRequest = new UnifiedRequest($this->wrappedRequest, ['userAgent' => 'UA']);
+        $this->assertSame('UA', $unifiedRequest->getUserAgent());
+    }
 }

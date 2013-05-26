@@ -50,6 +50,10 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
         $this->http->setUp();
 
         $this->assertSame($path . ' body', (string) $this->http->client->get('/foo')->send()->getBody());
+
+        $request = $this->http->requests->latest();
+        $this->assertSame('GET', $request->getMethod());
+        $this->assertSame($path, $request->getPath());
     }
 
     public function testErrorLogOutput()
