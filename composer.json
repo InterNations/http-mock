@@ -15,11 +15,11 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "git://github.com/lstrojny/guzzle.git"
+            "url": "https://github.com/lstrojny/guzzle.git"
         },
         {
             "type": "vcs",
-            "url": "git://github.com/lstrojny/super_closure.git"
+            "url": "https://github.com/lstrojny/super_closure.git"
         }
     ],
      "require": {
