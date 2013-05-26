@@ -6,7 +6,7 @@ php:
 
 before_script:
   - wget http://getcomposer.org/composer.phar
-  - php composer.phar install --dev
+  - php composer.phar install --dev --no-interaction
 
 script:
   - ./vendor/bin/phpcs --standard=vendor/internations/kodierungsregelwerksammlung/ruleset.xml ./src/
