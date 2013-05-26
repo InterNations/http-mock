@@ -12,15 +12,25 @@
             "email": "max.beutel@internations.org"
         }
     ],
-    "require": {
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git://github.com/lstrojny/guzzle.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git://github.com/lstrojny/super_closure.git"
+        }
+    ],
+     "require": {
         "silex/silex": "1.0.*@dev",
-        "guzzle/guzzle": "3.*",
+        "guzzle/guzzle": "dev-master#c7c1def18b4ee83dc9dc8328b67b9da7837947b7",
         "symfony/process": "2.*@dev",
-        "jeremeamia/superclosure": "dev-master",
-        "jeremeamia/functionparser": "*"
+        "jeremeamia/superclosure": "dev-master#223b9a639f8526748111621b75a8c74010c00e6f"
     },
     "require-dev": {
         "internations/kodierungsregelwerksammlung": "dev-master",
+        "internations/testing-component": "dev-master",
         "phpunit/phpunit": "3.*"
     },
     "minimum-stability": "dev",

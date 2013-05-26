@@ -1,13 +1,13 @@
 <?php
 namespace InterNations\Component\HttpMock\Matcher;
 
-use SuperClosure\SuperClosure;
+use Jeremeamia\SuperClosure\SerializableClosure;
 use Closure;
 
 interface MatcherInterface
 {
     /**
-     * @return SuperClosure
+     * @return SerializableClosure
      */
     public function getMatcher();
 

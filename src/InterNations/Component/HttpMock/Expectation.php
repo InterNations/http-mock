@@ -4,7 +4,7 @@ namespace InterNations\Component\HttpMock;
 use Symfony\Component\HttpFoundation\Response;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherInterface;
-use SuperClosure\SuperClosure;
+use Jeremeamia\SuperClosure\SerializableClosure;
 use Closure;
 
 class Expectation
@@ -78,7 +78,7 @@ class Expectation
     }
 
     /**
-     * @return SuperClosure[]
+     * @return SerializableClosure[]
      */
     public function getMatcherClosures()
     {

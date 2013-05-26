@@ -8,7 +8,7 @@ use Guzzle\Http\Client;
 use Guzzle\Http\Message\RequestFactory;
 use Guzzle\Http\Message\Response as GuzzleResponse;
 use Guzzle\Http\Message\EntityEnclosingRequest;
-use SuperClosure\SuperClosure;
+use Jeremeamia\SuperClosure\SerializableClosure;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Process\Process;
 
@@ -133,7 +133,7 @@ class AppIntegrationTest extends TestCase
     private function createExpectationParams(array $closures, Response $response)
     {
         foreach ($closures as $index => $closure) {
-            $closures[$index] = new SuperClosure($closure);
+            $closures[$index] = new SerializableClosure($closure);
         }
 
         return [

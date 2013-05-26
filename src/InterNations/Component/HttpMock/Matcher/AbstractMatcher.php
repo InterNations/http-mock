@@ -2,7 +2,7 @@
 namespace InterNations\Component\HttpMock\Matcher;
 
 use Closure;
-use SuperClosure\SuperClosure;
+use Jeremeamia\SuperClosure\SerializableClosure;
 
 abstract class AbstractMatcher implements MatcherInterface
 {
@@ -30,10 +30,14 @@ abstract class AbstractMatcher implements MatcherInterface
 
     public function getMatcher()
     {
-        $matcher = new SuperClosure($this->createMatcher());
-        $extractor = new SuperClosure($this->createExtractor());
+        $matcher = new SerializableClosure($this->createMatcher());
+        $extractor = new SerializableClosure($this->createExtractor());
 
-        return new SuperClosure(
+        return new SerializableClosure(function($request) use ($matcher, $extractor) {
+            return $matcher($extractor($request));
+        });
+
+        return new SerializableClosure(
             // @codingStandardsIgnoreStart
             static function (\Symfony\Component\HttpFoundation\Request $request) use ($matcher, $extractor) {
             // @codingStandardsIgnoreEnd
