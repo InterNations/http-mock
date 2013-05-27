@@ -4,6 +4,7 @@ namespace InterNations\Component\HttpMock;
 use Guzzle\Http\Client;
 use Guzzle\Common\Event;
 use Symfony\Component\Process\Process;
+use RuntimeException;
 
 class Server extends Process
 {
@@ -83,7 +84,7 @@ class Server extends Process
     {
         /** @var Expectation $expectation */
         foreach ($expectations as $expectation) {
-            $this->getClient()->post(
+            $response = $this->getClient()->post(
                 '/_expectation',
                 null,
                 [
@@ -91,6 +92,9 @@ class Server extends Process
                     'response' => serialize($expectation->getResponse())
                 ]
             )->send();
+            if ($response->getStatusCode() !== 201) {
+                throw new RuntimeException('Could not set up expectations');
+            }
         }
     }
 

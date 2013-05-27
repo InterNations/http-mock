@@ -93,4 +93,32 @@ class MockBuilderIntegrationTest extends TestCase
 
         $this->assertContains('CLOSURE MATCHER: POST /foo', $this->server->getErrorOutput());
     }
+
+    public function testCreateTwoExpectationsAfterEachOther()
+    {
+        $this->builder
+            ->when()
+                ->pathIs('/post-resource-1')
+                ->methodIs('POST')
+            ->then()
+                ->statusCode(200)
+                ->body('POST 1')
+        ->end();
+        $this->server->setUp($this->builder->getExpectations());
+
+        $this->builder
+            ->when()
+                ->pathIs('/post-resource-2')
+                ->methodIs($this->matches->regex('/POST/'))
+            ->then()
+                ->statusCode(200)
+                ->body('POST 2')
+            ->end();
+        $this->server->setUp($this->builder->getExpectations());
+
+        $this->assertSame('POST 1', (string) $this->server->getClient()->post('/post-resource-1')->send()->getBody());
+        $this->assertSame('POST 2', (string) $this->server->getClient()->post('/post-resource-2')->send()->getBody());
+        $this->assertSame('POST 1', (string) $this->server->getClient()->post('/post-resource-1')->send()->getBody());
+        $this->assertSame('POST 2', (string) $this->server->getClient()->post('/post-resource-2')->send()->getBody());
+    }
 }

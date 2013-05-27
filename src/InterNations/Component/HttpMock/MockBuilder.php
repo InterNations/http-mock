@@ -28,4 +28,9 @@ class MockBuilder
     {
         return $this->expectations;
     }
+
+    public function resetExpectations()
+    {
+        $this->expectations = [];
+    }
 }

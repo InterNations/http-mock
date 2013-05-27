@@ -113,7 +113,7 @@ $app->error(
             foreach ($expectations as $expectation) {
                 foreach ($expectation['matcher'] as $matcher) {
                     if (!$matcher($request)) {
-                        break 2;
+                        continue 2;
                     }
                 }
 

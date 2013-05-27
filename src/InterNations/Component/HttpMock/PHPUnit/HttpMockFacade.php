@@ -30,6 +30,7 @@ class HttpMockFacade
     public function setUp()
     {
         $this->server->setUp($this->mock->getExpectations());
+        $this->mock->resetExpectations();
     }
 
     public function __get($property)
