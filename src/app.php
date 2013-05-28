@@ -131,14 +131,14 @@ $app->error(
 $app->get(
     '/_request/latest',
     static function (Request $request) {
-        $requests = read($request, 'requests');
-        $requestData = end($requests);
+        $requestData = read($request, 'requests');
+        $requestString = end($requestData);
 
-        if ($request === null) {
+        if (!$requestString) {
             return new Response('No request recorded', 404);
         }
 
-        return new Response($requestData, 200, ['Content-Type' => 'text/plain']);
+        return new Response($requestString, 200, ['Content-Type' => 'text/plain']);
     }
 );
 

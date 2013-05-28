@@ -77,6 +77,11 @@ class AppIntegrationTest extends TestCase
     {
         $this->client->delete('/_all')->send();
 
+        $this->assertSame(404, $this->client->get('/_request/latest')->send()->getStatusCode());
+        $this->assertSame(404, $this->client->get('/_request/0')->send()->getStatusCode());
+        $this->assertSame(404, $this->client->get('/_request/shift')->send()->getStatusCode());
+        $this->assertSame(404, $this->client->get('/_request/pop')->send()->getStatusCode());
+
         $this->client->get('/req/0')->send();
         $this->client->get('/req/1')->send();
         $this->client->get('/req/2')->send();
