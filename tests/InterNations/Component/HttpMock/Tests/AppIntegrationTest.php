@@ -168,6 +168,37 @@ class AppIntegrationTest extends TestCase
         $this->assertSame('CUSTOM UA', $latestRequest['server']['HTTP_USER_AGENT']);
     }
 
+    public function testNewestExpectationsAreFirstEvaluated()
+    {
+        $this->client->post(
+            '/_expectation',
+            null,
+            $this->createExpectationParams(
+                [
+                    static function ($request) {
+                        return $request instanceof Request;
+                    }
+                ],
+                new Response('first', 200)
+            )
+        )->send();
+        $this->assertSame('first', $this->client->get('/')->send()->getBody(true));
+
+        $this->client->post(
+            '/_expectation',
+            null,
+            $this->createExpectationParams(
+                [
+                    static function ($request) {
+                        return $request instanceof Request;
+                    }
+                ],
+                new Response('second', 200)
+            )
+        )->send();
+        $this->assertSame('second', $this->client->get('/')->send()->getBody(true));
+    }
+
     private function parseRequestFromResponse(GuzzleResponse $response)
     {
         $body = unserialize($response->getBody());

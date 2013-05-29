@@ -37,6 +37,12 @@ function append(Request $request, $name, $data) {
     store($request, $name, $list);
 }
 
+function prepend(Request $request, $name, $data) {
+    $list = read($request, $name);
+    array_unshift($list, $data);
+    store($request, $name, $list);
+}
+
 function storage_file_name(Request $request, $name) {
     return __DIR__ . '/../state/' . $name . '-' . $request->server->get('SERVER_PORT');
 }
@@ -92,7 +98,7 @@ $app->post(
         // Fix issue with silex default error handling
         $response->headers->set('X-Status-Code', $response->getStatusCode());
 
-        append($request, 'expectations', ['matcher' => $matcher, 'response' => $response]);
+        prepend($request, 'expectations', ['matcher' => $matcher, 'response' => $response]);
 
         return new Response('', 201);
     }
