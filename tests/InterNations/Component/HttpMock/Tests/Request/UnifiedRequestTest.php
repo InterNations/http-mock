@@ -49,8 +49,6 @@ class UnifiedRequestTest extends AbstractTestCase
             ['getUrl'],
             ['getCookies'],
             ['isRedirect'],
-            ['getHeaders', [false]],
-            ['getHeaders', [true]],
             ['getHeader', ['header']],
             ['getTokenizedHeader', ['header']],
             ['hasHeader', ['header']],
@@ -59,7 +57,6 @@ class UnifiedRequestTest extends AbstractTestCase
             ['getUrl', [false]],
             ['getUrl', [true]],
             ['getCookie', ['cookieName']],
-            ['getHeader', ['header', true]],
             ['getTokenizedHeader', ['header', 'token']],
         ];
     }
