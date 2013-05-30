@@ -100,6 +100,10 @@ class Server extends Process
 
     public function clean()
     {
+        if (!$this->isRunning()) {
+            $this->start();
+        }
+
         $this->getClient()->delete('/_all')->send();
 
         $this->clearErrorOutput();

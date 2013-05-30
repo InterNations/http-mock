@@ -86,4 +86,16 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
         $this->assertSame(404, $response->getStatusCode());
         $this->assertSame('No matching expectation found', (string) $response->getBody());
     }
+
+    public function testStopServer()
+    {
+        $this->http->server->stop();
+    }
+
+    /** @depends testStopServer */
+    public function testHttpServerIsRestartedIfATestStopsIt()
+    {
+        $response = $this->http->client->get('/')->send();
+        $this->assertSame(404, $response->getStatusCode());
+    }
 }
