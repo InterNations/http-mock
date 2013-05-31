@@ -1,7 +1,6 @@
 <?php
 namespace InterNations\Component\HttpMock\PHPUnit;
 
-use Guzzle\Http\Client;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
