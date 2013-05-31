@@ -19,9 +19,7 @@ class MockBuilder
 
     public function once()
     {
-        $this->limiter = static function ($runs) {
-            return $runs === 0;
-        };
+        $this->exactly(1);
         return $this;
     }
 
