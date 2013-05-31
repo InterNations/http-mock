@@ -26,15 +26,16 @@ class Expectation
     private $matcherFactory;
 
     /**
-     * @var Response
+     * @var ResponseBuilder
      */
-    private $response;
+    private $responseBuilder;
+
 
     public function __construct(MockBuilder $mockBuilder, MatcherFactory $matcherFactory)
     {
         $this->mockBuilder = $mockBuilder;
         $this->matcherFactory = $matcherFactory;
-        $this->response = new Response(200);
+        $this->responseBuilder = new ResponseBuilder($this->mockBuilder);
     }
 
     public function pathIs($matcher)
@@ -90,37 +91,11 @@ class Expectation
 
     public function then()
     {
-        return $this;
-    }
-
-    public function statusCode($statusCode)
-    {
-        $this->response->setStatusCode($statusCode);
-
-        return $this;
-    }
-
-    public function body($body)
-    {
-        $this->response->setContent($body);
-
-        return $this;
-    }
-
-    public function header($header, $value)
-    {
-        $this->response->headers->set($header, $value);
-
-        return $this;
-    }
-
-    public function end()
-    {
-        return $this->mockBuilder;
+        return $this->responseBuilder;
     }
 
     public function getResponse()
     {
-        return $this->response;
+        return $this->responseBuilder->getResponse();
     }
 }
