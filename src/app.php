@@ -43,6 +43,12 @@ function prepend(Request $request, $name, $data) {
     store($request, $name, $list);
 }
 
+function silent_deserialize($serialized) {
+    // @codingStandardsIgnoreStart
+    return @unserialize($serialized);
+    // @codingStandardsIgnoreEnd
+}
+
 function storage_file_name(Request $request, $name) {
     return __DIR__ . '/../state/' . $name . '-' . $request->server->get('SERVER_PORT');
 }
@@ -73,9 +79,7 @@ $app->post(
 
         $matcher = [];
         if ($request->request->has('matcher')) {
-            // @codingStandardsIgnoreStart
-            $matcher = @unserialize($request->request->get('matcher'));
-            // @codingStandardsIgnoreEnd
+            $matcher = silent_deserialize($request->request->get('matcher'));
             $validator = static function ($closure) {
                 return is_callable($closure);
             };
@@ -88,16 +92,14 @@ $app->post(
             return new Response('POST data key "response" not found in POST data', 417);
         }
 
-        // @codingStandardsIgnoreStart
-        $response = @unserialize($request->request->get('response'));
-        // @codingStandardsIgnoreEnd
+        $response = silent_deserialize($request->request->get('response'));
         if (!$response instanceof Response) {
             return new Response('POST data key "response" must be a serialized Symfony response', 417);
         }
 
         $limiter = null;
         if ($request->request->has('limiter')) {
-            $limiter = @unserialize($request->request->get('limiter'));
+            $limiter = silent_deserialize($request->request->get('limiter'));
             if (!is_callable($limiter)) {
                 return new Response('POST data key "limiter" must be a serialized closure', 417);
             }
