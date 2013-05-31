@@ -98,4 +98,52 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
         $response = $this->http->client->get('/')->send();
         $this->assertSame(404, $response->getStatusCode());
     }
+
+    public function testLimitDurationOfAResponse()
+    {
+        $this->http->mock
+            ->once()
+            ->when()
+                ->methodIs('POST')
+            ->then()
+                ->body('POST METHOD')
+            ->end();
+        $this->http->setUp();
+        $firstResponse = $this->http->client->post('/')->send();
+        $this->assertSame(200, $firstResponse->getStatusCode());
+        $secondResponse = $this->http->client->post('/')->send();
+        $this->assertSame(410, $secondResponse->getStatusCode());
+        $this->assertSame('Expectation no longer applicable', $secondResponse->getBody(true));
+
+        $this->http->mock
+            ->exactly(2)
+            ->when()
+                ->methodIs('POST')
+            ->then()
+                ->body('POST METHOD')
+            ->end();
+        $this->http->setUp();
+        $firstResponse = $this->http->client->post('/')->send();
+        $this->assertSame(200, $firstResponse->getStatusCode());
+        $secondResponse = $this->http->client->post('/')->send();
+        $this->assertSame(200, $secondResponse->getStatusCode());
+        $thirdResponse = $this->http->client->post('/')->send();
+        $this->assertSame(410, $thirdResponse->getStatusCode());
+        $this->assertSame('Expectation no longer applicable', $thirdResponse->getBody(true));
+
+        $this->http->mock
+            ->any()
+            ->when()
+                ->methodIs('POST')
+            ->then()
+                ->body('POST METHOD')
+            ->end();
+        $this->http->setUp();
+        $firstResponse = $this->http->client->post('/')->send();
+        $this->assertSame(200, $firstResponse->getStatusCode());
+        $secondResponse = $this->http->client->post('/')->send();
+        $this->assertSame(200, $secondResponse->getStatusCode());
+        $thirdResponse = $this->http->client->post('/')->send();
+        $this->assertSame(200, $thirdResponse->getStatusCode());
+    }
 }

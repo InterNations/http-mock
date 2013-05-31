@@ -95,10 +95,22 @@ $app->post(
             return new Response('POST data key "response" must be a serialized Symfony response', 417);
         }
 
+        $limiter = null;
+        if ($request->request->has('limiter')) {
+            $limiter = @unserialize($request->request->get('limiter'));
+            if (!is_callable($limiter)) {
+                return new Response('POST data key "limiter" must be a serialized closure', 417);
+            }
+        }
+
         // Fix issue with silex default error handling
         $response->headers->set('X-Status-Code', $response->getStatusCode());
 
-        prepend($request, 'expectations', ['matcher' => $matcher, 'response' => $response]);
+        prepend(
+            $request,
+            'expectations',
+            ['matcher' => $matcher, 'response' => $response, 'limiter' => $limiter, 'runs' => 0]
+        );
 
         return new Response('', 201);
     }
@@ -115,18 +127,28 @@ $app->error(
                 serialize(['server' => $request->server->all(), 'request' => (string) $request])
             );
 
+            $notFoundResponse = new Response('No matching expectation found', 404);
+
             $expectations = read($request, 'expectations');
-            foreach ($expectations as $expectation) {
+            foreach ($expectations as $pos => $expectation) {
                 foreach ($expectation['matcher'] as $matcher) {
                     if (!$matcher($request)) {
                         continue 2;
                     }
                 }
 
+                if (isset($expectation['limiter']) && !$expectation['limiter']($expectation['runs'])) {
+                    $notFoundResponse = new Response('Expectation no longer applicable', 410);
+                    continue;
+                }
+
+                ++$expectations[$pos]['runs'];
+                store($request, 'expectations', $expectations);
+
                 return $expectation['response'];
             }
 
-            return new Response('No matching expectation found', 404);
+            return $notFoundResponse;
         }
 
         $code = ($e instanceof HttpException) ? $e->getStatusCode() : 500;

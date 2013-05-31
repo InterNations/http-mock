@@ -128,7 +128,7 @@ class AppIntegrationTest extends TestCase
         $this->assertSame(404, $this->client->get('/_request/2')->send()->getStatusCode());
     }
 
-    public function testErrorWhenNoMatchersPassed()
+    public function testErrorHandling()
     {
         $this->client->delete('/_all')->send();
 
@@ -147,6 +147,10 @@ class AppIntegrationTest extends TestCase
         $response = $this->client->post('/_expectation', null, ['response' => null])->send();
         $this->assertSame(417, $response->getStatusCode());
         $this->assertSame('POST data key "response" must be a serialized Symfony response', (string) $response->getBody());
+
+        $response = $this->client->post('/_expectation', null, ['response' => serialize(new Response()), 'limiter' => 'foo'])->send();
+        $this->assertSame(417, $response->getStatusCode());
+        $this->assertSame('POST data key "limiter" must be a serialized closure', (string) $response->getBody());
     }
 
     public function testServerParamsAreRecorded()

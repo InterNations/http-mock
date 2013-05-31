@@ -89,7 +89,8 @@ class Server extends Process
                 null,
                 [
                     'matcher'  => serialize($expectation->getMatcherClosures()),
-                    'response' => serialize($expectation->getResponse())
+                    'limiter'  => serialize($expectation->getLimiter()),
+                    'response' => serialize($expectation->getResponse()),
                 ]
             )->send();
             if ($response->getStatusCode() !== 201) {

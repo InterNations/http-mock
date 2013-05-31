@@ -30,12 +30,17 @@ class Expectation
      */
     private $responseBuilder;
 
+    /**
+     * @var Closure
+     */
+    private $limiter;
 
-    public function __construct(MockBuilder $mockBuilder, MatcherFactory $matcherFactory)
+    public function __construct(MockBuilder $mockBuilder, MatcherFactory $matcherFactory, Closure $limiter)
     {
         $this->mockBuilder = $mockBuilder;
         $this->matcherFactory = $matcherFactory;
         $this->responseBuilder = new ResponseBuilder($this->mockBuilder);
+        $this->limiter = $limiter;
     }
 
     public function pathIs($matcher)
@@ -97,5 +102,10 @@ class Expectation
     public function getResponse()
     {
         return $this->responseBuilder->getResponse();
+    }
+
+    public function getLimiter()
+    {
+        return new SerializableClosure($this->limiter);
     }
 }
