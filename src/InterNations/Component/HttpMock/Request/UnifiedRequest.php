@@ -107,14 +107,13 @@ class UnifiedRequest
      * Retrieve an HTTP header by name. Performs a case-insensitive search of all headers.
      *
      * @param string $header Header to retrieve.
-     * @param boolean $string Set to true to get the header as a string
      *
-     * @return string|Header|null Returns NULL if no matching header is found. Returns a string if $string is set to
-     *                            TRUE. Returns a Header object if a matching header is found.
+     * @return string|Header|null Returns NULL if no matching header is found.
+     *                            Returns a Header object if found.
      */
-    public function getHeader($header, $string = false)
+    public function getHeader($header)
     {
-        return $this->wrapped->getHeader($header, $string);
+        return $this->wrapped->getHeader($header);
     }
 
     /**
@@ -133,13 +132,11 @@ class UnifiedRequest
     /**
      * Get all headers as a collection
      *
-     * @param boolean $asObjects Set to true to retrieve a collection of Header objects
-     *
-     * @return Collection Returns a {@see Collection} of all headers
+     * @return Guzzle\Http\Message\Header\HeaderCollection
      */
-    public function getHeaders($asObjects = false)
+    public function getHeaders()
     {
-        return $this->wrapped->getHeaders($asObjects);
+        return $this->wrapped->getHeaders();
     }
 
     /**
