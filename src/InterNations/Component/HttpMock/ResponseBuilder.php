@@ -10,7 +10,7 @@ class ResponseBuilder
     /** @var MockBuilder */
     private $mockBuilder;
 
-    /** @var Response */
+    /** @var CallbackResponse */
     private $response;
 
     public function __construct(MockBuilder $mockBuilder)

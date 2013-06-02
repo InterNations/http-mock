@@ -151,7 +151,6 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
     public function testCallbackOnResponse()
     {
         $this->http->mock
-            ->any()
             ->when()
                 ->methodIs('POST')
             ->then()
@@ -159,5 +158,22 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
             ->end();
         $this->http->setUp();
         $this->assertSame('CALLBACK', $this->http->client->post('/')->send()->getBody(true));
+    }
+
+    public function testComplexResponse()
+    {
+        $this->http->mock
+            ->when()
+                ->methodIs('POST')
+            ->then()
+                ->body('BODY')
+                ->statusCode(201)
+                ->header('X-Foo', 'Bar')
+            ->end();
+        $this->http->setUp();
+        $response = $this->http->client->post('/')->send();
+        $this->assertSame('BODY', $response->getBody(true));
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertSame('Bar', $response->getHeader('X-Foo', true));
     }
 }
