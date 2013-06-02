@@ -3,6 +3,7 @@ namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
+use Symfony\Component\HttpFoundation\Response;
 
 class HttpMockPHPUnitIntegrationTest extends TestCase
 {
@@ -145,5 +146,18 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
         $this->assertSame(200, $secondResponse->getStatusCode());
         $thirdResponse = $this->http->client->post('/')->send();
         $this->assertSame(200, $thirdResponse->getStatusCode());
+    }
+
+    public function testCallbackOnResponse()
+    {
+        $this->http->mock
+            ->any()
+            ->when()
+                ->methodIs('POST')
+            ->then()
+                ->callback(static function(Response $response) {$response->setContent('CALLBACK');})
+            ->end();
+        $this->http->setUp();
+        $this->assertSame('CALLBACK', $this->http->client->post('/')->send()->getBody(true));
     }
 }

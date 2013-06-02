@@ -1,7 +1,9 @@
 <?php
 namespace InterNations\Component\HttpMock;
 
-use Symfony\Component\HttpFoundation\Response;
+use InterNations\Component\HttpMock\Response\CallbackResponse;
+use Closure;
+use Jeremeamia\SuperClosure\SerializableClosure;
 
 class ResponseBuilder
 {
@@ -14,7 +16,7 @@ class ResponseBuilder
     public function __construct(MockBuilder $mockBuilder)
     {
         $this->mockBuilder = $mockBuilder;
-        $this->response = new Response();
+        $this->response = new CallbackResponse();
     }
 
     public function statusCode($statusCode)
@@ -27,6 +29,13 @@ class ResponseBuilder
     public function body($body)
     {
         $this->response->setContent($body);
+
+        return $this;
+    }
+
+    public function callback(Closure $callback)
+    {
+        $this->response->setCallback(new SerializableClosure($callback));
 
         return $this;
     }
