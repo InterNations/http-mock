@@ -98,20 +98,20 @@ RECORDED REQUEST
 ```
 
 ### Shift recorded request
-``
+```
 GET /_request/shift
 Content-Type: text/plain
 
 RECORDED REQUEST
-``
+```
 
 ### Pop recorded request
-``
+```
 GET /_request/pop
 Content-Type: text/plain
 
 RECORDED REQUEST
-``
+```
 
 ### Deleting expectations
 ```
