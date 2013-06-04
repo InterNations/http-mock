@@ -77,6 +77,7 @@ POST /_expectation
 {
     response (required): serialized Symfony response
     matcher (optional): serialized list of closures
+    limiter (optional): serialized closure that limits the validity of the expectation
 }
 ```
 
@@ -95,6 +96,22 @@ Content-Type: text/plain
 
 RECORDED REQUEST
 ```
+
+### Shift recorded request
+``
+GET /_request/shift
+Content-Type: text/plain
+
+RECORDED REQUEST
+``
+
+### Pop recorded request
+``
+GET /_request/pop
+Content-Type: text/plain
+
+RECORDED REQUEST
+``
 
 ### Deleting expectations
 ```
