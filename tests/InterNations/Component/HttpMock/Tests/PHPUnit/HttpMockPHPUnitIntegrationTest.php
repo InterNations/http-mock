@@ -77,7 +77,7 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
             $this->tearDown();
             $this->fail('Exception expected');
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            $this->assertContains('HTTP mock server error log should be empty', $e->getMessage());
+            $this->assertContains('HTTP mock server standard error output should be empty', $e->getMessage());
         }
     }
 

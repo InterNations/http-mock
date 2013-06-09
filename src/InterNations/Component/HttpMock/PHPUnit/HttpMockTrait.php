@@ -46,7 +46,11 @@ trait HttpMockTrait
 
         $http = $this->http;
         $this->http = null;
-        $this->assertSame('', $http->server->getErrorOutput(), 'HTTP mock server error log should be empty');
+        $this->assertSame(
+            '',
+            (string) $http->server->getIncrementalErrorOutput(),
+            'HTTP mock server standard error output should be empty'
+        );
     }
 
     protected static function tearDownHttpMockAfterClass()

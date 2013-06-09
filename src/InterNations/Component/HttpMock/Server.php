@@ -16,8 +16,6 @@ class Server extends Process
 
     private $client;
 
-    private $stderr;
-
     public function __construct($port, $host)
     {
         $this->port = $port;
@@ -67,18 +65,6 @@ class Server extends Process
         return sprintf('%s:%d', $this->host, $this->port);
     }
 
-    public function addErrorOutput($line)
-    {
-        $this->stderr .= $line;
-    }
-
-    public function getErrorOutput()
-    {
-        $this->updateErrorOutput();
-
-        return $this->stderr;
-    }
-
     /**
      * @param Expectation[] $expectations
      * @throws RuntimeException
@@ -109,14 +95,6 @@ class Server extends Process
         }
 
         $this->getClient()->delete('/_all')->send();
-
-        $this->clearErrorOutput();
-    }
-
-    private function clearErrorOutput()
-    {
-        // Clear error output
-        $this->stderr = '';
     }
 
     private function pollWait()
