@@ -32,14 +32,7 @@ class Server extends Process
     public function start($callback = null)
     {
         parent::start($callback);
-        foreach (FibonacciFactory::sequence(50000, 10000) as $sleepTime) {
-            try {
-                usleep($sleepTime);
-                $this->getClient()->head('/_me')->send();
-                break;
-            } catch (CurlException $e) {
-            }
-        }
+        $this->pollWait();
     }
 
     public function stop($timeout = 10, $signal = null)
@@ -124,5 +117,18 @@ class Server extends Process
     {
         // Clear error output
         $this->stderr = '';
+    }
+
+    private function pollWait()
+    {
+        foreach (FibonacciFactory::sequence(50000, 10000) as $sleepTime) {
+            try {
+                usleep($sleepTime);
+                $this->getClient()->head('/_me')->send();
+                break;
+            } catch (CurlException $e) {
+                continue;
+            }
+        }
     }
 }
