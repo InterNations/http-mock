@@ -3,8 +3,10 @@ namespace InterNations\Component\HttpMock;
 
 use Guzzle\Http\Client;
 use Guzzle\Common\Event;
+use hmmmath\Fibonacci\FibonacciFactory;
 use Symfony\Component\Process\Process;
 use RuntimeException;
+use Guzzle\Http\Exception\CurlException;
 
 class Server extends Process
 {
@@ -30,7 +32,14 @@ class Server extends Process
     public function start($callback = null)
     {
         parent::start($callback);
-        sleep(1);
+        foreach (FibonacciFactory::sequence(50000, 10000) as $sleepTime) {
+            try {
+                usleep($sleepTime);
+                $this->getClient()->head('/_me')->send();
+                break;
+            } catch (CurlException $e) {
+            }
+        }
     }
 
     public function stop($timeout = 10, $signal = null)
@@ -79,6 +88,7 @@ class Server extends Process
 
     /**
      * @param Expectation[] $expectations
+     * @throws RuntimeException
      */
     public function setUp(array $expectations)
     {
