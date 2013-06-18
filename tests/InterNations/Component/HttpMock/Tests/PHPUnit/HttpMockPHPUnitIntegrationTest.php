@@ -176,4 +176,10 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', $response->getHeader('X-Foo', true));
     }
+
+    public function testFatalError()
+    {
+        $this->markTestSkipped('Comment in to test if fatal errors are properly handled');
+        new \PHPUnit_Framework_TestCase();
+    }
 }
