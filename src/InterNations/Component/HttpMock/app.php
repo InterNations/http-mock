@@ -10,13 +10,21 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 $autoloadFiles = [
-    __DIR__ . '/../vendor/autoload.php',
-    __DIR__ . '/../../../autoload.php',
+    __DIR__ . '/../../../../vendor/autoload.php',
+    __DIR__ . '/../../../../../../autoload.php',
 ];
+$autoloaderFound = false;
 foreach ($autoloadFiles as $autoloadFile) {
     if (file_exists($autoloadFile)) {
         require_once $autoloadFile;
+        $autoloaderFound = true;
+        break;
     }
+}
+if (!$autoloaderFound) {
+    throw new Exception(
+        sprintf('Could not locate autoloader file. Tried "%s"', join($autoloadFiles, '", "'))
+    );
 }
 
 function store(Request $request, $name, $data) {
@@ -50,7 +58,7 @@ function silent_deserialize($serialized) {
 }
 
 function storage_file_name(Request $request, $name) {
-    return __DIR__ . '/../state/' . $name . '-' . $request->server->get('SERVER_PORT');
+    return __DIR__ . '/../../../../state/' . $name . '-' . $request->server->get('SERVER_PORT');
 }
 
 function clear(Request $request, $name) {
