@@ -4,7 +4,9 @@ namespace InterNations\Component\HttpMock\PHPUnit;
 use InterNations\Component\HttpMock\Server;
 use SplObjectStorage;
 
+// @codingStandardsIgnoreStart
 final class ServerManager
+// @codingStandardsIgnoreEnd
 {
     /** @var SplObjectStorage|Server[] */
     private $servers;
