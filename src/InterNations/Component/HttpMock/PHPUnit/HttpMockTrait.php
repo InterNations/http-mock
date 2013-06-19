@@ -16,7 +16,7 @@ trait HttpMockTrait
     protected static function setUpHttpMockBeforeClass($port = 28080, $host = 'localhost')
     {
         static::$staticHttp = new HttpMockFacade($port, $host);
-        register_shutdown_function([static::$staticHttp->server, 'stop']);
+        ServerManager::getInstance()->add(static::$staticHttp->server);
     }
 
     protected function setUpHttpMock()
@@ -57,5 +57,6 @@ trait HttpMockTrait
     protected static function tearDownHttpMockAfterClass()
     {
         static::$staticHttp->server->stop();
+        ServerManager::getInstance()->remove(static::$staticHttp->server);
     }
 }
