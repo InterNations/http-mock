@@ -56,9 +56,33 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
         $this->assertSame('GET', $request->getMethod());
         $this->assertSame($path, $request->getPath());
 
+        $request = $this->http->requests->last();
+        $this->assertSame('GET', $request->getMethod());
+        $this->assertSame($path, $request->getPath());
+
+        $request = $this->http->requests->first();
+        $this->assertSame('GET', $request->getMethod());
+        $this->assertSame($path, $request->getPath());
+
         $request = $this->http->requests->at(0);
         $this->assertSame('GET', $request->getMethod());
         $this->assertSame($path, $request->getPath());
+
+        $request = $this->http->requests->pop();
+        $this->assertSame('GET', $request->getMethod());
+        $this->assertSame($path, $request->getPath());
+
+        $this->assertSame($path . ' body', (string) $this->http->client->get('/foo')->send()->getBody());
+
+        $request = $this->http->requests->shift();
+        $this->assertSame('GET', $request->getMethod());
+        $this->assertSame($path, $request->getPath());
+
+        $this->setExpectedException(
+            'UnexpectedValueException',
+            'Expected status code 200 from "/_request/last", got 404'
+        );
+        $this->http->requests->pop();
     }
 
     public function testErrorLogOutput()

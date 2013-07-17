@@ -22,7 +22,23 @@ class RequestCollectionFacade
      */
     public function latest()
     {
-        return $this->getRecordedRequest('/_request/latest');
+        return $this->getRecordedRequest('/_request/last');
+    }
+
+    /**
+     * @return UnifiedRequest
+     */
+    public function last()
+    {
+        return $this->getRecordedRequest('/_request/last');
+    }
+
+    /**
+     * @return UnifiedRequest
+     */
+    public function first()
+    {
+        return $this->getRecordedRequest('/_request/first');
     }
 
     /**
@@ -39,7 +55,7 @@ class RequestCollectionFacade
      */
     public function pop()
     {
-        return $this->getRecordedRequest('/_request/pop');
+        return $this->deleteRecordedRequest('/_request/last');
     }
 
     /**
@@ -47,7 +63,7 @@ class RequestCollectionFacade
      */
     public function shift()
     {
-        return $this->getRecordedRequest('/_request/shift');
+        return $this->deleteRecordedRequest('/_request/first');
     }
 
     /**
@@ -70,7 +86,6 @@ class RequestCollectionFacade
                     $response->getBody()
                 )
             );
-
         }
 
         $requestAsString = $requestInfo['request'];
@@ -108,6 +123,20 @@ class RequestCollectionFacade
             ->get($path)
             ->send();
 
+        return $this->parseResponse($response, $path);
+    }
+
+    private function deleteRecordedRequest($path)
+    {
+        $response = $this->client
+            ->delete($path)
+            ->send();
+
+        return $this->parseResponse($response, $path);
+    }
+
+    private function parseResponse(Response $response, $path)
+    {
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             throw new UnexpectedValueException(

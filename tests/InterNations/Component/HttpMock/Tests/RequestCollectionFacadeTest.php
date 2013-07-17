@@ -30,24 +30,26 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     {
         $this->client = $this->getSimpleMock('Guzzle\Http\ClientInterface');
         $this->facade = new RequestCollectionFacade($this->client);
-        $this->request = new Request('GET', '/_request/latest');
+        $this->request = new Request('GET', '/_request/last');
         $this->request->setClient($this->client);
     }
 
     public static function provideMethodAndUrls()
     {
         return [
-            ['latest', '/_request/latest'],
+            ['latest', '/_request/last'],
+            ['first', '/_request/first'],
+            ['last', '/_request/last'],
             ['at', '/_request/0', [0]],
-            ['shift', '/_request/shift'],
-            ['pop', '/_request/pop'],
+            ['shift', '/_request/first', [], 'delete'],
+            ['pop', '/_request/last', [], 'delete'],
         ];
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestingLatestRequest($method, $path, array $args = [])
+    public function testRequestingLatestRequest($method, $path, array $args = [], $httpMethod = 'get')
     {
-        $this->mockClient($path, $this->createSimpleResponse());
+        $this->mockClient($path, $this->createSimpleResponse(), $httpMethod);
 
         $request = call_user_func_array([$this->facade, $method], $args);
 
@@ -57,9 +59,9 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestLatestResponseWithHttpAuth($method, $path, array $args = [])
+    public function testRequestLatestResponseWithHttpAuth($method, $path, array $args = [], $httpMethod = 'get')
     {
-        $this->mockClient($path, $this->createComplexResponse());
+        $this->mockClient($path, $this->createComplexResponse(), $httpMethod);
 
         $request = call_user_func_array([$this->facade, $method], $args);
 
@@ -74,9 +76,9 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_InvalidStatusCode($method, $path, array $args = [])
+    public function testRequestResponse_InvalidStatusCode($method, $path, array $args = [], $httpMethod = 'get')
     {
-        $this->mockClient($path, $this->createResponseWithInvalidStatusCode());
+        $this->mockClient($path, $this->createResponseWithInvalidStatusCode(), $httpMethod);
 
         $this->setExpectedException(
             'UnexpectedValueException',
@@ -86,9 +88,9 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_EmptyContentType($method, $path, array $args = [])
+    public function testRequestResponse_EmptyContentType($method, $path, array $args = [], $httpMethod = 'get')
     {
-        $this->mockClient($path, $this->createResponseWithEmptyContentType());
+        $this->mockClient($path, $this->createResponseWithEmptyContentType(), $httpMethod);
 
         $this->setExpectedException(
             'UnexpectedValueException',
@@ -98,9 +100,9 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_InvalidContentType($method, $path, array $args = [])
+    public function testRequestResponse_InvalidContentType($method, $path, array $args = [], $httpMethod = 'get')
     {
-        $this->mockClient($path, $this->createResponseWithInvalidContentType());
+        $this->mockClient($path, $this->createResponseWithInvalidContentType(), $httpMethod);
 
         $this->setExpectedException(
             'UnexpectedValueException',
@@ -110,9 +112,9 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_DeserializationError($method, $path, array $args = [])
+    public function testRequestResponse_DeserializationError($method, $path, array $args = [], $httpMethod = 'get')
     {
-        $this->mockClient($path, $this->createResponseThatCannotBeDeserialized());
+        $this->mockClient($path, $this->createResponseThatCannotBeDeserialized(), $httpMethod);
 
         $this->setExpectedException(
             'UnexpectedValueException',
@@ -121,11 +123,11 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         call_user_func_array([$this->facade, $method], $args);
     }
 
-    private function mockClient($path, Response $response)
+    private function mockClient($path, Response $response, $method)
     {
         $this->client
             ->expects($this->once())
-            ->method('get')
+            ->method($method)
             ->with($path)
             ->will($this->returnValue($this->request));
 

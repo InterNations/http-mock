@@ -167,20 +167,6 @@ $app->error(
 );
 
 $app->get(
-    '/_request/latest',
-    static function (Request $request) {
-        $requestData = read($request, 'requests');
-        $requestString = end($requestData);
-
-        if (!$requestString) {
-            return new Response('No request recorded', 404);
-        }
-
-        return new Response($requestString, 200, ['Content-Type' => 'text/plain']);
-    }
-);
-
-$app->get(
     '/_request/{index}',
     static function (Request $request, $index) {
         $requestData = read($request, 'requests');
@@ -192,11 +178,11 @@ $app->get(
     }
 )->assert('index', '\d+');
 
-$app->get(
+$app->delete(
     '/_request/{action}',
     static function (Request $request, $action) {
         $requestData = read($request, 'requests');
-        $fn = 'array_' . $action;
+        $fn = 'array_' . ($action === 'last' ? 'pop' : 'shift');
         $requestString = $fn($requestData);
         store($request, 'requests', $requestData);
         if (!$requestString) {
@@ -205,7 +191,21 @@ $app->get(
 
         return new Response($requestString, 200, ['Content-Type' => 'text/plain']);
     }
-)->assert('action', '(pop|shift)');
+)->assert('index', '(last|first)');
+
+$app->get(
+    '/_request/{action}',
+    static function (Request $request, $action) {
+        $requestData = read($request, 'requests');
+        $fn = 'array_' . ($action === 'last' ? 'pop' : 'shift');
+        $requestString = $fn($requestData);
+        if (!$requestString) {
+            return new Response($action . ' not available', 404);
+        }
+
+        return new Response($requestString, 200, ['Content-Type' => 'text/plain']);
+    }
+)->assert('index', '(last|first)');
 
 $app->delete(
     '/_request',
