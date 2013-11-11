@@ -27,11 +27,13 @@ if (!$autoloaderFound) {
     );
 }
 
-function store(Request $request, $name, $data) {
+function store(Request $request, $name, $data)
+{
     file_put_contents(storage_file_name($request, $name), serialize($data));
 }
 
-function read(Request $request, $name) {
+function read(Request $request, $name)
+{
     $fileName = storage_file_name($request, $name);
     if (!file_exists($fileName)) {
         return [];
@@ -39,29 +41,34 @@ function read(Request $request, $name) {
     return unserialize(file_get_contents($fileName));
 }
 
-function append(Request $request, $name, $data) {
+function append(Request $request, $name, $data)
+{
     $list = read($request, $name);
     $list[] = $data;
     store($request, $name, $list);
 }
 
-function prepend(Request $request, $name, $data) {
+function prepend(Request $request, $name, $data)
+{
     $list = read($request, $name);
     array_unshift($list, $data);
     store($request, $name, $list);
 }
 
-function silent_deserialize($serialized) {
+function silent_deserialize($serialized)
+{
     // @codingStandardsIgnoreStart
     return @unserialize($serialized);
     // @codingStandardsIgnoreEnd
 }
 
-function storage_file_name(Request $request, $name) {
+function storage_file_name(Request $request, $name)
+{
     return __DIR__ . '/../../../../state/' . $name . '-' . $request->server->get('SERVER_PORT');
 }
 
-function clear(Request $request, $name) {
+function clear(Request $request, $name)
+{
     $fileName = storage_file_name($request, $name);
 
     if (file_exists($fileName)) {
