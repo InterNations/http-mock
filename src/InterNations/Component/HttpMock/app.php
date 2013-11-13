@@ -23,7 +23,7 @@ foreach ($autoloadFiles as $autoloadFile) {
 }
 if (!$autoloaderFound) {
     throw new Exception(
-        sprintf('Could not locate autoloader file. Tried "%s"', join($autoloadFiles, '", "'))
+        sprintf('Could not locate autoloader file. Tried "%s"', implode($autoloadFiles, '", "'))
     );
 }
 
