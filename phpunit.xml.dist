@@ -26,10 +26,7 @@
 
     <php>
         <ini name="error_reporting" value="-1"/>
-    </php>
-
-    <php>
-        <ini name="error_reporting" value="-1"/>
+        <ini name="date.timezone" value="Europe/Berlin"/>
         <const name="HTTP_MOCK_PORT" value="38080"/>
         <const name="HTTP_MOCK_HOST" value="localhost"/>
     </php>
