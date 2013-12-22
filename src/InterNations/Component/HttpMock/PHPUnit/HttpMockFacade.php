@@ -40,6 +40,13 @@ class HttpMockFacade
             return $this->services[$property];
         }
 
+        $this->initializeService($property);
+
+        return $this->services[$property];
+    }
+
+    private function initializeService($property)
+    {
         switch ($property) {
             case 'matches':
                 $this->services['matches'] = new MatcherFactory();
@@ -61,8 +68,6 @@ class HttpMockFacade
                 throw new RuntimeException(sprintf('Invalid property "%s" read', $property));
                 break;
         }
-
-        return $this->services[$property];
     }
 
     public function __clone()
