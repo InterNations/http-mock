@@ -14,6 +14,9 @@ use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 
 require_once __DIR__ . '/Fixtures/Request.php';
 
+/**
+ * @large
+ */
 class MockBuilderIntegrationTest extends TestCase
 {
     /** @var MockBuilder */
