@@ -24,8 +24,9 @@ class HttpMockFacade
 
     public function __construct($port, $host)
     {
-        $this->services['server'] = new Server($port, $host);
-        $this->services['server']->start();
+        $server = new Server($port, $host);
+        $server->start();
+        $this->services['server'] = $server;
     }
 
     public function setUp()

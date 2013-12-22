@@ -4,6 +4,7 @@ namespace InterNations\Component\HttpMock;
 use Guzzle\Http\ClientInterface;
 use Guzzle\Http\Message\Request;
 use Guzzle\Http\Message\RequestFactory;
+use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\Message\Response;
 use InterNations\Component\HttpMock\Request\UnifiedRequest;
 use UnexpectedValueException;
@@ -88,12 +89,14 @@ class RequestCollectionFacade
             );
         }
 
-        $requestAsString = $requestInfo['request'];
-        $server = $requestInfo['server'];
+        $request = RequestFactory::getInstance()->fromMessage($requestInfo['request']);
+        $params = $this->configureRequest($request, $requestInfo['server']);
 
-        $requestFactory = RequestFactory::getInstance();
-        $request = $requestFactory->fromMessage($requestAsString);
+        return new UnifiedRequest($request, $params);
+    }
 
+    private function configureRequest(RequestInterface $request, array $server)
+    {
         if (isset($server['HTTP_HOST'])) {
             $request->setHost($server['HTTP_HOST']);
         }
@@ -114,7 +117,7 @@ class RequestCollectionFacade
             $params['userAgent'] = $server['HTTP_USER_AGENT'];
         }
 
-        return new UnifiedRequest($request, $params);
+        return $params;
     }
 
     private function getRecordedRequest($path)
