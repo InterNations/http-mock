@@ -2,7 +2,6 @@
 namespace InterNations\Component\HttpMock\Tests;
 
 use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\EntityEnclosingRequest;
 use Guzzle\Http\Message\Request;
 use Guzzle\Http\Message\Response;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
@@ -19,9 +18,6 @@ class RequestCollectionFacadeTest extends AbstractTestCase
 
     /** @var Request */
     private $request;
-
-    /** @var Response */
-    private $response;
 
     /** @var RequestCollectionFacade */
     private $facade;

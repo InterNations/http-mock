@@ -2,7 +2,7 @@
 namespace InterNations\Component\HttpMock\Tests;
 
 use InterNations\Component\HttpMock\Server;
-use PHPUnit_Framework_TestCase as TestCase;
+use InterNations\Component\Testing\AbstractTestCase;
 use Guzzle\Http\Client;
 use Guzzle\Http\Message\RequestFactory;
 use Guzzle\Http\Message\Response as GuzzleResponse;
@@ -14,8 +14,9 @@ use Symfony\Component\Process\Process;
 
 /**
  * @large
+ * @group integration
  */
-class AppIntegrationTest extends TestCase
+class AppIntegrationTest extends AbstractTestCase
 {
     /**
      * @var Server

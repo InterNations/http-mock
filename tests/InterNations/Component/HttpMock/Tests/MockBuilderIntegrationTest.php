@@ -1,8 +1,6 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests;
 
-use Guzzle\Http\Client;
-use Symfony\Component\HttpFoundation\Request;
 use InterNations\Component\HttpMock\Expectation;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
@@ -16,6 +14,7 @@ require_once __DIR__ . '/Fixtures/Request.php';
 
 /**
  * @large
+ * @group integration
  */
 class MockBuilderIntegrationTest extends TestCase
 {

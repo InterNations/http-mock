@@ -1,11 +1,11 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
-use PHPUnit_Framework_TestCase as TestCase;
+use InterNations\Component\Testing\AbstractTestCase;
 use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
 use Symfony\Component\HttpFoundation\Response;
 
-class HttpMockPHPUnitIntegrationTest extends TestCase
+class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
 {
     use HttpMockTrait;
 
