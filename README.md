@@ -43,7 +43,9 @@ class ExampleTest extends PHPUnit_Framework_TestCase
                 ->methodIs('GET')
                 ->pathIs('/foo')
             ->then()
-                ->body('mocked body')
+                ->stub()
+                    ->body('mocked body')
+                ->end()
             ->end();
         $this->http->setUp();
 
@@ -57,7 +59,9 @@ class ExampleTest extends PHPUnit_Framework_TestCase
                 ->methodIs('POST')
                 ->pathIs('/foo')
             ->then()
-                ->body('mocked body')
+                ->stub()
+                    ->body('mocked body')
+                ->end()
             ->end();
         $this->http->setUp();
 

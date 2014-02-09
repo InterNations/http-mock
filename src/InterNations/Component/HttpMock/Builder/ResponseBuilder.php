@@ -1,9 +1,7 @@
 <?php
 namespace InterNations\Component\HttpMock\Builder;
 
-use InterNations\Component\HttpMock\Response\CallbackResponse;
 use Closure;
-use Jeremeamia\SuperClosure\SerializableClosure;
 
 class ResponseBuilder
 {
@@ -19,11 +17,17 @@ class ResponseBuilder
         $this->stubBuilder = new StubBuilder($this);
     }
 
+    /** @return StubBuilder */
     public function stub()
     {
         return $this->stubBuilder;
     }
 
+    /**
+     * @param integer $statusCode
+     * @deprecated Call stub() before to mark matched path as stubbed
+     * @return ResponseBuilder
+     */
     public function statusCode($statusCode)
     {
         $this->stubBuilder->statusCode($statusCode);
@@ -31,6 +35,11 @@ class ResponseBuilder
         return $this;
     }
 
+    /**
+     * @param string $body
+     * @deprecated Call stub() before to mark matched path as stubbed
+     * @return ResponseBuilder
+     */
     public function body($body)
     {
         $this->stubBuilder->body($body);
@@ -38,6 +47,11 @@ class ResponseBuilder
         return $this;
     }
 
+    /**
+     * @param Closure $callback
+     * @deprecated Call stub() before to mark matched path as stubbed
+     * @return ResponseBuilder
+     */
     public function callback(Closure $callback)
     {
         $this->stubBuilder->callback($callback);
@@ -45,6 +59,12 @@ class ResponseBuilder
         return $this;
     }
 
+    /**
+     * @param string $header
+     * @param string $value
+     * @deprecated Call stub() before to mark matched path as stubbed
+     * @return ResponseBuilder
+     */
     public function header($header, $value)
     {
         $this->stubBuilder->header($header, $value);
@@ -52,6 +72,7 @@ class ResponseBuilder
         return $this;
     }
 
+    /** @return MockBuilder */
     public function end()
     {
         return $this->mockBuilder;
