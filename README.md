@@ -44,12 +44,12 @@ class ExampleTest extends PHPUnit_Framework_TestCase
                 ->pathIs('/foo')
             ->then()
                 ->stub()
-                    ->body('mocked body')
+                    ->body('stubbed body')
                 ->end()
             ->end();
         $this->http->setUp();
 
-        $this->assertSame('mocked body', file_get_contents('http://localhost:8082/foo'));
+        $this->assertSame('stubbed body', file_get_contents('http://localhost:8082/foo'));
     }
 
     public function testAccessingRecordedRequests()
@@ -60,12 +60,12 @@ class ExampleTest extends PHPUnit_Framework_TestCase
                 ->pathIs('/foo')
             ->then()
                 ->stub()
-                    ->body('mocked body')
+                    ->body('stubbed body')
                 ->end()
             ->end();
         $this->http->setUp();
 
-        $this->assertSame('mocked body', $this->http->client->post('http://localhost:8082/foo')->send());
+        $this->assertSame('stubbed body', $this->http->client->post('http://localhost:8082/foo')->send());
 
         $this->assertSame('GET', $this->http->requests->latest()->getMethod());
         $this->assertSame('/foo', $this->http->requests->latest()->getPath());
