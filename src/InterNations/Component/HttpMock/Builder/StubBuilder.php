@@ -1,21 +1,22 @@
 <?php
-namespace InterNations\Component\HttpMock;
+namespace InterNations\Component\HttpMock\Builder;
 
-use InterNations\Component\HttpMock\Response\CallbackResponse;
 use Closure;
+use InterNations\Component\HttpMock\Builder\ResponseBuilder;
+use InterNations\Component\HttpMock\Response\CallbackResponse;
 use Jeremeamia\SuperClosure\SerializableClosure;
 
-class ResponseBuilder
+class StubBuilder
 {
-    /** @var MockBuilder */
-    private $mockBuilder;
+    /** @var ResponseBuilder */
+    private $responseBuilder;
 
     /** @var CallbackResponse */
     private $response;
 
-    public function __construct(MockBuilder $mockBuilder)
+    public function __construct(ResponseBuilder $responseBuilder)
     {
-        $this->mockBuilder = $mockBuilder;
+        $this->responseBuilder = $responseBuilder;
         $this->response = new CallbackResponse();
     }
 
@@ -47,13 +48,13 @@ class ResponseBuilder
         return $this;
     }
 
-    public function end()
-    {
-        return $this->mockBuilder;
-    }
-
     public function getResponse()
     {
         return $this->response;
+    }
+
+    public function end()
+    {
+        return $this->responseBuilder;
     }
 }

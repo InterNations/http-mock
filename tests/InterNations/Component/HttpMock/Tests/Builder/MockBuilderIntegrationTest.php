@@ -1,16 +1,16 @@
 <?php
-namespace InterNations\Component\HttpMock\Tests;
+namespace InterNations\Component\HttpMock\Tests\Builder;
 
 use InterNations\Component\HttpMock\Expectation;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
-use InterNations\Component\HttpMock\MockBuilder;
+use InterNations\Component\HttpMock\Builder\MockBuilder;
 use InterNations\Component\HttpMock\Server;
 use PHPUnit_Framework_TestCase as TestCase;
 use DateTime;
 use DateTimeZone;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 
-require_once __DIR__ . '/Fixtures/Request.php';
+require_once __DIR__ . '/../Fixtures/Request.php';
 
 /**
  * @large

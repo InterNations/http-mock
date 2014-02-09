@@ -46,7 +46,9 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             ->when()
                 ->pathIs($path)
             ->then()
-                ->body($path . ' body')
+                ->stub()
+                    ->body($path . ' body')
+                ->end()
             ->end();
         $this->http->setUp();
 
@@ -131,7 +133,9 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             ->when()
                 ->methodIs('POST')
             ->then()
-                ->body('POST METHOD')
+                ->stub()
+                    ->body('POST METHOD')
+                ->end()
             ->end();
         $this->http->setUp();
         $firstResponse = $this->http->client->post('/')->send();
@@ -145,7 +149,9 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             ->when()
                 ->methodIs('POST')
             ->then()
-                ->body('POST METHOD')
+                ->stub()
+                    ->body('POST METHOD')
+                ->end()
             ->end();
         $this->http->setUp();
         $firstResponse = $this->http->client->post('/')->send();
@@ -161,7 +167,9 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             ->when()
                 ->methodIs('POST')
             ->then()
-                ->body('POST METHOD')
+                ->stub()
+                    ->body('POST METHOD')
+                ->end()
             ->end();
         $this->http->setUp();
         $firstResponse = $this->http->client->post('/')->send();
@@ -178,7 +186,9 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             ->when()
                 ->methodIs('POST')
             ->then()
-                ->callback(static function(Response $response) {$response->setContent('CALLBACK');})
+                ->stub()
+                    ->callback(static function(Response $response) {$response->setContent('CALLBACK');})
+                ->end()
             ->end();
         $this->http->setUp();
         $this->assertSame('CALLBACK', $this->http->client->post('/')->send()->getBody(true));
@@ -190,9 +200,11 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             ->when()
                 ->methodIs('POST')
             ->then()
-                ->body('BODY')
-                ->statusCode(201)
-                ->header('X-Foo', 'Bar')
+                ->stub()
+                    ->body('BODY')
+                    ->statusCode(201)
+                    ->header('X-Foo', 'Bar')
+                ->end()
             ->end();
         $this->http->setUp();
         $response = $this->http->client->post('/')->send();

@@ -1,6 +1,7 @@
 <?php
-namespace InterNations\Component\HttpMock;
+namespace InterNations\Component\HttpMock\Builder;
 
+use InterNations\Component\HttpMock\Expectation;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 
 class MockBuilder
@@ -39,9 +40,7 @@ class MockBuilder
         return $this;
     }
 
-    /**
-     * @return Expectation
-     */
+    /** @return Expectation */
     public function when()
     {
         $this->expectations[] = new Expectation($this, $this->matcherFactory, $this->limiter);

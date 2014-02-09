@@ -1,7 +1,8 @@
 <?php
 namespace InterNations\Component\HttpMock;
 
-use Symfony\Component\HttpFoundation\Response;
+use InterNations\Component\HttpMock\Builder\MockBuilder;
+use InterNations\Component\HttpMock\Builder\ResponseBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherInterface;
@@ -10,29 +11,19 @@ use Closure;
 
 class Expectation
 {
-    /**
-     * @var MatcherInterface[]
-     */
+    /** @var MatcherInterface[] */
     private $matcher = [];
 
-    /**
-     * @var MockBuilder
-     */
+    /** @var MockBuilder */
     private $mockBuilder;
 
-    /**
-     * @var MatcherFactory
-     */
+    /** @var MatcherFactory */
     private $matcherFactory;
 
-    /**
-     * @var ResponseBuilder
-     */
+    /** @var ResponseBuilder */
     private $responseBuilder;
 
-    /**
-     * @var Closure
-     */
+    /** @var Closure */
     private $limiter;
 
     public function __construct(MockBuilder $mockBuilder, MatcherFactory $matcherFactory, Closure $limiter)

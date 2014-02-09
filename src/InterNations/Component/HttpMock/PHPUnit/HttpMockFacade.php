@@ -2,8 +2,8 @@
 namespace InterNations\Component\HttpMock\PHPUnit;
 
 use Guzzle\Http\Client;
+use InterNations\Component\HttpMock\Builder\MockBuilder;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
-use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
 use InterNations\Component\HttpMock\Server;
 use RuntimeException;

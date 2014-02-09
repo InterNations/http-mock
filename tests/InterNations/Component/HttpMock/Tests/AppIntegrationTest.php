@@ -36,6 +36,7 @@ class AppIntegrationTest extends AbstractTestCase
 
     public static function tearDownAfterClass()
     {
+        error_log((string) static::$server1->getErrorOutput());
         static::assertSame('', (string) static::$server1->getOutput());
         static::assertSame('', (string) static::$server1->getErrorOutput());
         static::$server1->stop();
