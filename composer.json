@@ -13,11 +13,10 @@
         }
     ],
      "require": {
-        "silex/silex": "~1.1",
+        "silex/silex": "~1",
         "guzzle/guzzle": "*",
-        "symfony/process": "2.*@dev",
+        "symfony/process": "*",
         "jeremeamia/superclosure": "dev-master",
-        "nikic/php-parser": "v0.9.4 as dev-master",
         "lstrojny/hmmmath": "dev-master"
     },
     "require-dev": {
