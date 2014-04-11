@@ -1,4 +1,4 @@
-# HTTP Mock for PHP [![Build Status](https://travis-ci.org/InterNations/http-mock.svg)](https://travis-ci.org/InterNations/http-mock)
+# HTTP Mock for PHP [![Build Status](https://travis-ci.org/InterNations/http-mock.svg)](https://travis-ci.org/InterNations/http-mock) [![Dependency Status](https://www.versioneye.com/user/projects/53479c42fe0d0720b500006a/badge.png)](https://www.versioneye.com/user/projects/53479c42fe0d0720b500006a)
 
 Mock HTTP requests on the server side in your PHP unit tests.
 
