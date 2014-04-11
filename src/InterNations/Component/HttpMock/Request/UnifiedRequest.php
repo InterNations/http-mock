@@ -4,9 +4,9 @@ namespace InterNations\Component\HttpMock\Request;
 use BadMethodCallException;
 use Guzzle\Common\Collection;
 use Guzzle\Http\EntityBodyInterface;
-use Guzzle\Http\Message\EntityEnclosingRequest;
 use Guzzle\Http\Message\EntityEnclosingRequestInterface;
 use Guzzle\Http\Message\Header;
+use Guzzle\Http\Message\Header\HeaderCollection;
 use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\QueryString;
 use Guzzle\Http\Url;
@@ -108,8 +108,8 @@ class UnifiedRequest
      *
      * @param string $header Header to retrieve.
      *
-     * @return string|Header|null Returns NULL if no matching header is found.
-     *                            Returns a Header object if found.
+     * @return Header|null Returns NULL if no matching header is found.
+     *                     Returns a Header object if found.
      */
     public function getHeader($header)
     {
@@ -117,22 +117,9 @@ class UnifiedRequest
     }
 
     /**
-     * Get a tokenized header as a Collection
-     *
-     * @param string $header Header to retrieve
-     * @param string $token  Token separator
-     *
-     * @return Collection|null
-     */
-    public function getTokenizedHeader($header, $token = ';')
-    {
-        return $this->wrapped->getTokenizedHeader($header, $token);
-    }
-
-    /**
      * Get all headers as a collection
      *
-     * @return Guzzle\Http\Message\Header\HeaderCollection
+     * @return HeaderCollection
      */
     public function getHeaders()
     {
@@ -169,30 +156,6 @@ class UnifiedRequest
     public function getRawHeaders()
     {
         return $this->wrapped->getRawHeaders();
-    }
-
-    /**
-     * Get a Cache-Control directive from the message
-     *
-     * @param string $directive Directive to retrieve
-     *
-     * @return null|string
-     */
-    public function getCacheControlDirective($directive)
-    {
-        return $this->wrapped->getCacheControlDirective($directive);
-    }
-
-    /**
-     * Check if the message has a Cache-Control directive
-     *
-     * @param string $directive Directive to check
-     *
-     * @return boolean
-     */
-    public function hasCacheControlDirective($directive)
-    {
-        return $this->wrapped->hasCacheControlDirective($directive);
     }
 
     /**
@@ -319,16 +282,6 @@ class UnifiedRequest
     public function getCookie($name)
     {
         return $this->wrapped->getCookie($name);
-    }
-
-    /**
-     * Check whether or not the request is a request that resulted from a redirect
-     *
-     * @return boolean
-     */
-    public function isRedirect()
-    {
-        return $this->wrapped->isRedirect();
     }
 
     protected function invokeWrappedIfEntityEnclosed($method, array $params = [])

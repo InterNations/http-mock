@@ -198,7 +198,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $response = $this->http->client->post('/')->send();
         $this->assertSame('BODY', $response->getBody(true));
         $this->assertSame(201, $response->getStatusCode());
-        $this->assertSame('Bar', $response->getHeader('X-Foo', true));
+        $this->assertSame('Bar', (string) $response->getHeader('X-Foo'));
     }
 
     public function testFatalError()

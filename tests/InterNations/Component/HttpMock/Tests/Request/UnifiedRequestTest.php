@@ -48,16 +48,11 @@ class UnifiedRequestTest extends AbstractTestCase
             ['getPassword'],
             ['getUrl'],
             ['getCookies'],
-            ['isRedirect'],
             ['getHeader', ['header']],
-            ['getTokenizedHeader', ['header']],
             ['hasHeader', ['header']],
-            ['getCacheControlDirective', ['directive']],
-            ['hasCacheControlDirective', ['directive']],
             ['getUrl', [false]],
             ['getUrl', [true]],
             ['getCookie', ['cookieName']],
-            ['getTokenizedHeader', ['header', 'token']],
         ];
     }
 
