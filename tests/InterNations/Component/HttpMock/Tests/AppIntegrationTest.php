@@ -136,7 +136,7 @@ class AppIntegrationTest extends AbstractTestCase
     {
         $this->client->delete('/_all')->send();
 
-        $response = $this->client->post('/_expectation', null, ['matcher' => null])->send();
+        $response = $this->client->post('/_expectation', null, ['matcher' => ''])->send();
         $this->assertSame(417, $response->getStatusCode());
         $this->assertSame('POST data key "matcher" must be a serialized list of closures', (string) $response->getBody());
 
@@ -148,7 +148,7 @@ class AppIntegrationTest extends AbstractTestCase
         $this->assertSame(417, $response->getStatusCode());
         $this->assertSame('POST data key "response" not found in POST data', (string) $response->getBody());
 
-        $response = $this->client->post('/_expectation', null, ['response' => null])->send();
+        $response = $this->client->post('/_expectation', null, ['response' => ''])->send();
         $this->assertSame(417, $response->getStatusCode());
         $this->assertSame('POST data key "response" must be a serialized Symfony response', (string) $response->getBody());
 
