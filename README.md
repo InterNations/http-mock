@@ -36,7 +36,7 @@ class ExampleTest extends PHPUnit_Framework_TestCase
         $this->tearDownHttpMock();
     }
 
-    public function testSimpleRequest($path)
+    public function testSimpleRequest()
     {
         $this->http->mock
             ->when()
