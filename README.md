@@ -61,9 +61,9 @@ class ExampleTest extends PHPUnit_Framework_TestCase
             ->end();
         $this->http->setUp();
 
-        $this->assertSame('mocked body', $this->http->client->post('http://localhost:8082/foo')->send());
+        $this->assertSame('mocked body', $this->http->client->post('http://localhost:8082/foo')->send()->getBody(true));
 
-        $this->assertSame('GET', $this->http->requests->latest()->getMethod());
+        $this->assertSame('POST', $this->http->requests->latest()->getMethod());
         $this->assertSame('/foo', $this->http->requests->latest()->getPath());
     }
 }
