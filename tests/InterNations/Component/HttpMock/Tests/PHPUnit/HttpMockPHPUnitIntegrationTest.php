@@ -5,6 +5,7 @@ use InterNations\Component\Testing\AbstractTestCase;
 use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
 use Symfony\Component\HttpFoundation\Response;
 
+/** @large */
 class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
 {
     use HttpMockTrait;
