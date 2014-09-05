@@ -21,7 +21,10 @@ class Server extends Process
         $this->port = $port;
         $this->host = $host;
         parent::__construct(
-            sprintf('exec php -dalways_populate_raw_post_data=-1 -derror_log= -S %s -t public/ public/index.php', $this->getConnectionString()),
+            sprintf(
+                'exec php -dalways_populate_raw_post_data=-1 -derror_log= -S %s -t public/ public/index.php', 
+                $this->getConnectionString()
+            ),
             __DIR__ . '/../../../../'
         );
         $this->setTimeout(null);
