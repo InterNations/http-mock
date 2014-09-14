@@ -16,8 +16,8 @@
         "silex/silex": "~1",
         "guzzle/guzzle": "*",
         "symfony/process": "*",
-        "jeremeamia/superclosure": "dev-master",
-        "lstrojny/hmmmath": "dev-master"
+        "jeremeamia/superclosure": ">=1.0.0",
+        "lstrojny/hmmmath": ">=0.5.0"
     },
     "require-dev": {
         "internations/kodierungsregelwerksammlung": "dev-master",
