@@ -2,6 +2,7 @@
 namespace InterNations\Component\HttpMock\Tests;
 
 use InterNations\Component\HttpMock\Expectation;
+use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\Server;
@@ -30,7 +31,7 @@ class MockBuilderIntegrationTest extends TestCase
     public function setUp()
     {
         $this->matches = new MatcherFactory();
-        $this->builder = new MockBuilder($this->matches);
+        $this->builder = new MockBuilder($this->matches, new ExtractorFactory());
         $this->server = new Server(HTTP_MOCK_PORT, HTTP_MOCK_HOST);
         $this->server->start();
         $this->server->clean();
@@ -59,7 +60,7 @@ class MockBuilderIntegrationTest extends TestCase
 
         $this->assertSame($this->builder, $builder);
 
-        $expectations = $this->builder->getExpectations();
+        $expectations = $this->builder->flushExpectations();
 
         $this->assertCount(1, $expectations);
         /** @var Expectation $expectation */
@@ -87,7 +88,7 @@ class MockBuilderIntegrationTest extends TestCase
         $this->assertSame($response, (string)$expectation->getResponse());
 
 
-        $this->server->setUp($this->builder->getExpectations());
+        $this->server->setUp($expectations);
 
         $client = $this->server->getClient();
 
@@ -106,7 +107,7 @@ class MockBuilderIntegrationTest extends TestCase
                 ->statusCode(200)
                 ->body('POST 1')
         ->end();
-        $this->server->setUp($this->builder->getExpectations());
+        $this->server->setUp($this->builder->flushExpectations());
 
         $this->builder
             ->when()
@@ -116,7 +117,7 @@ class MockBuilderIntegrationTest extends TestCase
                 ->statusCode(200)
                 ->body('POST 2')
             ->end();
-        $this->server->setUp($this->builder->getExpectations());
+        $this->server->setUp($this->builder->flushExpectations());
 
         $this->assertSame('POST 1', (string) $this->server->getClient()->post('/post-resource-1')->send()->getBody());
         $this->assertSame('POST 2', (string) $this->server->getClient()->post('/post-resource-2')->send()->getBody());

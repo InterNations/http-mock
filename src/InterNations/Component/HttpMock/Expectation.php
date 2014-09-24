@@ -1,8 +1,7 @@
 <?php
 namespace InterNations\Component\HttpMock;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
+use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherInterface;
 use Jeremeamia\SuperClosure\SerializableClosure;
@@ -10,79 +9,60 @@ use Closure;
 
 class Expectation
 {
-    /**
-     * @var MatcherInterface[]
-     */
+    /** @var MatcherInterface[] */
     private $matcher = [];
 
-    /**
-     * @var MockBuilder
-     */
+    /** @var MockBuilder */
     private $mockBuilder;
 
-    /**
-     * @var MatcherFactory
-     */
+    /** @var MatcherFactory */
     private $matcherFactory;
 
-    /**
-     * @var ResponseBuilder
-     */
+    /** @var ResponseBuilder */
     private $responseBuilder;
 
-    /**
-     * @var Closure
-     */
+    /** @var Closure */
     private $limiter;
 
-    public function __construct(MockBuilder $mockBuilder, MatcherFactory $matcherFactory, Closure $limiter)
+    /** @var ExtractorFactory */
+    private $extractorFactory;
+
+    public function __construct(
+        MockBuilder $mockBuilder,
+        MatcherFactory $matcherFactory,
+        ExtractorFactory $extractorFactory,
+        Closure $limiter
+    )
     {
         $this->mockBuilder = $mockBuilder;
         $this->matcherFactory = $matcherFactory;
         $this->responseBuilder = new ResponseBuilder($this->mockBuilder);
+        $this->extractorFactory = $extractorFactory;
         $this->limiter = $limiter;
     }
 
     public function pathIs($matcher)
     {
-        if (!$matcher instanceof MatcherInterface) {
-            $matcher = $this->matcherFactory->str($matcher);
-        }
-        $matcher->setExtractor(
-            static function (Request $request) {
-                return $request->getRequestUri();
-            }
-        );
-        $this->matcher[] = $matcher;
+        $this->appendMatcher($matcher, $this->extractorFactory->createPathExtractor());
 
         return $this;
     }
 
     public function methodIs($matcher)
     {
-        if (!$matcher instanceof MatcherInterface) {
-            $matcher = $this->matcherFactory->str($matcher);
-        }
-        $matcher->setExtractor(
-            static function (Request $request) {
-                return $request->getMethod();
-            }
-        );
-        $this->matcher[] = $matcher;
+        $this->appendMatcher($matcher, $this->extractorFactory->createMethodExtractor());
 
         return $this;
     }
 
     public function callback(Closure $callback)
     {
-        $this->matcher[] = $this->matcherFactory->closure($callback);
+        $this->appendMatcher($this->matcherFactory->closure($callback));
 
         return $this;
     }
 
-    /**
-     * @return SerializableClosure[]
-     */
+    /** @return SerializableClosure[]  */
     public function getMatcherClosures()
     {
         $closures = [];
@@ -107,5 +87,21 @@ class Expectation
     public function getLimiter()
     {
         return new SerializableClosure($this->limiter);
+    }
+
+    private function appendMatcher($matcher, Closure $extractor = null)
+    {
+        $matcher = $this->createMatcher($matcher);
+
+        if ($extractor) {
+            $matcher->setExtractor($extractor);
+        }
+
+        $this->matcher[] = $matcher;
+    }
+
+    private function createMatcher($matcher)
+    {
+        return $matcher instanceof MatcherInterface ? $matcher : $this->matcherFactory->str($matcher);
     }
 }
