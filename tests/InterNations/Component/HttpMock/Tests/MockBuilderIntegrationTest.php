@@ -2,6 +2,7 @@
 namespace InterNations\Component\HttpMock\Tests;
 
 use InterNations\Component\HttpMock\Expectation;
+use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\Server;
@@ -30,7 +31,7 @@ class MockBuilderIntegrationTest extends TestCase
     public function setUp()
     {
         $this->matches = new MatcherFactory();
-        $this->builder = new MockBuilder($this->matches);
+        $this->builder = new MockBuilder($this->matches, new ExtractorFactory());
         $this->server = new Server(HTTP_MOCK_PORT, HTTP_MOCK_HOST);
         $this->server->start();
         $this->server->clean();

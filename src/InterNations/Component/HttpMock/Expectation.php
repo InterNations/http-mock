@@ -1,6 +1,7 @@
 <?php
 namespace InterNations\Component\HttpMock;
 
+use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
@@ -10,36 +11,35 @@ use Closure;
 
 class Expectation
 {
-    /**
-     * @var MatcherInterface[]
-     */
+    /** @var MatcherInterface[] */
     private $matcher = [];
 
-    /**
-     * @var MockBuilder
-     */
+    /** @var MockBuilder */
     private $mockBuilder;
 
-    /**
-     * @var MatcherFactory
-     */
+    /** @var MatcherFactory */
     private $matcherFactory;
 
-    /**
-     * @var ResponseBuilder
-     */
+    /** @var ResponseBuilder */
     private $responseBuilder;
 
-    /**
-     * @var Closure
-     */
+    /** @var Closure */
     private $limiter;
 
-    public function __construct(MockBuilder $mockBuilder, MatcherFactory $matcherFactory, Closure $limiter)
+    /** @var ExtractorFactory */
+    private $extractorFactory;
+
+    public function __construct(
+        MockBuilder $mockBuilder,
+        MatcherFactory $matcherFactory,
+        ExtractorFactory $extractorFactory,
+        Closure $limiter
+    )
     {
         $this->mockBuilder = $mockBuilder;
         $this->matcherFactory = $matcherFactory;
         $this->responseBuilder = new ResponseBuilder($this->mockBuilder);
+        $this->extractorFactory = $extractorFactory;
         $this->limiter = $limiter;
     }
 
@@ -48,11 +48,7 @@ class Expectation
         if (!$matcher instanceof MatcherInterface) {
             $matcher = $this->matcherFactory->str($matcher);
         }
-        $matcher->setExtractor(
-            static function (Request $request) {
-                return $request->getRequestUri();
-            }
-        );
+        $matcher->setExtractor($this->extractorFactory->createPathExtractor());
         $this->matcher[] = $matcher;
 
         return $this;
