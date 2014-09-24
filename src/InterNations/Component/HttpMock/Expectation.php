@@ -45,40 +45,26 @@ class Expectation
 
     public function pathIs($matcher)
     {
-        if (!$matcher instanceof MatcherInterface) {
-            $matcher = $this->matcherFactory->str($matcher);
-        }
-        $matcher->setExtractor($this->extractorFactory->createPathExtractor());
-        $this->matcher[] = $matcher;
+        $this->appendMatcher($matcher, $this->extractorFactory->createPathExtractor());
 
         return $this;
     }
 
     public function methodIs($matcher)
     {
-        if (!$matcher instanceof MatcherInterface) {
-            $matcher = $this->matcherFactory->str($matcher);
-        }
-        $matcher->setExtractor(
-            static function (Request $request) {
-                return $request->getMethod();
-            }
-        );
-        $this->matcher[] = $matcher;
+        $this->appendMatcher($matcher, $this->extractorFactory->createMethodExtractor());
 
         return $this;
     }
 
     public function callback(Closure $callback)
     {
-        $this->matcher[] = $this->matcherFactory->closure($callback);
+        $this->appendMatcher($this->matcherFactory->closure($callback));
 
         return $this;
     }
 
-    /**
-     * @return SerializableClosure[]
-     */
+    /** @return SerializableClosure[]  */
     public function getMatcherClosures()
     {
         $closures = [];
@@ -103,5 +89,21 @@ class Expectation
     public function getLimiter()
     {
         return new SerializableClosure($this->limiter);
+    }
+
+    private function appendMatcher($matcher, Closure $extractor = null)
+    {
+        $matcher = $this->createMatcher($matcher);
+
+        if ($extractor) {
+            $matcher->setExtractor($extractor);
+        }
+
+        $this->matcher[] = $matcher;
+    }
+
+    private function createMatcher($matcher)
+    {
+        return $matcher instanceof MatcherInterface ? $matcher : $this->matcherFactory->str($matcher);
     }
 }
