@@ -2,6 +2,7 @@
 namespace InterNations\Component\HttpMock\PHPUnit;
 
 use Guzzle\Http\Client;
+use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
@@ -17,22 +18,22 @@ use RuntimeException;
  */
 class HttpMockFacade
 {
-    /**
-     * @var array
-     */
+    /** @var array  */
     private $services = [];
 
-    public function __construct($port, $host)
+    private $basePath;
+
+    public function __construct($port, $host, $basePath)
     {
         $server = new Server($port, $host);
         $server->start();
         $this->services['server'] = $server;
+        $this->basePath = $basePath;
     }
 
     public function setUp()
     {
-        $this->server->setUp($this->mock->getExpectations());
-        $this->mock->resetExpectations();
+        $this->server->setUp($this->mock->flushExpectations());
     }
 
     public function __get($property)
@@ -54,7 +55,7 @@ class HttpMockFacade
                 break;
 
             case 'mock':
-                $this->services['mock'] = new MockBuilder($this->matches);
+                $this->services['mock'] = new MockBuilder($this->matches, new ExtractorFactory($this->basePath));
                 break;
 
             case 'client':

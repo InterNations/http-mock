@@ -13,9 +13,11 @@ trait HttpMockTrait
      */
     protected $http;
 
-    protected static function setUpHttpMockBeforeClass($port = 28080, $host = 'localhost')
+    protected static function setUpHttpMockBeforeClass($port = null, $host = null, $basePath = null)
     {
-        static::$staticHttp = new HttpMockFacade($port, $host);
+        $port = $port ?: 28080;
+        $host = $host ?: 'localhost';
+        static::$staticHttp = new HttpMockFacade($port, $host, $basePath);
         ServerManager::getInstance()->add(static::$staticHttp->server);
     }
 

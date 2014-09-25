@@ -51,7 +51,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             ->end();
         $this->http->setUp();
 
-        $this->assertSame($path . ' body', (string) $this->http->client->get('/foo')->send()->getBody());
+        $this->assertSame($path . ' body', (string) $this->http->client->get($path)->send()->getBody());
 
         $request = $this->http->requests->latest();
         $this->assertSame('GET', $request->getMethod());
@@ -73,7 +73,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame('GET', $request->getMethod());
         $this->assertSame($path, $request->getPath());
 
-        $this->assertSame($path . ' body', (string) $this->http->client->get('/foo')->send()->getBody());
+        $this->assertSame($path . ' body', (string) $this->http->client->get($path)->send()->getBody());
 
         $request = $this->http->requests->shift();
         $this->assertSame('GET', $request->getMethod());
