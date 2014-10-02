@@ -1,4 +1,5 @@
-# HTTP Mock for PHP [![Build Status](https://travis-ci.org/InterNations/http-mock.svg)](https://travis-ci.org/InterNations/http-mock) [![Dependency Status](https://www.versioneye.com/user/projects/53479c42fe0d0720b500006a/badge.png)](https://www.versioneye.com/user/projects/53479c42fe0d0720b500006a)
+# HTTP Mock for PHP
+[![Build Status](https://travis-ci.org/InterNations/http-mock.svg)](https://travis-ci.org/InterNations/http-mock) [![Dependency Status](https://www.versioneye.com/user/projects/53479c42fe0d0720b500006a/badge.png)](https://www.versioneye.com/user/projects/53479c42fe0d0720b500006a) [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/InterNations/http-mock.svg)](http://isitmaintained.com/project/InterNations/http-mock "Average time to resolve an issue") [![Percentage of issues still open](http://isitmaintained.com/badge/open/InterNations/http-mock.svg)](http://isitmaintained.com/project/InterNations/http-mock "Percentage of issues still open")
 
 Mock HTTP requests on the server side in your PHP unit tests.
 
