@@ -22,9 +22,7 @@ foreach ($autoloadFiles as $autoloadFile) {
     }
 }
 if (!$autoloaderFound) {
-    throw new Exception(
-        sprintf('Could not locate autoloader file. Tried "%s"', implode($autoloadFiles, '", "'))
-    );
+    throw new Exception(sprintf('Could not locate autoloader file. Tried "%s"', implode($autoloadFiles, '", "')));
 }
 
 function store(Request $request, $name, $data)

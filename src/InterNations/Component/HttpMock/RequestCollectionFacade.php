@@ -81,11 +81,7 @@ class RequestCollectionFacade
 
         if ($requestInfo === false) {
             throw new UnexpectedValueException(
-                sprintf(
-                    'Cannot deserialize response from "%s": "%s"',
-                    $path,
-                    $response->getBody()
-                )
+                sprintf('Cannot deserialize response from "%s": "%s"', $path, $response->getBody())
             );
         }
 
@@ -106,10 +102,7 @@ class RequestCollectionFacade
         }
 
         if (isset($server['PHP_AUTH_USER'])) {
-            $request->setAuth(
-                $server['PHP_AUTH_USER'],
-                isset($server['PHP_AUTH_PW']) ? $server['PHP_AUTH_PW'] : null
-            );
+            $request->setAuth($server['PHP_AUTH_USER'], isset($server['PHP_AUTH_PW']) ? $server['PHP_AUTH_PW'] : null);
         }
 
         $params = [];
@@ -143,11 +136,7 @@ class RequestCollectionFacade
         $statusCode = $response->getStatusCode();
         if ($statusCode !== 200) {
             throw new UnexpectedValueException(
-                sprintf(
-                    'Expected status code 200 from "%s", got %d',
-                    $path,
-                    $statusCode
-                )
+                sprintf('Expected status code 200 from "%s", got %d', $path, $statusCode)
             );
         }
 
@@ -156,11 +145,7 @@ class RequestCollectionFacade
             : '';
         if ($contentType !== 'text/plain') {
             throw new UnexpectedValueException(
-                sprintf(
-                    'Expected content type "text/plain" from "%s", got "%s"',
-                    $path,
-                    $contentType
-                )
+                sprintf('Expected content type "text/plain" from "%s", got "%s"', $path, $contentType)
             );
         }
 
