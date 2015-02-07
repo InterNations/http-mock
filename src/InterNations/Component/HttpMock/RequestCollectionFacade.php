@@ -140,10 +140,11 @@ class RequestCollectionFacade
             );
         }
 
-        $contentType = $response->hasHeader('Content-Type')
-            ? $response->getTokenizedHeader('content-type')->get(0)
+        $contentType = $response->hasHeader('content-type')
+            ? $response->getContentType()
             : '';
-        if ($contentType !== 'text/plain') {
+
+        if (substr($contentType, 0, 10) !== 'text/plain') {
             throw new UnexpectedValueException(
                 sprintf('Expected content type "text/plain" from "%s", got "%s"', $path, $contentType)
             );
