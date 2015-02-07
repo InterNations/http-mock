@@ -2,8 +2,8 @@
 namespace InterNations\Component\HttpMock;
 
 use InterNations\Component\HttpMock\Response\CallbackResponse;
+use SuperClosure\SerializableClosure;
 use Closure;
-use Jeremeamia\SuperClosure\SerializableClosure;
 
 class ResponseBuilder
 {

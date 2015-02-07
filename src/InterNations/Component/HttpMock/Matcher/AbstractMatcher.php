@@ -2,7 +2,7 @@
 namespace InterNations\Component\HttpMock\Matcher;
 
 use Closure;
-use Jeremeamia\SuperClosure\SerializableClosure;
+use SuperClosure\SerializableClosure;
 use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractMatcher implements MatcherInterface

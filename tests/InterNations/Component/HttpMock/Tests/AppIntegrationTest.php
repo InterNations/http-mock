@@ -7,7 +7,7 @@ use Guzzle\Http\Client;
 use Guzzle\Http\Message\RequestFactory;
 use Guzzle\Http\Message\Response as GuzzleResponse;
 use Guzzle\Http\Message\EntityEnclosingRequest;
-use Jeremeamia\SuperClosure\SerializableClosure;
+use SuperClosure\SerializableClosure;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Process\Process;
@@ -36,8 +36,8 @@ class AppIntegrationTest extends AbstractTestCase
 
     public static function tearDownAfterClass()
     {
-        static::assertSame('', (string) static::$server1->getOutput());
-        static::assertSame('', (string) static::$server1->getErrorOutput());
+        static::assertSame('', (string) static::$server1->getOutput(), (string) static::$server1->getOutput());
+        static::assertSame('', (string) static::$server1->getErrorOutput(), (string) static::$server1->getErrorOutput());
         static::$server1->stop();
     }
 
