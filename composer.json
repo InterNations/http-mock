@@ -27,5 +27,9 @@
     },
     "autoload": {
         "psr-0": {"InterNations\\Component\\HttpMock\\": "src/"}
+    },
+    "autoload-dev": {
+        "psr-0": {"InterNations\\Component\\HttpMock\\Tests\\": "tests/"}
     }
+
 }
