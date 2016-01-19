@@ -3,6 +3,7 @@
 namespace InterNations\Component\HttpMock;
 
 use Exception;
+use RuntimeException;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +23,9 @@ foreach ($autoloadFiles as $autoloadFile) {
     }
 }
 if (!$autoloaderFound) {
-    throw new Exception(sprintf('Could not locate autoloader file. Tried "%s"', implode($autoloadFiles, '", "')));
+    throw new RuntimeException(
+        sprintf('Could not locate autoloader file. Tried "%s"', implode($autoloadFiles, '", "'))
+    );
 }
 
 function store(Request $request, $name, $data)
@@ -36,7 +39,7 @@ function read(Request $request, $name)
     if (!file_exists($fileName)) {
         return [];
     }
-    return unserialize(file_get_contents($fileName));
+    return Util::deserialize(file_get_contents($fileName));
 }
 
 function append(Request $request, $name, $data)
@@ -51,13 +54,6 @@ function prepend(Request $request, $name, $data)
     $list = read($request, $name);
     array_unshift($list, $data);
     store($request, $name, $list);
-}
-
-function silent_deserialize($serialized)
-{
-    // @codingStandardsIgnoreStart
-    return @unserialize($serialized);
-    // @codingStandardsIgnoreEnd
 }
 
 function storage_file_name(Request $request, $name)
@@ -92,7 +88,7 @@ $app->post(
 
         $matcher = [];
         if ($request->request->has('matcher')) {
-            $matcher = silent_deserialize($request->request->get('matcher'));
+            $matcher = Util::silentDeserialize($request->request->get('matcher'));
             $validator = static function ($closure) {
                 return is_callable($closure);
             };
@@ -105,14 +101,14 @@ $app->post(
             return new Response('POST data key "response" not found in POST data', 417);
         }
 
-        $response = silent_deserialize($request->request->get('response'));
+        $response = Util::silentDeserialize($request->request->get('response'));
         if (!$response instanceof Response) {
             return new Response('POST data key "response" must be a serialized Symfony response', 417);
         }
 
         $limiter = null;
         if ($request->request->has('limiter')) {
-            $limiter = silent_deserialize($request->request->get('limiter'));
+            $limiter = Util::silentDeserialize($request->request->get('limiter'));
             if (!is_callable($limiter)) {
                 return new Response('POST data key "limiter" must be a serialized closure', 417);
             }
@@ -139,7 +135,13 @@ $app->error(
             append(
                 $request,
                 'requests',
-                serialize(['server' => $request->server->all(), 'request' => (string) $request])
+                serialize(
+                    [
+                        'server'    => $request->server->all(),
+                        'request'   => (string) $request,
+                        'enclosure' => $request->request->all(),
+                    ]
+                )
             );
 
             $notFoundResponse = new Response('No matching expectation found', 404);

@@ -51,7 +51,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
 
         $this->assertSame('POST', $request->getMethod());
         $this->assertSame('/foo', $request->getPath());
-        $this->assertSame('RECOREDED=1', (string) $request->getBody());
+        $this->assertSame('RECORDED=1', (string) $request->getBody());
     }
 
     /** @dataProvider provideMethodAndUrls */
@@ -63,7 +63,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
 
         $this->assertSame('POST', $request->getMethod());
         $this->assertSame('/foo', $request->getPath());
-        $this->assertSame('RECOREDED=1', (string) $request->getBody());
+        $this->assertSame('RECORDED=1', (string) $request->getBody());
         $this->assertSame('host', $request->getHost());
         $this->assertSame(1234, $request->getPort());
         $this->assertSame('username', $request->getUsername());
@@ -139,7 +139,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         $recordedRequest = new TestRequest();
         $recordedRequest->setMethod('POST');
         $recordedRequest->setRequestUri('/foo');
-        $recordedRequest->setContent('RECOREDED=1');
+        $recordedRequest->setContent('RECORDED=1');
 
         return new Response(
             '200',
@@ -158,7 +158,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         $recordedRequest = new TestRequest();
         $recordedRequest->setMethod('POST');
         $recordedRequest->setRequestUri('/foo');
-        $recordedRequest->setContent('RECOREDED=1');
+        $recordedRequest->setContent('RECORDED=1');
         $recordedRequest->headers->set('Php-Auth-User', 'ignored');
         $recordedRequest->headers->set('Php-Auth-Pw', 'ignored');
         $recordedRequest->headers->set('User-Agent', 'ignored');

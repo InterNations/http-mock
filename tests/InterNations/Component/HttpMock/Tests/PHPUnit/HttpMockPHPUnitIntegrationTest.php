@@ -189,17 +189,36 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
     {
         $this->http->mock
             ->when()
-                ->methodIs('POST')
+            ->methodIs('POST')
+            ->then()
+            ->body('BODY')
+            ->statusCode(201)
+            ->header('X-Foo', 'Bar')
+            ->end();
+        $this->http->setUp();
+        $response = $this->http->client->post('/', ['x-client-header' => 'header-value'], ['post-key' => 'post-value'])->send();
+        $this->assertSame('BODY', $response->getBody(true));
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertSame('Bar', (string) $response->getHeader('X-Foo'));
+        $this->assertSame('post-value', $this->http->requests->latest()->getPostField('post-key'));
+    }
+
+    public function testPutRequest()
+    {
+        $this->http->mock
+            ->when()
+                ->methodIs('PUT')
             ->then()
                 ->body('BODY')
                 ->statusCode(201)
                 ->header('X-Foo', 'Bar')
             ->end();
         $this->http->setUp();
-        $response = $this->http->client->post('/')->send();
+        $response = $this->http->client->put('/', ['x-client-header' => 'header-value'], ['put-key' => 'put-value'])->send();
         $this->assertSame('BODY', $response->getBody(true));
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeader('X-Foo'));
+        $this->assertSame('put-value', $this->http->requests->latest()->getPostField('put-key'));
     }
 
     public function testFatalError()

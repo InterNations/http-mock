@@ -10,6 +10,7 @@ use PHPUnit_Framework_TestCase as TestCase;
 use DateTime;
 use DateTimeZone;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
+use Symfony\Component\HttpFoundation\Request;
 
 require_once __DIR__ . '/Fixtures/Request.php';
 
@@ -48,7 +49,7 @@ class MockBuilderIntegrationTest extends TestCase
             ->when()
                 ->pathIs('/foo')
                 ->methodIs($this->matches->regex('/POST/'))
-                ->callback(static function ($request) {
+                ->callback(static function (Request $request) {
                     error_log('CLOSURE MATCHER: ' . $request->getMethod() . ' ' . $request->getPathInfo());
                     return true;
                 })

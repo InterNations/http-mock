@@ -2,7 +2,7 @@
 namespace InterNations\Component\HttpMock;
 
 use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\Request;
+use Guzzle\Http\Message\EntityEnclosingRequestInterface;
 use Guzzle\Http\Message\RequestFactory;
 use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\Message\Response;
@@ -75,23 +75,27 @@ class RequestCollectionFacade
      */
     private function parseRequestFromResponse(Response $response, $path)
     {
-        // @codingStandardsIgnoreStart
-        $requestInfo = @unserialize($response->getBody());
-        // @codingStandardsIgnoreEnd
-
-        if ($requestInfo === false) {
+        try {
+            $requestInfo = Util::deserialize($response->getBody());
+        } catch (UnexpectedValueException $e) {
             throw new UnexpectedValueException(
-                sprintf('Cannot deserialize response from "%s": "%s"', $path, $response->getBody())
+                sprintf('Cannot deserialize response from "%s": "%s"', $path, $response->getBody()),
+                null,
+                $e
             );
         }
 
         $request = RequestFactory::getInstance()->fromMessage($requestInfo['request']);
-        $params = $this->configureRequest($request, $requestInfo['server']);
+        $params = $this->configureRequest(
+            $request,
+            $requestInfo['server'],
+            isset($requestInfo['enclosure']) ? $requestInfo['enclosure'] : []
+        );
 
         return new UnifiedRequest($request, $params);
     }
 
-    private function configureRequest(RequestInterface $request, array $server)
+    private function configureRequest(RequestInterface $request, array $server, array $enclosure)
     {
         if (isset($server['HTTP_HOST'])) {
             $request->setHost($server['HTTP_HOST']);
@@ -108,6 +112,10 @@ class RequestCollectionFacade
         $params = [];
         if (isset($server['HTTP_USER_AGENT'])) {
             $params['userAgent'] = $server['HTTP_USER_AGENT'];
+        }
+
+        if ($request instanceof EntityEnclosingRequestInterface) {
+            $request->addPostFields($enclosure);
         }
 
         return $params;

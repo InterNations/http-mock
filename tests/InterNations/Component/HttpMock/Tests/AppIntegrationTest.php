@@ -211,9 +211,7 @@ class AppIntegrationTest extends AbstractTestCase
     {
         $body = unserialize($response->getBody());
 
-        $request = RequestFactory::getInstance()->fromMessage($body['request']);
-
-        return $request;
+        return RequestFactory::getInstance()->fromMessage($body['request']);
     }
 
     private function createExpectationParams(array $closures, Response $response)
