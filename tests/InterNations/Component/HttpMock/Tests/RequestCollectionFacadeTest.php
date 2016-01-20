@@ -9,8 +9,6 @@ use InterNations\Component\Testing\AbstractTestCase;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 
-require_once __DIR__ . '/Fixtures/Request.php';
-
 class RequestCollectionFacadeTest extends AbstractTestCase
 {
     /** @var ClientInterface|MockObject */

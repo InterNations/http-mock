@@ -12,8 +12,6 @@ use DateTimeZone;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 use Symfony\Component\HttpFoundation\Request;
 
-require_once __DIR__ . '/Fixtures/Request.php';
-
 /**
  * @large
  * @group integration
