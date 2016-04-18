@@ -22,7 +22,7 @@ class Server extends Process
         $this->host = $host;
         parent::__construct(
             sprintf(
-                'exec php -dalways_populate_raw_post_data=-1 -derror_log= -S %s -t public/ public/index.php', 
+                'exec php -dalways_populate_raw_post_data=-1 -derror_log= -S %s -t public/ public/index.php',
                 $this->getConnectionString()
             ),
             __DIR__ . '/../../../../'
@@ -33,29 +33,31 @@ class Server extends Process
     public function start(callable $callback = null)
     {
         parent::start($callback);
+
         $this->pollWait();
     }
 
     public function stop($timeout = 10, $signal = null)
     {
-        $exitCode = parent::stop($timeout, $signal);
-
-        return $exitCode;
+        return parent::stop($timeout, $signal);
     }
 
     public function getClient()
     {
-        if (!$this->client) {
-            $this->client = new Client($this->getBaseUrl());
-            $this->client->getEventDispatcher()->addListener(
-                'request.error',
-                static function (Event $event) {
-                    $event->stopPropagation();
-                }
-            );
-        }
+        return $this->client ?: $this->client = $this->createClient();
+    }
 
-        return $this->client;
+    private function createClient()
+    {
+        $client = new Client($this->getBaseUrl());
+        $client->getEventDispatcher()->addListener(
+            'request.error',
+            static function (Event $event) {
+                $event->stopPropagation();
+            }
+        );
+
+        return $client;
     }
 
     public function getBaseUrl()

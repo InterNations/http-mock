@@ -196,7 +196,8 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
                 ->header('X-Foo', 'Bar')
             ->end();
         $this->http->setUp();
-        $response = $this->http->client->post('/', ['x-client-header' => 'header-value'], ['post-key' => 'post-value'])->send();
+        $response = $this->http->client
+            ->post('/', ['x-client-header' => 'header-value'], ['post-key' => 'post-value'])->send();
         $this->assertSame('BODY', $response->getBody(true));
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeader('X-Foo'));
@@ -207,14 +208,34 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
     {
         $this->http->mock
             ->when()
-                ->methodIs('PUT')
+            ->methodIs('PUT')
+            ->then()
+            ->body('BODY')
+            ->statusCode(201)
+            ->header('X-Foo', 'Bar')
+            ->end();
+        $this->http->setUp();
+        $response = $this->http->client
+            ->put('/', ['x-client-header' => 'header-value'], ['put-key' => 'put-value'])->send();
+        $this->assertSame('BODY', $response->getBody(true));
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertSame('Bar', (string) $response->getHeader('X-Foo'));
+        $this->assertSame('put-value', $this->http->requests->latest()->getPostField('put-key'));
+    }
+
+    public function testPostRequest()
+    {
+        $this->http->mock
+            ->when()
+                ->methodIs('POST')
             ->then()
                 ->body('BODY')
-                ->statusCode(201)
+            ->statusCode(201)
                 ->header('X-Foo', 'Bar')
             ->end();
         $this->http->setUp();
-        $response = $this->http->client->put('/', ['x-client-header' => 'header-value'], ['put-key' => 'put-value'])->send();
+        $response = $this->http->client
+            ->post('/', ['x-client-header' => 'header-value'], ['put-key' => 'put-value'])->send();
         $this->assertSame('BODY', $response->getBody(true));
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeader('X-Foo'));
