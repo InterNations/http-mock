@@ -55,7 +55,7 @@ class HttpMockFacadeMap implements ArrayAccess
 
     public function __get($property)
     {
-        if (in_array($property, HttpMockFacade::PROPERTIES, true)) {
+        if (in_array($property, HttpMockFacade::getProperties(), true)) {
             throw new OutOfBoundsException(
                 sprintf(
                     'Tried to access facade property "%1$s" on facade map. First select one of the facades from '
