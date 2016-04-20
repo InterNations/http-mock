@@ -66,7 +66,7 @@ trait HttpMockTrait
     protected static function tearDownHttpMockAfterClass()
     {
         static::$staticHttp->each(
-            function (HttpMockFacade $facade) {
+            static function (HttpMockFacade $facade) {
                 $facade->server->stop();
                 ServerManager::getInstance()->remove($facade->server);
             }
