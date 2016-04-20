@@ -28,55 +28,14 @@ if (!$autoloaderFound) {
     );
 }
 
-function store(Request $request, $name, $data)
-{
-    file_put_contents(storage_file_name($request, $name), serialize($data));
-}
-
-function read(Request $request, $name)
-{
-    $fileName = storage_file_name($request, $name);
-    if (!file_exists($fileName)) {
-        return [];
-    }
-    return Util::deserialize(file_get_contents($fileName));
-}
-
-function append(Request $request, $name, $data)
-{
-    $list = read($request, $name);
-    $list[] = $data;
-    store($request, $name, $list);
-}
-
-function prepend(Request $request, $name, $data)
-{
-    $list = read($request, $name);
-    array_unshift($list, $data);
-    store($request, $name, $list);
-}
-
-function storage_file_name(Request $request, $name)
-{
-    return __DIR__ . '/../../../../state/' . $name . '-' . $request->server->get('SERVER_PORT');
-}
-
-function clear(Request $request, $name)
-{
-    $fileName = storage_file_name($request, $name);
-
-    if (file_exists($fileName)) {
-        unlink($fileName);
-    }
-}
-
 $app = new Application();
 $app['debug'] = true;
+$app['storage'] = new RequestStorage(getmypid(), __DIR__ . '/../../../../state/');
 
 $app->delete(
     '/_expectation',
-    static function (Request $request) {
-        clear($request, 'expectations');
+    static function (Request $request) use ($app) {
+        $app['storage']->clear($request, 'expectations');
 
         return new Response('', 200);
     }
@@ -84,7 +43,7 @@ $app->delete(
 
 $app->post(
     '/_expectation',
-    static function (Request $request) {
+    static function (Request $request) use ($app) {
 
         $matcher = [];
         if ($request->request->has('matcher')) {
@@ -117,7 +76,7 @@ $app->post(
         // Fix issue with silex default error handling
         $response->headers->set('X-Status-Code', $response->getStatusCode());
 
-        prepend(
+        $app['storage']->prepend(
             $request,
             'expectations',
             ['matcher' => $matcher, 'response' => $response, 'limiter' => $limiter, 'runs' => 0]
@@ -132,7 +91,7 @@ $app->error(
         if ($e instanceof NotFoundHttpException) {
             /** @var Request $request */
             $request = $app['request'];
-            append(
+            $app['storage']->append(
                 $request,
                 'requests',
                 serialize(
@@ -146,7 +105,7 @@ $app->error(
 
             $notFoundResponse = new Response('No matching expectation found', 404);
 
-            $expectations = read($request, 'expectations');
+            $expectations = $app['storage']->read($request, 'expectations');
             foreach ($expectations as $pos => $expectation) {
                 foreach ($expectation['matcher'] as $matcher) {
                     if (!$matcher($request)) {
@@ -160,7 +119,7 @@ $app->error(
                 }
 
                 ++$expectations[$pos]['runs'];
-                store($request, 'expectations', $expectations);
+                $app['storage']->store($request, 'expectations', $expectations);
 
                 return $expectation['response'];
             }
@@ -175,8 +134,8 @@ $app->error(
 
 $app->get(
     '/_request/{index}',
-    static function (Request $request, $index) {
-        $requestData = read($request, 'requests');
+    static function (Request $request, $index) use ($app) {
+        $requestData = $app['storage']->read($request, 'requests');
         if (!isset($requestData[$index])) {
             return new Response('Index ' . $index . ' not found', 404);
         }
@@ -187,11 +146,11 @@ $app->get(
 
 $app->delete(
     '/_request/{action}',
-    static function (Request $request, $action) {
-        $requestData = read($request, 'requests');
+    static function (Request $request, $action) use ($app) {
+        $requestData = $app['storage']->read($request, 'requests');
         $fn = 'array_' . ($action === 'last' ? 'pop' : 'shift');
         $requestString = $fn($requestData);
-        store($request, 'requests', $requestData);
+        $app['storage']->store($request, 'requests', $requestData);
         if (!$requestString) {
             return new Response($action . ' not possible', 404);
         }
@@ -202,8 +161,8 @@ $app->delete(
 
 $app->get(
     '/_request/{action}',
-    static function (Request $request, $action) {
-        $requestData = read($request, 'requests');
+    static function (Request $request, $action) use ($app) {
+        $requestData = $app['storage']->read($request, 'requests');
         $fn = 'array_' . ($action === 'last' ? 'pop' : 'shift');
         $requestString = $fn($requestData);
         if (!$requestString) {
@@ -216,8 +175,8 @@ $app->get(
 
 $app->delete(
     '/_request',
-    static function (Request $request) {
-        store($request, 'requests', []);
+    static function (Request $request) use ($app) {
+        $app['storage']->store($request, 'requests', []);
 
         return new Response('', 200);
     }
@@ -225,9 +184,9 @@ $app->delete(
 
 $app->delete(
     '/_all',
-    static function (Request $request) {
-        store($request, 'requests', []);
-        store($request, 'expectations', []);
+    static function (Request $request) use ($app) {
+        $app['storage']->store($request, 'requests', []);
+        $app['storage']->store($request, 'expectations', []);
 
         return new Response('', 200);
     }
