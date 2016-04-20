@@ -18,8 +18,8 @@ use RuntimeException;
  */
 class HttpMockFacade
 {
-    const PROPERTIES = ['server', 'mathes', 'mock', 'requests', 'client'];
-    
+    const PROPERTIES = ['server', 'matches', 'mock', 'requests', 'client'];
+
     /** @var array  */
     private $services = [];
 
@@ -78,7 +78,7 @@ class HttpMockFacade
     {
         $this->server->clean();
     }
-    
+
     public function each(callable $callback)
     {
         $callback($this);
