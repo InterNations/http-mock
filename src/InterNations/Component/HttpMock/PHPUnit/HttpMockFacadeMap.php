@@ -74,4 +74,9 @@ class HttpMockFacadeMap implements ArrayAccess
             )
         );
     }
+
+    public function all()
+    {
+        return $this->facadeMap;
+    }
 }

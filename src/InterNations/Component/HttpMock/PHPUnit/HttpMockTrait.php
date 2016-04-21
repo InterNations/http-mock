@@ -3,6 +3,16 @@ namespace InterNations\Component\HttpMock\PHPUnit;
 
 trait HttpMockTrait
 {
+    public static function getHttpMockDefaultPort()
+    {
+        return 28080;
+    }
+
+    public static function getHttpMockDefaultHost()
+    {
+        return 'localhost';
+    }
+
     /** @var HttpMockFacade|HttpMockFacadeMap */
     protected static $staticHttp;
 
@@ -11,12 +21,14 @@ trait HttpMockTrait
 
     protected static function setUpHttpMockBeforeClass($port = null, $host = null, $basePath = null, $name = null)
     {
-        $port = $port ?: 28080;
-        $host = $host ?: 'localhost';
+        $port = $port ?: static::getHttpMockDefaultPort();
+        $host = $host ?: static::getHttpMockDefaultHost();
 
         $facade = new HttpMockFacade($port, $host, $basePath);
         if ($name === null) {
             static::$staticHttp = $facade;
+        } elseif (static::$staticHttp instanceof HttpMockFacadeMap) {
+            static::$staticHttp = new HttpMockFacadeMap([$name => $facade] + static::$staticHttp->all());
         } else {
             static::$staticHttp = new HttpMockFacadeMap([$name => $facade]);
         }
