@@ -11,8 +11,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 $autoloadFiles = [
-    __DIR__ . '/../../../../vendor/autoload.php',
-    __DIR__ . '/../../../../../../autoload.php',
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php',
 ];
 $autoloaderFound = false;
 foreach ($autoloadFiles as $autoloadFile) {
@@ -30,7 +30,7 @@ if (!$autoloaderFound) {
 
 $app = new Application();
 $app['debug'] = true;
-$app['storage'] = new RequestStorage(getmypid(), __DIR__ . '/../../../../state/');
+$app['storage'] = new RequestStorage(getmypid(), __DIR__ . '/../state/');
 
 $app->delete(
     '/_expectation',
