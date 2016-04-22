@@ -191,9 +191,9 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             ->when()
                 ->methodIs('POST')
             ->then()
-                ->body('BODY')
                 ->statusCode(201)
                 ->header('X-Foo', 'Bar')
+                ->body('BODY')
             ->end();
         $this->http->setUp();
         $response = $this->http->client
@@ -227,11 +227,11 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
     {
         $this->http->mock
             ->when()
-            ->methodIs('POST')
+                ->methodIs('POST')
             ->then()
-            ->body('BODY')
+                ->body('BODY')
             ->statusCode(201)
-            ->header('X-Foo', 'Bar')
+                ->header('X-Foo', 'Bar')
             ->end();
         $this->http->setUp();
         $response = $this->http->client
