@@ -25,7 +25,7 @@ class Server extends Process
                 'exec php -dalways_populate_raw_post_data=-1 -derror_log= -S %s -t public/ public/index.php',
                 $this->getConnectionString()
             ),
-            __DIR__ . '/../../../../'
+            __DIR__ . '/../'
         );
         $this->setTimeout(null);
     }
