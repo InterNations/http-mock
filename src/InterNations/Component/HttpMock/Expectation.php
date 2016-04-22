@@ -1,11 +1,12 @@
 <?php
 namespace InterNations\Component\HttpMock;
 
+use Closure;
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherInterface;
 use SuperClosure\SerializableClosure;
-use Closure;
+use Symfony\Component\HttpFoundation\Request;
 
 class Expectation
 {
@@ -51,6 +52,28 @@ class Expectation
     public function methodIs($matcher)
     {
         $this->appendMatcher($matcher, $this->extractorFactory->createMethodExtractor());
+
+        return $this;
+    }
+
+    public function headerExists($name)
+    {
+        $this->appendMatcher(
+            $this->matcherFactory->closure(function (Request $request) use ($name) {
+                return $request->headers->has($name);
+            })
+        );
+
+        return $this;
+    }
+
+    public function headerIs($name, $value)
+    {
+        $this->appendMatcher(
+            $this->matcherFactory->closure(function (Request $request) use ($name, $value) {
+                return $request->headers->contains($name, $value);
+            })
+        );
 
         return $this;
     }
