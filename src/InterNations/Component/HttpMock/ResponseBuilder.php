@@ -1,9 +1,11 @@
 <?php
 namespace InterNations\Component\HttpMock;
 
-use InterNations\Component\HttpMock\Response\CallbackResponse;
-use SuperClosure\SerializableClosure;
 use Closure;
+use InterNations\Component\HttpMock\Response\CallbackResponse;
+use InvalidArgumentException;
+use JsonSerializable;
+use SuperClosure\SerializableClosure;
 
 class ResponseBuilder
 {
@@ -31,6 +33,15 @@ class ResponseBuilder
         $this->response->setContent($body);
 
         return $this;
+    }
+
+    public function jsonBody($body)
+    {
+        if (!is_array($body) && !($body instanceof JsonSerializable)) {
+            throw new InvalidArgumentException('Body can not be transformed to JSON.');
+        }
+
+        return $this->body(json_encode($body, JSON_PRETTY_PRINT));
     }
 
     public function callback(Closure $callback)
