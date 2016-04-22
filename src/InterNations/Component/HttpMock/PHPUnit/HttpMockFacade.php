@@ -31,6 +31,11 @@ class HttpMockFacade
         $this->basePath = $basePath;
     }
 
+    public static function getProperties()
+    {
+        return ['server', 'matches', 'mock', 'requests', 'client'];
+    }
+
     public function setUp()
     {
         $this->server->setUp($this->mock->flushExpectations());
@@ -42,28 +47,26 @@ class HttpMockFacade
             return $this->services[$property];
         }
 
-        $this->initializeService($property);
-
-        return $this->services[$property];
+        return $this->services[$property] = $this->createService($property);
     }
 
-    private function initializeService($property)
+    private function createService($property)
     {
         switch ($property) {
             case 'matches':
-                $this->services['matches'] = new MatcherFactory();
+                return new MatcherFactory();
                 break;
 
             case 'mock':
-                $this->services['mock'] = new MockBuilder($this->matches, new ExtractorFactory($this->basePath));
+                return new MockBuilder($this->matches, new ExtractorFactory($this->basePath));
                 break;
 
             case 'client':
-                $this->services['client'] = $this->server->getClient();
+                return $this->server->getClient();
                 break;
 
             case 'requests':
-                $this->services['requests'] = new RequestCollectionFacade($this->client);
+                return new RequestCollectionFacade($this->client);
                 break;
 
             default:
@@ -75,5 +78,10 @@ class HttpMockFacade
     public function __clone()
     {
         $this->server->clean();
+    }
+
+    public function each(callable $callback)
+    {
+        $callback($this);
     }
 }
