@@ -208,11 +208,11 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
     {
         $this->http->mock
             ->when()
-            ->methodIs('PUT')
+                ->methodIs('PUT')
             ->then()
             ->body('BODY')
-            ->statusCode(201)
-            ->header('X-Foo', 'Bar')
+                ->statusCode(201)
+                ->header('X-Foo', 'Bar')
             ->end();
         $this->http->setUp();
         $response = $this->http->client
@@ -227,11 +227,11 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
     {
         $this->http->mock
             ->when()
-                ->methodIs('POST')
+            ->methodIs('POST')
             ->then()
-                ->body('BODY')
+            ->body('BODY')
             ->statusCode(201)
-                ->header('X-Foo', 'Bar')
+            ->header('X-Foo', 'Bar')
             ->end();
         $this->http->setUp();
         $response = $this->http->client
@@ -240,6 +240,21 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeader('X-Foo'));
         $this->assertSame('post-value', $this->http->requests->latest()->getPostField('post-key'));
+    }
+
+    public function testCountRequests()
+    {
+        $this->http->mock
+            ->when()
+                ->pathIs('/resource')
+            ->then()
+                ->body('resource body')
+            ->end();
+        $this->http->setUp();
+
+        $this->assertCount(0, $this->http->requests);
+        $this->assertSame('resource body', (string) $this->http->client->get('/resource')->send()->getBody());
+        $this->assertCount(1, $this->http->requests);
     }
 
     public function testFatalError()

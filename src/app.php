@@ -133,6 +133,13 @@ $app->error(
 );
 
 $app->get(
+    '/_request/count',
+    static function (Request $request) use ($app) {
+        return count($app['storage']->read($request, 'requests'));
+    }
+);
+
+$app->get(
     '/_request/{index}',
     static function (Request $request, $index) use ($app) {
         $requestData = $app['storage']->read($request, 'requests');
