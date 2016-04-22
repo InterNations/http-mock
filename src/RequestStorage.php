@@ -43,7 +43,7 @@ class RequestStorage
         $this->store($request, $name, $list);
     }
 
-    public function getFileName(Request $request, $name)
+    private function getFileName(Request $request, $name)
     {
         return $this->directory . $this->pid . '-' . $name . '-' . $request->server->get('SERVER_PORT');
     }

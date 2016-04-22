@@ -1,6 +1,7 @@
 <?php
 namespace InterNations\Component\HttpMock;
 
+use Countable;
 use Guzzle\Http\ClientInterface;
 use Guzzle\Http\Message\EntityEnclosingRequestInterface;
 use Guzzle\Http\Message\RequestFactory;
@@ -9,7 +10,7 @@ use Guzzle\Http\Message\Response;
 use InterNations\Component\HttpMock\Request\UnifiedRequest;
 use UnexpectedValueException;
 
-class RequestCollectionFacade
+class RequestCollectionFacade implements Countable
 {
     private $client;
 
@@ -65,6 +66,15 @@ class RequestCollectionFacade
     public function shift()
     {
         return $this->deleteRecordedRequest('/_request/first');
+    }
+
+    public function count()
+    {
+        $response = $this->client
+            ->get('/_request/count')
+            ->send();
+
+        return (int) $response->getBody(true);
     }
 
     /**
