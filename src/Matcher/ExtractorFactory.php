@@ -13,7 +13,6 @@ class ExtractorFactory
         $this->basePath = rtrim($basePath, '/');
     }
 
-    /** @return Closure */
     public function createPathExtractor()
     {
         $basePath = $this->basePath;
@@ -23,11 +22,24 @@ class ExtractorFactory
         };
     }
 
-    /** @return Closure */
     public function createMethodExtractor()
     {
         return static function (Request $request) {
             return $request->getMethod();
+        };
+    }
+
+    public function createParamExtractor($param)
+    {
+        return static function (Request $request) use ($param) {
+            return $request->query->get($param);
+        };
+    }
+
+    public function createParamExistsExtractor($param)
+    {
+        return static function (Request $request) use ($param) {
+            return $request->query->has($param);
         };
     }
 }
