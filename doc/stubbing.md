@@ -45,7 +45,7 @@ $this->http->mock
 
 What we can see above is that we use standard Symfony HTTP foundation `Request` and `Response` objects. If you want to
 learn more about it, look at
-(Symfony’s documentation)[https://symfony.com/doc/current/components/http_foundation/introduction.html].
+[Symfony’s documentation](https://symfony.com/doc/current/components/http_foundation/introduction.html).
 
 Let’s have a look what we can do with matching and response building shortcuts:
 
