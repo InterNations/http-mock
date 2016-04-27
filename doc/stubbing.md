@@ -83,7 +83,7 @@ $this->http->mock
     ->then()
         ->body('response')
     ->end();`
-``
+```
 
 ## Limiting
 
