@@ -15,9 +15,8 @@ class MockBuilder
 
     /** @var Closure */
     private $limiter;
-    /**
-     * @var ExtractorFactory
-     */
+
+    /** @var ExtractorFactory */
     private $extractorFactory;
 
     public function __construct(MatcherFactory $matcherFactory, ExtractorFactory $extractorFactory)

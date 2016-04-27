@@ -37,7 +37,7 @@ $app->delete(
     static function (Request $request) use ($app) {
         $app['storage']->clear($request, 'expectations');
 
-        return new Response('', 200);
+        return new Response('', Response::HTTP_OK);
     }
 );
 
@@ -52,24 +52,33 @@ $app->post(
                 return is_callable($closure);
             };
             if (!is_array($matcher) || count(array_filter($matcher, $validator)) !== count($matcher)) {
-                return new Response('POST data key "matcher" must be a serialized list of closures', 417);
+                return new Response(
+                    'POST data key "matcher" must be a serialized list of closures',
+                    Response::HTTP_EXPECTATION_FAILED
+                );
             }
         }
 
         if (!$request->request->has('response')) {
-            return new Response('POST data key "response" not found in POST data', 417);
+            return new Response('POST data key "response" not found in POST data', Response::HTTP_EXPECTATION_FAILED);
         }
 
         $response = Util::silentDeserialize($request->request->get('response'));
         if (!$response instanceof Response) {
-            return new Response('POST data key "response" must be a serialized Symfony response', 417);
+            return new Response(
+                'POST data key "response" must be a serialized Symfony response',
+                Response::HTTP_EXPECTATION_FAILED
+            );
         }
 
         $limiter = null;
         if ($request->request->has('limiter')) {
             $limiter = Util::silentDeserialize($request->request->get('limiter'));
             if (!is_callable($limiter)) {
-                return new Response('POST data key "limiter" must be a serialized closure', 417);
+                return new Response(
+                    'POST data key "limiter" must be a serialized closure',
+                    Response::HTTP_EXPECTATION_FAILED
+                );
             }
         }
 
@@ -82,7 +91,7 @@ $app->post(
             ['matcher' => $matcher, 'response' => $response, 'limiter' => $limiter, 'runs' => 0]
         );
 
-        return new Response('', 201);
+        return new Response('', Response::HTTP_CREATED);
     }
 );
 
@@ -103,7 +112,7 @@ $app->error(
                 )
             );
 
-            $notFoundResponse = new Response('No matching expectation found', 404);
+            $notFoundResponse = new Response('No matching expectation found', Response::HTTP_NOT_FOUND);
 
             $expectations = $app['storage']->read($request, 'expectations');
             foreach ($expectations as $pos => $expectation) {
@@ -114,7 +123,7 @@ $app->error(
                 }
 
                 if (isset($expectation['limiter']) && !$expectation['limiter']($expectation['runs'])) {
-                    $notFoundResponse = new Response('Expectation no longer applicable', 410);
+                    $notFoundResponse = new Response('Expectation no longer applicable', Response::HTTP_GONE);
                     continue;
                 }
 
@@ -127,7 +136,7 @@ $app->error(
             return $notFoundResponse;
         }
 
-        $code = ($e instanceof HttpException) ? $e->getStatusCode() : 500;
+        $code = ($e instanceof HttpException) ? $e->getStatusCode() : Response::HTTP_INTERNAL_SERVER_ERROR;
         return new Response('Server error: ' . $e->getMessage(), $code);
     }
 );
@@ -144,10 +153,10 @@ $app->get(
     static function (Request $request, $index) use ($app) {
         $requestData = $app['storage']->read($request, 'requests');
         if (!isset($requestData[$index])) {
-            return new Response('Index ' . $index . ' not found', 404);
+            return new Response('Index ' . $index . ' not found', Response::HTTP_NOT_FOUND);
         }
 
-        return new Response($requestData[$index], 200, ['Content-Type' => 'text/plain']);
+        return new Response($requestData[$index], Response::HTTP_OK, ['Content-Type' => 'text/plain']);
     }
 )->assert('index', '\d+');
 
@@ -159,10 +168,10 @@ $app->delete(
         $requestString = $fn($requestData);
         $app['storage']->store($request, 'requests', $requestData);
         if (!$requestString) {
-            return new Response($action . ' not possible', 404);
+            return new Response($action . ' not possible', Response::HTTP_NOT_FOUND);
         }
 
-        return new Response($requestString, 200, ['Content-Type' => 'text/plain']);
+        return new Response($requestString, Response::HTTP_OK, ['Content-Type' => 'text/plain']);
     }
 )->assert('index', '(last|first)');
 
@@ -173,10 +182,10 @@ $app->get(
         $fn = 'array_' . ($action === 'last' ? 'pop' : 'shift');
         $requestString = $fn($requestData);
         if (!$requestString) {
-            return new Response($action . ' not available', 404);
+            return new Response($action . ' not available', Response::HTTP_NOT_FOUND);
         }
 
-        return new Response($requestString, 200, ['Content-Type' => 'text/plain']);
+        return new Response($requestString, Response::HTTP_OK, ['Content-Type' => 'text/plain']);
     }
 )->assert('index', '(last|first)');
 
@@ -185,7 +194,7 @@ $app->delete(
     static function (Request $request) use ($app) {
         $app['storage']->store($request, 'requests', []);
 
-        return new Response('', 200);
+        return new Response('', Response::HTTP_OK);
     }
 );
 
@@ -195,14 +204,14 @@ $app->delete(
         $app['storage']->store($request, 'requests', []);
         $app['storage']->store($request, 'expectations', []);
 
-        return new Response('', 200);
+        return new Response('', Response::HTTP_OK);
     }
 );
 
 $app->get(
     '/_me',
     static function () {
-        return new Response('O RLY?', 418, ['Content-Type' => 'text/plain']);
+        return new Response('O RLY?', Response::HTTP_I_AM_A_TEAPOT, ['Content-Type' => 'text/plain']);
     }
 );
 

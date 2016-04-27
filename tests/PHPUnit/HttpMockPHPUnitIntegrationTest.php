@@ -1,8 +1,9 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
-use InterNations\Component\Testing\AbstractTestCase;
 use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
+use InterNations\Component\Testing\AbstractTestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /** @large */
@@ -255,6 +256,41 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertCount(0, $this->http->requests);
         $this->assertSame('resource body', (string) $this->http->client->get('/resource')->send()->getBody());
         $this->assertCount(1, $this->http->requests);
+    }
+
+    public function testMatchQueryString()
+    {
+        $this->http->mock
+            ->when()
+                ->callback(
+                    function (Request $request) {
+                        return $request->query->has('key1');
+                    }
+                )
+                ->methodIs('GET')
+            ->then()
+                ->body('query string')
+            ->end();
+        $this->http->setUp();
+
+        $this->assertSame('query string', (string) $this->http->client->get('/?key1=')->send()->getBody());
+
+        $this->assertEquals(Response::HTTP_NOT_FOUND, (string) $this->http->client->get('/')->send()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NOT_FOUND, (string) $this->http->client->post('/')->send()->getStatusCode());
+    }
+
+    public function testMatchRegex()
+    {
+        $this->http->mock
+            ->when()
+                ->methodIs($this->http->matches->regex('/(GET|POST)/'))
+            ->then()
+                ->body('response')
+            ->end();
+        $this->http->setUp();
+
+        $this->assertSame('response', (string) $this->http->client->get('/')->send()->getBody());
+        $this->assertSame('response', (string) $this->http->client->get('/')->send()->getBody());
     }
 
     public function testFatalError()
