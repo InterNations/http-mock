@@ -1,6 +1,6 @@
 # Getting started with HTTP mock
 
-HTTP mock comes out of the box with an integration with (PHPUnit)[https://phpunit.de] in the shape of
+HTTP mock comes out of the box with an integration with [PHPUnit](https://phpunit.de) in the shape of
 `InterNations\Component\HttpMock\PHPUnit\HttpMockTrait`. In order to use it, we start and stop the background HTTP
 server in `setUpBeforeClass()` and `tearDownAfterClass()` respectively.
 

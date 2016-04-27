@@ -12,7 +12,7 @@ registering request matcher and responses from the client side.
 
 ## The client side API
 
-Read the [docs](docs/index.md)
+Read the [docs](doc/index.md)
 
 ## The server
 

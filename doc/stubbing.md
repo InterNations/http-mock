@@ -2,7 +2,7 @@
 
 When we want to fake HTTP requests, one of the important part is to craft responses a client is supposed to handle. This
 process is called stubbing, as Gerard Meszaros explains in
-(xUnit pattern)[http://xunitpatterns.com/Mocks,%20Fakes,%20Stubs%20and%20Dummies.html]. Consequently,
+[xUnit pattern](http://xunitpatterns.com/Mocks,%20Fakes,%20Stubs%20and%20Dummies.html). Consequently,
 `internations/http-mock` should have been called `internations/http-stub` but it’s too late for that now.
 
 ## Matching
