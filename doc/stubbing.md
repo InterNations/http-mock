@@ -69,7 +69,7 @@ If you have more ideas for syntactic sugar, feel free to open a pull requests.
 
 For more advanced matching, we can use the matcher API to match against regular expressions and even callbacks.
 
-```
+```php
 $this->http->mock
     ->when()
         ->methodIs($this->http->matches->regex('/(GET|POST)/'))
@@ -90,6 +90,7 @@ $this->http->mock
 If we need to simulate different responses for the same request based on the position, we can limit the scope of a single response
 a single stub.
 
+```php
 $this->http->mock
     ->once()
     ->when()
