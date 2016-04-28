@@ -300,12 +300,18 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
                 ->queryParamExists('p1')
                 ->queryParamIs('p2', 'v2')
                 ->queryParamNotExists('p3')
+                ->queryParamsExist(['p4'])
+                ->queryParamsAre(['p5' => 'v5', 'p6' => 'v6'])
+                ->queryParamsNotExist(['p7'])
             ->then()
                 ->body('response')
             ->end();
         $this->http->setUp();
 
-        $this->assertSame('response', (string) $this->http->client->get('/?p1=&p2=v2')->send()->getBody());
+        $this->assertSame(
+            'response',
+            (string) $this->http->client->get('/?p1=&p2=v2&p4=any&p5=v5&p6=v6')->send()->getBody()
+        );
         $this->assertEquals(
             Response::HTTP_NOT_FOUND,
             (string) $this->http->client->get('/?p1=&p2=v2&p3=foo')->send()->getStatusCode()
