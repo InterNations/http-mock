@@ -1,5 +1,4 @@
-<?php // @codingStandardsIgnoreStart
-// @codingStandardsIgnoreEnd
+<?php // @codingStandardsIgnoreLine
 namespace InterNations\Component\HttpMock;
 
 use Exception;
@@ -14,7 +13,9 @@ $autoloadFiles = [
     __DIR__ . '/../vendor/autoload.php',
     __DIR__ . '/../../../autoload.php',
 ];
+
 $autoloaderFound = false;
+
 foreach ($autoloadFiles as $autoloadFile) {
     if (file_exists($autoloadFile)) {
         require_once $autoloadFile;
@@ -22,6 +23,7 @@ foreach ($autoloadFiles as $autoloadFile) {
         break;
     }
 }
+
 if (!$autoloaderFound) {
     throw new RuntimeException(
         sprintf('Could not locate autoloader file. Tried "%s"', implode($autoloadFiles, '", "'))
@@ -46,11 +48,13 @@ $app->post(
     static function (Request $request) use ($app) {
 
         $matcher = [];
+
         if ($request->request->has('matcher')) {
             $matcher = Util::silentDeserialize($request->request->get('matcher'));
             $validator = static function ($closure) {
                 return is_callable($closure);
             };
+
             if (!is_array($matcher) || count(array_filter($matcher, $validator)) !== count($matcher)) {
                 return new Response(
                     'POST data key "matcher" must be a serialized list of closures',
@@ -64,6 +68,7 @@ $app->post(
         }
 
         $response = Util::silentDeserialize($request->request->get('response'));
+
         if (!$response instanceof Response) {
             return new Response(
                 'POST data key "response" must be a serialized Symfony response',
@@ -72,8 +77,10 @@ $app->post(
         }
 
         $limiter = null;
+
         if ($request->request->has('limiter')) {
             $limiter = Util::silentDeserialize($request->request->get('limiter'));
+
             if (!is_callable($limiter)) {
                 return new Response(
                     'POST data key "limiter" must be a serialized closure',
@@ -115,6 +122,7 @@ $app->error(
             $notFoundResponse = new Response('No matching expectation found', Response::HTTP_NOT_FOUND);
 
             $expectations = $app['storage']->read($request, 'expectations');
+
             foreach ($expectations as $pos => $expectation) {
                 foreach ($expectation['matcher'] as $matcher) {
                     if (!$matcher($request)) {
@@ -137,6 +145,7 @@ $app->error(
         }
 
         $code = ($e instanceof HttpException) ? $e->getStatusCode() : Response::HTTP_INTERNAL_SERVER_ERROR;
+
         return new Response('Server error: ' . $e->getMessage(), $code);
     }
 );
@@ -152,6 +161,7 @@ $app->get(
     '/_request/{index}',
     static function (Request $request, $index) use ($app) {
         $requestData = $app['storage']->read($request, 'requests');
+
         if (!isset($requestData[$index])) {
             return new Response('Index ' . $index . ' not found', Response::HTTP_NOT_FOUND);
         }
@@ -167,6 +177,7 @@ $app->delete(
         $fn = 'array_' . ($action === 'last' ? 'pop' : 'shift');
         $requestString = $fn($requestData);
         $app['storage']->store($request, 'requests', $requestData);
+
         if (!$requestString) {
             return new Response($action . ' not possible', Response::HTTP_NOT_FOUND);
         }
@@ -181,6 +192,7 @@ $app->get(
         $requestData = $app['storage']->read($request, 'requests');
         $fn = 'array_' . ($action === 'last' ? 'pop' : 'shift');
         $requestString = $fn($requestData);
+
         if (!$requestString) {
             return new Response($action . ' not available', Response::HTTP_NOT_FOUND);
         }

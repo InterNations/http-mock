@@ -87,6 +87,7 @@ class Server extends Process
                     'response' => serialize($expectation->getResponse()),
                 ]
             )->send();
+
             if ($response->getStatusCode() !== 201) {
                 throw new RuntimeException('Could not set up expectations');
             }

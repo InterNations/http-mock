@@ -120,6 +120,7 @@ class RequestCollectionFacade implements Countable
         }
 
         $params = [];
+
         if (isset($server['HTTP_USER_AGENT'])) {
             $params['userAgent'] = $server['HTTP_USER_AGENT'];
         }
@@ -152,6 +153,7 @@ class RequestCollectionFacade implements Countable
     private function parseResponse(Response $response, $path)
     {
         $statusCode = $response->getStatusCode();
+
         if ($statusCode !== 200) {
             throw new UnexpectedValueException(
                 sprintf('Expected status code 200 from "%s", got %d', $path, $statusCode)

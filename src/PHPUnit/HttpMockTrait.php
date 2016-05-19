@@ -25,6 +25,7 @@ trait HttpMockTrait
         $host = $host ?: static::getHttpMockDefaultHost();
 
         $facade = new HttpMockFacade($port, $host, $basePath);
+
         if ($name === null) {
             static::$staticHttp = $facade;
         } elseif (static::$staticHttp instanceof HttpMockFacadeMap) {

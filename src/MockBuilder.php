@@ -73,6 +73,7 @@ class MockBuilder
     {
         $expectations = $this->expectations;
         $this->expectations = [];
+
         return $expectations;
     }
 }

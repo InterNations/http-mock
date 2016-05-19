@@ -43,7 +43,9 @@ class HttpMockFacadeMap implements ArrayAccess
     public function __clone()
     {
         $this->facadeMap = array_map(
-            static function (HttpMockFacade $facade) { return clone $facade; },
+            static function (HttpMockFacade $facade) {
+                return clone $facade;
+            },
             $this->facadeMap
         );
     }

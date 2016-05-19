@@ -23,9 +23,11 @@ class RequestStorage
     public function read(Request $request, $name)
     {
         $fileName = $this->getFileName($request, $name);
+
         if (!file_exists($fileName)) {
             return [];
         }
+
         return Util::deserialize(file_get_contents($fileName));
     }
 
