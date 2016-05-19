@@ -1,7 +1,6 @@
 <?php
 namespace InterNations\Component\HttpMock\Matcher;
 
-use Closure;
 use Symfony\Component\HttpFoundation\Request;
 
 class ExtractorFactory
