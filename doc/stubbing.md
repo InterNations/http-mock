@@ -63,6 +63,10 @@ $this->http->mock
     ->end();`
 ```
 
+Additional matching methods are `queryParamExists(string $param)`, `queryParamNotExists(string $param)`,
+`queryParamIs(string $param, mixed $value)`, `queryParamsExist(array $params)`, `queryParamsNotExist(array $params)`
+ and `queryParamsAre(array $paramMap)`.
+
 If you have more ideas for syntactic sugar, feel free to open a pull requests.
 
 ## Pattern matching

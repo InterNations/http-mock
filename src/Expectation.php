@@ -55,6 +55,54 @@ class Expectation
         return $this;
     }
 
+    public function queryParamIs($param, $matcher)
+    {
+        $this->appendMatcher($matcher, $this->extractorFactory->createParamExtractor($param));
+
+        return $this;
+    }
+
+    public function queryParamExists($param)
+    {
+        $this->appendMatcher(true, $this->extractorFactory->createParamExistsExtractor($param));
+
+        return $this;
+    }
+
+    public function queryParamNotExists($param)
+    {
+        $this->appendMatcher(false, $this->extractorFactory->createParamExistsExtractor($param));
+
+        return $this;
+    }
+
+    public function queryParamsAre(array $paramMap)
+    {
+        foreach ($paramMap as $param => $value) {
+            $this->queryParamIs($param, $value);
+        }
+
+        return $this;
+    }
+
+    public function queryParamsExist(array $params)
+    {
+        foreach ($params as $param) {
+            $this->queryParamExists($param);
+        }
+
+        return $this;
+    }
+
+    public function queryParamsNotExist(array $params)
+    {
+        foreach ($params as $param) {
+            $this->queryParamNotExists($param);
+        }
+
+        return $this;
+    }
+
     public function callback(Closure $callback)
     {
         $this->appendMatcher($this->matcherFactory->closure($callback));
