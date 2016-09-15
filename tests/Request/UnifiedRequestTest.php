@@ -24,8 +24,8 @@ class UnifiedRequestTest extends AbstractTestCase
 
     public function setUp()
     {
-        $this->wrappedRequest = $this->getSimpleMock('Guzzle\Http\Message\RequestInterface');
-        $this->wrappedEntityEnclosingRequest = $this->getSimpleMock('Guzzle\Http\Message\EntityEnclosingRequestInterface');
+        $this->wrappedRequest = $this->createMock('Guzzle\Http\Message\RequestInterface');
+        $this->wrappedEntityEnclosingRequest = $this->createMock('Guzzle\Http\Message\EntityEnclosingRequestInterface');
         $this->unifiedRequest = new UnifiedRequest($this->wrappedRequest);
         $this->unifiedEnclosingEntityRequest = new UnifiedRequest($this->wrappedEntityEnclosingRequest);
     }

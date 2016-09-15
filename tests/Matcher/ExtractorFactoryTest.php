@@ -17,7 +17,7 @@ class ExtractorFactoryTest extends AbstractTestCase
     public function setUp()
     {
         $this->extractorFactory = new ExtractorFactory();
-        $this->request = $this->getSimpleMock('Symfony\Component\HttpFoundation\Request');
+        $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
     }
 
     public function testGetMethod()
