@@ -106,7 +106,7 @@ $app->error(
     static function (Exception $e) use ($app) {
         if ($e instanceof NotFoundHttpException) {
             /** @var Request $request */
-            $request = $app['request'];
+            $request = $app['request_stack']->getCurrentRequest();
             $app['storage']->append(
                 $request,
                 'requests',
