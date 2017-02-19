@@ -3,8 +3,10 @@ namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
 use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
 use InterNations\Component\Testing\AbstractTestCase;
+use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use PHPUnit\Framework\TestCase;
 
 /** @large */
 class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
@@ -80,10 +82,9 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame('GET', $request->getMethod());
         $this->assertSame($path, $request->getPath());
 
-        $this->setExpectedException(
-            'UnexpectedValueException',
-            'Expected status code 200 from "/_request/last", got 404'
-        );
+        $this->expectException('UnexpectedValueException');
+
+        $this->expectExceptionMessage('Expected status code 200 from "/_request/last", got 404');
         $this->http->requests->pop();
     }
 
@@ -102,7 +103,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         try {
             $this->tearDown();
             $this->fail('Exception expected');
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (ExpectationFailedException $e) {
             $this->assertContains('HTTP mock server standard error output should be empty', $e->getMessage());
         }
     }
@@ -332,7 +333,9 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             $this->markTestSkipped('Comment in to test if fatal errors are properly handled');
         }
 
-        $this->setExpectedException('Error', 'Cannot instantiate abstract class');
-        new \PHPUnit_Framework_TestCase();
+        $this->expectException('Error');
+
+        $this->expectExceptionMessage('Cannot instantiate abstract class');
+        new TestCase();
     }
 }
