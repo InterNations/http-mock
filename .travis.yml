@@ -17,4 +17,4 @@ sudo: false
 
 script:
   - ./vendor/bin/phpcs --standard=vendor/internations/kodierungsregelwerksammlung/ruleset.xml ./src/
-  - phpunit
+  - ./vendor/bin/phpunit
