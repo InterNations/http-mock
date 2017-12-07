@@ -20,14 +20,14 @@ class Server extends Process
     {
         $this->port = $port;
         $this->host = $host;
-        $package_root = __DIR__ . '/../';
+        $packageRoot = __DIR__ . '/../';
         parent::__construct(
             sprintf(
                 'exec php -dalways_populate_raw_post_data=-1 -derror_log= -S %s -t public/ %spublic/index.php',
                 $this->getConnectionString(),
-                $package_root
+                $packageRoot
             ),
-            $package_root
+            $packageRoot
         );
         $this->setTimeout(null);
     }
