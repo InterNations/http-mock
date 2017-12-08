@@ -21,9 +21,9 @@
         "lstrojny/hmmmath": ">=0.5.0"
     },
     "require-dev": {
-        "internations/kodierungsregelwerksammlung": "dev-master",
-        "internations/testing-component": "dev-master",
-        "phpunit/phpunit": ">=6"
+        "internations/kodierungsregelwerksammlung": "0.24.1",
+        "internations/testing-component": "1.0.1",
+        "phpunit/phpunit": "6.0"
     },
     "autoload": {
         "psr-4": {"InterNations\\Component\\HttpMock\\": "src/"}
