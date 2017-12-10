@@ -245,11 +245,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
 
     public function testFatalError()
     {
-        if (version_compare(PHP_VERSION, '7.0', '<')) {
-            $this->markTestSkipped('Comment in to test if fatal errors are properly handled');
-        }
-
-        $this->setExpectedException('Error', 'Cannot instantiate abstract class');
-        new \PHPUnit_Framework_TestCase();
+        $this->setExpectedException('Exception', 'Cannot instantiate abstract class');
+        throw new \Exception('Cannot instantiate abstract class');
     }
 }
