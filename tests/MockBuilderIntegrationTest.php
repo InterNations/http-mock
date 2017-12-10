@@ -6,7 +6,7 @@ use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\Server;
-use PHPUnit\Framework\TestCase;
+use PHPUnit_Framework_TestCase as TestCase;
 use DateTime;
 use DateTimeZone;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
@@ -83,7 +83,7 @@ class MockBuilderIntegrationTest extends TestCase
         $this->assertSame(3, $run);
 
         $expectation->getResponse()->setDate(new DateTime('2012-11-10 09:08:07', new DateTimeZone('UTC')));
-        $response = "HTTP/1.0 401 Unauthorized\r\nCache-Control: no-cache, private\r\nDate:          Sat, 10 Nov 2012 09:08:07 GMT\r\nX-Foo:         Bar\r\n\r\nresponse body";
+        $response = "HTTP/1.0 401 Unauthorized\r\nCache-Control: no-cache\r\nDate:          Sat, 10 Nov 2012 09:08:07 GMT\r\nX-Foo:         Bar\r\n\r\nresponse body";
         $this->assertSame($response, (string)$expectation->getResponse());
 
 
