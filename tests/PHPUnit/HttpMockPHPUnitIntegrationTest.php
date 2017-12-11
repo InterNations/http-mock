@@ -329,8 +329,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
 
     public function testFatalError()
     {
-        $this->expectException('Error');
-        $this->expectExceptionMessage('Cannot instantiate abstract class PHPUnit\Framework\TestCase');
-        new TestCase();
+        $this->setExpectedException('Exception', 'Cannot instantiate abstract class');
+        throw new \Exception('Cannot instantiate abstract class');
     }
 }
