@@ -3,9 +3,7 @@ namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
 use InterNations\Component\Testing\AbstractTestCase;
 use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
-use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\HttpFoundation\Response;
-use PHPUnit\Framework\TestCase;
 
 /** @large */
 class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
@@ -82,9 +80,10 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame('GET', $request->getMethod());
         $this->assertSame($path, $request->getPath());
 
-        $this->expectException('UnexpectedValueException');
-
-        $this->expectExceptionMessage('Expected status code 200 from "/_request/last", got 404');
+        $this->setExpectedException(
+            'UnexpectedValueException',
+            'Expected status code 200 from "/_request/last", got 404'
+        );
         $this->http['firstNamedServer']->requests->pop();
     }
 
@@ -103,7 +102,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         try {
             $this->tearDown();
             $this->fail('Exception expected');
-        } catch (ExpectationFailedException $e) {
+        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             $this->assertContains('HTTP mock server standard error output should be empty', $e->getMessage());
         }
     }

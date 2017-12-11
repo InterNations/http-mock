@@ -74,9 +74,10 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     {
         $this->mockClient($path, $this->createResponseWithInvalidStatusCode(), $httpMethod);
 
-        $this->expectException('UnexpectedValueException');
-
-        $this->expectExceptionMessage('Expected status code 200 from "' . $path . '", got 404');
+        $this->setExpectedException(
+            'UnexpectedValueException',
+            'Expected status code 200 from "' . $path . '", got 404'
+        );
         call_user_func_array([$this->facade, $method], $args);
     }
 
@@ -85,9 +86,10 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     {
         $this->mockClient($path, $this->createResponseWithEmptyContentType(), $httpMethod);
 
-        $this->expectException('UnexpectedValueException');
-
-        $this->expectExceptionMessage('Expected content type "text/plain" from "' . $path . '", got ""');
+        $this->setExpectedException(
+            'UnexpectedValueException',
+            'Expected content type "text/plain" from "' . $path . '", got ""'
+        );
         call_user_func_array([$this->facade, $method], $args);
     }
 
@@ -96,9 +98,10 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     {
         $this->mockClient($path, $this->createResponseWithInvalidContentType(), $httpMethod);
 
-        $this->expectException('UnexpectedValueException');
-
-        $this->expectExceptionMessage('Expected content type "text/plain" from "' . $path . '", got "text/html"');
+        $this->setExpectedException(
+            'UnexpectedValueException',
+            'Expected content type "text/plain" from "' . $path . '", got "text/html"'
+        );
         call_user_func_array([$this->facade, $method], $args);
     }
 
@@ -107,9 +110,10 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     {
         $this->mockClient($path, $this->createResponseThatCannotBeDeserialized(), $httpMethod);
 
-        $this->expectException('UnexpectedValueException');
-
-        $this->expectExceptionMessage('Cannot deserialize response from "' . $path . '": "invalid response"');
+        $this->setExpectedException(
+            'UnexpectedValueException',
+            'Cannot deserialize response from "' . $path . '": "invalid response"'
+        );
         call_user_func_array([$this->facade, $method], $args);
     }
 
