@@ -112,12 +112,15 @@ class UnifiedRequestTest extends AbstractTestCase
             ->method('getPath')
             ->will($this->returnValue('/foo'));
 
-        $this->setExpectedException(
-            'BadMethodCallException',
+        $this->expectException('BadMethodCallException');
+
+        $this->expectExceptionMessage(
+
             sprintf(
                 'Cannot call method "%s" on a request that does not enclose an entity. Did you expect a POST/PUT request instead of METHOD /foo?',
                 $method
             )
+
         );
         call_user_func_array([$this->unifiedRequest, $method], $params);
     }

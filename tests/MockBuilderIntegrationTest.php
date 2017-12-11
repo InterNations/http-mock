@@ -6,7 +6,7 @@ use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\Server;
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use DateTime;
 use DateTimeZone;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
