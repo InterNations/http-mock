@@ -88,6 +88,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         $this->http['firstNamedServer']->requests->pop();
     }
 
+
     public function testErrorLogOutput()
     {
         $this->http['firstNamedServer']->mock
@@ -103,7 +104,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         try {
             $this->tearDown();
             $this->fail('Exception expected');
-        } catch (ExpectationFailedException $e) {
+        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             $this->assertContains('HTTP mock server standard error output should be empty', $e->getMessage());
         }
     }
@@ -242,12 +243,5 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeader('X-Foo'));
         $this->assertSame('post-value', $this->http['firstNamedServer']->requests->latest()->getPostField('post-key'));
-    }
-
-    public function testFatalError()
-    {
-        $this->expectException('Error');
-        $this->expectExceptionMessage('Cannot instantiate abstract class PHPUnit\Framework\TestCase');
-        new TestCase();
     }
 }

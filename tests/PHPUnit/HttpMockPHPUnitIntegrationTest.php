@@ -103,7 +103,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         try {
             $this->tearDown();
             $this->fail('Exception expected');
-        } catch (ExpectationFailedException $e) {
+        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             $this->assertContains('HTTP mock server standard error output should be empty', $e->getMessage());
         }
     }
@@ -325,12 +325,5 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             Response::HTTP_NOT_FOUND,
             (string) $this->http->client->get('/?p3=foo')->send()->getStatusCode()
         );
-    }
-
-    public function testFatalError()
-    {
-        $this->expectException('Error');
-        $this->expectExceptionMessage('Cannot instantiate abstract class PHPUnit\Framework\TestCase');
-        new TestCase();
     }
 }
