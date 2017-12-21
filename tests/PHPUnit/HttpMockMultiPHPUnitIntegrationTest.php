@@ -3,7 +3,6 @@ namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
 use InterNations\Component\Testing\AbstractTestCase;
 use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
-use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\HttpFoundation\Response;
 use PHPUnit\Framework\TestCase;
 
@@ -103,7 +102,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         try {
             $this->tearDown();
             $this->fail('Exception expected');
-        } catch (ExpectationFailedException $e) {
+        } catch (\Exception $e) {
             $this->assertContains('HTTP mock server standard error output should be empty', $e->getMessage());
         }
     }
