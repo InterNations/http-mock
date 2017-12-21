@@ -3,7 +3,6 @@ namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
 use InterNations\Component\Testing\AbstractTestCase;
 use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
-use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\HttpFoundation\Response;
 use PHPUnit\Framework\TestCase;
 
@@ -104,7 +103,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         try {
             $this->tearDown();
             $this->fail('Exception expected');
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\Exception $e) {
             $this->assertContains('HTTP mock server standard error output should be empty', $e->getMessage());
         }
     }
@@ -243,5 +242,17 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeader('X-Foo'));
         $this->assertSame('post-value', $this->http['firstNamedServer']->requests->latest()->getPostField('post-key'));
+    }
+
+    public function testFatalError()
+    {
+        if (version_compare(PHP_VERSION, '7.0', '<')) {
+            $this->markTestSkipped('Comment in to test if fatal errors are properly handled');
+        }
+
+        $this->expectException('Error');
+
+        $this->expectExceptionMessage('Cannot instantiate abstract class');
+        new TestCase();
     }
 }
