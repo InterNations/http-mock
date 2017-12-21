@@ -87,7 +87,6 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         $this->http['firstNamedServer']->requests->pop();
     }
 
-
     public function testErrorLogOutput()
     {
         $this->http['firstNamedServer']->mock
