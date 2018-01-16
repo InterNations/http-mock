@@ -21,11 +21,12 @@ class Server extends Process
         $this->port = $port;
         $this->host = $host;
         $packageRoot = __DIR__ . '/../';
+        $packagePath = escapeshellarg($packageRoot . 'public/index.php');
         parent::__construct(
             sprintf(
-                'exec php -dalways_populate_raw_post_data=-1 -derror_log= -S %s -t public/ %spublic/index.php',
+                'exec php -dalways_populate_raw_post_data=-1 -derror_log= -S %s -t public/ %s',
                 $this->getConnectionString(),
-                $packageRoot
+                $packagePath
             ),
             $packageRoot
         );
