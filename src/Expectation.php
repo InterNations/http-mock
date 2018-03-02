@@ -103,6 +103,20 @@ class Expectation
         return $this;
     }
 
+    public function headerIs($name, $value)
+    {
+        $this->appendMatcher($value, $this->extractorFactory->createHeaderExtractor($name));
+
+        return $this;
+    }
+
+    public function headerExists($name)
+    {
+        $this->appendMatcher(true, $this->extractorFactory->createHeaderExistsExtractor($name));
+
+        return $this;
+    }
+
     public function callback(Closure $callback)
     {
         $this->appendMatcher($this->matcherFactory->closure($callback));

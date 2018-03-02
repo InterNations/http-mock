@@ -41,4 +41,18 @@ class ExtractorFactory
             return $request->query->has($param);
         };
     }
+
+    public function createHeaderExtractor($header)
+    {
+        return static function (Request $request) use ($header) {
+            return $request->headers->get($header);
+        };
+    }
+
+    public function createHeaderExistsExtractor($header)
+    {
+        return static function (Request $request) use ($header) {
+            return $request->headers->has($header);
+        };
+    }
 }

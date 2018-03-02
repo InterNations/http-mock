@@ -80,4 +80,72 @@ class ExtractorFactoryTest extends AbstractTestCase
         $extractor = $extractorFactory->createPathExtractor();
         $this->assertSame('', $extractor($this->request));
     }
+
+    public function testGetHeaderWithExistingHeader()
+    {
+        $request = new Request(
+            [],
+            [],
+            [],
+            [],
+            [],
+            ['HTTP_CONTENT_TYPE' => 'application/json']
+        );
+
+        $extractorFactory = new ExtractorFactory('/foo');
+
+        $extractor = $extractorFactory->createHeaderExtractor('content-type');
+        $this->assertSame('application/json', $extractor($request));
+    }
+
+    public function testGetHeaderWithNonExistingHeader()
+    {
+        $request = new Request(
+            [],
+            [],
+            [],
+            [],
+            [],
+            ['HTTP_X_FOO' => 'bar']
+        );
+
+        $extractorFactory = new ExtractorFactory('/foo');
+
+        $extractor = $extractorFactory->createHeaderExtractor('content-type');
+        $this->assertSame(null, $extractor($request));
+    }
+
+    public function testHeaderExistsWithExistingHeader()
+    {
+        $request = new Request(
+            [],
+            [],
+            [],
+            [],
+            [],
+            ['HTTP_CONTENT_TYPE' => 'application/json']
+        );
+
+        $extractorFactory = new ExtractorFactory('/foo');
+
+        $extractor = $extractorFactory->createHeaderExistsExtractor('content-type');
+        $this->assertTrue($extractor($request));
+    }
+
+    public function testHeaderExistsWithNonExistingHeader()
+    {
+        $request = new Request(
+            [],
+            [],
+            [],
+            [],
+            [],
+            ['HTTP_X_FOO' => 'bar']
+        );
+
+        $extractorFactory = new ExtractorFactory('/foo');
+
+        $extractor = $extractorFactory->createHeaderExistsExtractor('content-type');
+        $this->assertFalse($extractor($request));
+    }
 }
