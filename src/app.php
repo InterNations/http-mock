@@ -136,7 +136,7 @@ $app->error(
                 ++$expectations[$pos]['runs'];
                 $app['storage']->store($request, 'expectations', $expectations);
 
-                if ($event && method_exists($event, 'allowCustomResponseCode')) {
+                if (method_exists($event, 'allowCustomResponseCode')) {
                     $event->allowCustomResponseCode();
                 }
 
