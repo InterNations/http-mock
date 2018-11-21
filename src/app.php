@@ -103,7 +103,7 @@ $app->post(
 );
 
 $app->error(
-    static function (Exception $e, Request $request, $code, GetResponseForExceptionEvent $event) use ($app) {
+    static function (Exception $e, Request $request, $code, GetResponseForExceptionEvent $event = null) use ($app) {
         if ($e instanceof NotFoundHttpException) {
             $app['storage']->append(
                 $request,
@@ -136,7 +136,7 @@ $app->error(
                 ++$expectations[$pos]['runs'];
                 $app['storage']->store($request, 'expectations', $expectations);
 
-                if (method_exists($event, 'allowCustomResponseCode')) {
+                if ($event && method_exists($event, 'allowCustomResponseCode')) {
                     $event->allowCustomResponseCode();
                 }
 
