@@ -6,7 +6,7 @@ use RuntimeException;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 $autoloadFiles = [
@@ -103,10 +103,8 @@ $app->post(
 );
 
 $app->error(
-    static function (Exception $e) use ($app) {
+    static function (Exception $e, Request $request, $code, GetResponseForExceptionEvent $event) use ($app) {
         if ($e instanceof NotFoundHttpException) {
-            /** @var Request $request */
-            $request = $app['request_stack']->getCurrentRequest();
             $app['storage']->append(
                 $request,
                 'requests',
@@ -138,13 +136,15 @@ $app->error(
                 ++$expectations[$pos]['runs'];
                 $app['storage']->store($request, 'expectations', $expectations);
 
+                if (method_exists($event, 'allowCustomResponseCode')) {
+                    $event->allowCustomResponseCode();
+                }
+
                 return $expectation['response'];
             }
 
             return $notFoundResponse;
         }
-
-        $code = ($e instanceof HttpException) ? $e->getStatusCode() : Response::HTTP_INTERNAL_SERVER_ERROR;
 
         return new Response('Server error: ' . $e->getMessage(), $code);
     }

@@ -33,9 +33,9 @@ class Server extends Process
         $this->setTimeout(null);
     }
 
-    public function start(callable $callback = null)
+    public function start(callable $callback = null, array $env = [])
     {
-        parent::start($callback);
+        parent::start($callback, $env);
 
         $this->pollWait();
     }
