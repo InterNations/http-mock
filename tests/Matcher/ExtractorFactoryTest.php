@@ -4,7 +4,7 @@ namespace InterNations\Component\HttpMock\Tests\Matcher;
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\Testing\AbstractTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ExtractorFactoryTest extends AbstractTestCase
 {

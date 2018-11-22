@@ -6,7 +6,7 @@ use Guzzle\Http\Message\Request;
 use Guzzle\Http\Message\Response;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
 use InterNations\Component\Testing\AbstractTestCase;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 
 class RequestCollectionFacadeTest extends AbstractTestCase

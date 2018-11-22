@@ -22,8 +22,7 @@
     "require-dev": {
         "internations/kodierungsregelwerksammlung": "~0.23.0",
         "internations/testing-component": "1.0.1",
-        "phpunit/phpunit": "^5.7|^6",
-        "phpunit/phpunit-mock-objects": "^3|^4"
+        "phpunit/phpunit": "^7"
     },
     "autoload": {
         "psr-4": {"InterNations\\Component\\HttpMock\\": "src/"}

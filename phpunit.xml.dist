@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false"
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/7.4/phpunit.xsd"
+         backupGlobals="false"
          convertErrorsToExceptions="true"
          convertWarningsToExceptions="true"
          convertNoticesToExceptions="true"
-         mapTestClassNameToCoveredClassName="true"
          bootstrap="vendor/autoload.php"
          verbose="true"
          colors="true"
@@ -16,11 +17,8 @@
     </testsuites>
 
     <logging>
-        <log type="coverage-html" target="build/coverage" title="http-mock code coverage"
-             charset="UTF-8" yui="true" highlight="true"
-             lowUpperBound="35" highLowerBound="70"/>
         <log type="coverage-clover" target="build/logs/clover.xml"/>
-        <log type="junit" target="build/logs/junit.xml" logIncompleteSkipped="false"/>
+        <log type="junit" target="build/logs/junit.xml" />
     </logging>
 
     <php>

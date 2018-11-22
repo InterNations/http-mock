@@ -5,8 +5,7 @@ use Guzzle\Http\Message\EntityEnclosingRequestInterface;
 use InterNations\Component\HttpMock\Request\UnifiedRequest;
 use InterNations\Component\Testing\AbstractTestCase;
 use Guzzle\Http\Message\RequestInterface;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
-use PHPUnit_Framework_MockObject_Matcher_Parameters as ParametersMatcher;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class UnifiedRequestTest extends AbstractTestCase
 {
@@ -74,7 +73,7 @@ class UnifiedRequestTest extends AbstractTestCase
             ->expects($this->once())
             ->method($method)
             ->will($this->returnValue('REQ'))
-            ->getMatcher()->parametersMatcher = new ParametersMatcher($params);
+            ->with(...$params);
         $this->assertSame('REQ', call_user_func_array([$this->unifiedRequest, $method], $params));
 
 
@@ -82,7 +81,7 @@ class UnifiedRequestTest extends AbstractTestCase
             ->expects($this->once())
             ->method($method)
             ->will($this->returnValue('ENTITY_ENCL_REQ'))
-            ->getMatcher()->parametersMatcher = new ParametersMatcher($params);
+            ->with(...$params);
         $this->assertSame(
             'ENTITY_ENCL_REQ',
             call_user_func_array([$this->unifiedEnclosingEntityRequest, $method], $params)
@@ -96,7 +95,7 @@ class UnifiedRequestTest extends AbstractTestCase
             ->expects($this->once())
             ->method($method)
             ->will($this->returnValue('ENTITY_ENCL_REQ'))
-            ->getMatcher()->parametersMatcher = new ParametersMatcher($params);
+            ->with(...$params);
 
         $this->assertSame(
             'ENTITY_ENCL_REQ',
