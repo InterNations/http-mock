@@ -33,7 +33,7 @@ abstract class AbstractMatcher implements MatcherInterface
         $extractor = new SerializableClosure($this->createExtractor());
 
         return new SerializableClosure(
-            static function ($request) use ($matcher, $extractor) {
+            static function (Request $request) use ($matcher, $extractor) {
                 return $matcher($extractor($request));
             }
         );

@@ -15,7 +15,7 @@ class StringMatcher extends AbstractMatcher
         $string = $this->string;
 
         return static function ($value) use ($string) {
-            return $string === $value;
+            return (string) $string === (string) $value;
         };
     }
 }
