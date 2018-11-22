@@ -35,7 +35,7 @@ class ExtractorFactoryTest extends AbstractTestCase
     {
         $this->request
             ->expects($this->once())
-            ->method('getRequestUri')
+            ->method('getPathInfo')
             ->will($this->returnValue('/foo/bar'));
 
         $extractor = $this->extractorFactory->createPathExtractor();
@@ -46,7 +46,7 @@ class ExtractorFactoryTest extends AbstractTestCase
     {
         $this->request
             ->expects($this->once())
-            ->method('getRequestUri')
+            ->method('getPathInfo')
             ->will($this->returnValue('/foo/bar'));
 
         $extractorFactory = new ExtractorFactory('/foo');
@@ -59,7 +59,7 @@ class ExtractorFactoryTest extends AbstractTestCase
     {
         $this->request
             ->expects($this->once())
-            ->method('getRequestUri')
+            ->method('getPathInfo')
             ->will($this->returnValue('/foo/bar'));
 
         $extractorFactory = new ExtractorFactory('/foo/');
@@ -72,7 +72,7 @@ class ExtractorFactoryTest extends AbstractTestCase
     {
         $this->request
             ->expects($this->once())
-            ->method('getRequestUri')
+            ->method('getPathInfo')
             ->will($this->returnValue('/bar'));
 
         $extractorFactory = new ExtractorFactory('/foo');

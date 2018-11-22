@@ -17,7 +17,7 @@ class ExtractorFactory
         $basePath = $this->basePath;
 
         return static function (Request $request) use ($basePath) {
-            return substr_replace($request->getRequestUri(), '', 0, strlen($basePath));
+            return substr_replace($request->getPathInfo(), '', 0, strlen($basePath));
         };
     }
 

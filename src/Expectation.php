@@ -12,9 +12,6 @@ class Expectation
     /** @var MatcherInterface[] */
     private $matcher = [];
 
-    /** @var MockBuilder */
-    private $mockBuilder;
-
     /** @var MatcherFactory */
     private $matcherFactory;
 
@@ -34,9 +31,8 @@ class Expectation
         Closure $limiter
     )
     {
-        $this->mockBuilder = $mockBuilder;
         $this->matcherFactory = $matcherFactory;
-        $this->responseBuilder = new ResponseBuilder($this->mockBuilder);
+        $this->responseBuilder = new ResponseBuilder($mockBuilder);
         $this->extractorFactory = $extractorFactory;
         $this->limiter = $limiter;
     }
