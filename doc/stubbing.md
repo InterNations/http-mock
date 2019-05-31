@@ -24,8 +24,8 @@ The example above say: when we see a `GET` request asking for `/resource` respon
 What we see here is internally syntactic sugar for the following, more verbose, example using plain callbacks.
 
 ```php
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Psr\Http\Message\RequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
 
 $this->http->mock
     ->when()
@@ -43,21 +43,20 @@ $this->http->mock
     ->end();
 ```
 
-What we can see above is that we use standard Symfony HTTP foundation `Request` and `Response` objects. If you want to
-learn more about it, look at
-[Symfony’s documentation](https://symfony.com/doc/current/components/http_foundation/introduction.html).
+What we can see above is that we use standard PSR/7 Request Response, we use the Guzzle implementation on the Client and the Slim implementation on the server side, hurrah standards
 
 Let’s have a look what we can do with matching and response building shortcuts:
 
 ```php
-use Symfony\Component\HttpFoundation\Response;
+use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Http\StatusCode;
 
 $this->http->mock
     ->when()
         ->methodIs('GET')
         ->pathIs('/resource')
     ->then()
-        ->statusCode(Response::HTTP_NOT_FOUND)
+        ->statusCode(StatusCode::HTTP_NOT_FOUND)
         ->header('X-Custom-Header', 'Header Value')
         ->body('response')
     ->end();`

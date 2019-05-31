@@ -1,20 +1,17 @@
 <?php
-namespace InterNations\Component\HttpMock;
+namespace Pagely\Component\HttpMock;
 
 use Countable;
-use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\EntityEnclosingRequestInterface;
-use Guzzle\Http\Message\RequestFactory;
-use Guzzle\Http\Message\RequestInterface;
-use Guzzle\Http\Message\Response;
-use InterNations\Component\HttpMock\Request\UnifiedRequest;
+use GuzzleHttp\Client;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use UnexpectedValueException;
 
 class RequestCollectionFacade implements Countable
 {
     private $client;
 
-    public function __construct(ClientInterface $client)
+    public function __construct(Client $client)
     {
         $this->client = $client;
     }
@@ -71,72 +68,39 @@ class RequestCollectionFacade implements Countable
     public function count()
     {
         $response = $this->client
-            ->get('/_request/count')
-            ->send();
+            ->get('/_request/count');
 
-        return (int) $response->getBody(true);
+        return (int) $response->getBody()->getContents();
     }
 
     /**
      * @param Response $response
      * @param string $path
      * @throws UnexpectedValueException
-     * @return UnifiedRequest
+     * @return RequestInterface
      */
-    private function parseRequestFromResponse(Response $response, $path)
+    private function parseRequestFromResponse(ResponseInterface $response, $path)
     {
         try {
-            $requestInfo = Util::deserialize($response->getBody());
+            $contents = $response->getBody()->getContents();
+            $requestInfo = Util::deserialize($contents);
         } catch (UnexpectedValueException $e) {
             throw new UnexpectedValueException(
-                sprintf('Cannot deserialize response from "%s": "%s"', $path, $response->getBody()),
+                sprintf('Cannot deserialize response from "%s": "%s"', $path, $contents),
                 null,
                 $e
             );
         }
 
-        $request = RequestFactory::getInstance()->fromMessage($requestInfo['request']);
-        $params = $this->configureRequest(
-            $request,
-            $requestInfo['server'],
-            isset($requestInfo['enclosure']) ? $requestInfo['enclosure'] : []
-        );
+        $request = \GuzzleHttp\Psr7\parse_request($requestInfo['request']);
 
-        return new UnifiedRequest($request, $params);
-    }
-
-    private function configureRequest(RequestInterface $request, array $server, array $enclosure)
-    {
-        if (isset($server['HTTP_HOST'])) {
-            $request->setHost($server['HTTP_HOST']);
-        }
-
-        if (isset($server['HTTP_PORT'])) {
-            $request->setPort($server['HTTP_PORT']);
-        }
-
-        if (isset($server['PHP_AUTH_USER'])) {
-            $request->setAuth($server['PHP_AUTH_USER'], isset($server['PHP_AUTH_PW']) ? $server['PHP_AUTH_PW'] : null);
-        }
-
-        $params = [];
-
-        if (isset($server['HTTP_USER_AGENT'])) {
-            $params['userAgent'] = $server['HTTP_USER_AGENT'];
-        }
-
-        if ($request instanceof EntityEnclosingRequestInterface) {
-            $request->addPostFields($enclosure);
-        }
-
-        return $params;
+        return $request;
     }
 
     private function getRecordedRequest($path)
     {
         $response = $this->client
-            ->get($path)
-            ->send();
+            ->get($path);
 
         return $this->parseResponse($response, $path);
     }
@@ -144,13 +108,12 @@ class RequestCollectionFacade implements Countable
     private function deleteRecordedRequest($path)
     {
         $response = $this->client
-            ->delete($path)
-            ->send();
+            ->delete($path);
 
         return $this->parseResponse($response, $path);
     }
 
-    private function parseResponse(Response $response, $path)
+    private function parseResponse(ResponseInterface $response, $path)
     {
         $statusCode = $response->getStatusCode();
 
@@ -161,7 +124,7 @@ class RequestCollectionFacade implements Countable
         }
 
         $contentType = $response->hasHeader('content-type')
-            ? $response->getContentType()
+            ? $response->getHeaderLine('content-type')
             : '';
 
         if (substr($contentType, 0, 10) !== 'text/plain') {

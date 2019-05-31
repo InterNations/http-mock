@@ -6,7 +6,8 @@ Overview of the internal server functionality
 ```
 POST /_expectation
 {
-    response (required): serialized Symfony response
+    response (required): stringified http respopnse
+    responseCallback (optional): serialized closure that is passed in the response, and can return a new Response
     matcher (optional): serialized list of closures
     limiter (optional): serialized closure that limits the validity of the expectation
 }

@@ -1,12 +1,11 @@
 <?php
-namespace InterNations\Component\HttpMock;
+namespace Pagely\Component\HttpMock;
 
-use Guzzle\Http\Client;
-use Guzzle\Common\Event;
 use hmmmath\Fibonacci\FibonacciFactory;
 use Symfony\Component\Process\Process;
 use RuntimeException;
-use Guzzle\Http\Exception\CurlException;
+
+use GuzzleHttp\Client;
 
 class Server extends Process
 {
@@ -53,13 +52,7 @@ class Server extends Process
 
     private function createClient()
     {
-        $client = new Client($this->getBaseUrl());
-        $client->getEventDispatcher()->addListener(
-            'request.error',
-            static function (Event $event) {
-                $event->stopPropagation();
-            }
-        );
+        $client = new Client(['base_uri' => $this->getBaseUrl(), 'http_errors' => false]);
 
         return $client;
     }
@@ -84,16 +77,16 @@ class Server extends Process
         foreach ($expectations as $expectation) {
             $response = $this->getClient()->post(
                 '/_expectation',
-                null,
-                [
+                ['json' => [
                     'matcher'  => serialize($expectation->getMatcherClosures()),
                     'limiter'  => serialize($expectation->getLimiter()),
-                    'response' => serialize($expectation->getResponse()),
-                ]
-            )->send();
+                    'response' => Util::serializePsrMessage($expectation->getResponse()),
+                    'responseCallback' => serialize($expectation->getResponseCallback()),
+                ]]
+            );
 
             if ($response->getStatusCode() !== 201) {
-                throw new RuntimeException('Could not set up expectations');
+                throw new RuntimeException('Could not set up expectations: '.$response->getBody()->getContents());
             }
         }
     }
@@ -104,19 +97,28 @@ class Server extends Process
             $this->start();
         }
 
-        $this->getClient()->delete('/_all')->send();
+        $this->getClient()->delete('/_all');
     }
 
     private function pollWait()
     {
-        foreach (FibonacciFactory::sequence(50000, 10000) as $sleepTime) {
+        $success = false;
+        foreach (FibonacciFactory::sequence(50000, 10000, 8) as $sleepTime) {
             try {
                 usleep($sleepTime);
-                $this->getClient()->head('/_me')->send();
+                $r = $this->getClient()->head('/_me');
+                if ($r->getStatusCode() != 418) {
+                    continue;
+                }
+                $success = true;
                 break;
-            } catch (CurlException $e) {
+            } catch (ServerException $e) {
                 continue;
             }
+        }
+
+        if (!$success) {
+            throw $e;
         }
     }
 }

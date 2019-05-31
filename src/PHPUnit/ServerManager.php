@@ -1,7 +1,7 @@
 <?php
-namespace InterNations\Component\HttpMock\PHPUnit;
+namespace Pagely\Component\HttpMock\PHPUnit;
 
-use InterNations\Component\HttpMock\Server;
+use Pagely\Component\HttpMock\Server;
 use SplObjectStorage;
 
 // @codingStandardsIgnoreStart

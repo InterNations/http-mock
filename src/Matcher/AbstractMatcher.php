@@ -1,9 +1,9 @@
 <?php
-namespace InterNations\Component\HttpMock\Matcher;
+namespace Pagely\Component\HttpMock\Matcher;
 
 use Closure;
 use SuperClosure\SerializableClosure;
-use Symfony\Component\HttpFoundation\Request;
+use Psr\Http\Message\RequestInterface as Request;
 
 abstract class AbstractMatcher implements MatcherInterface
 {

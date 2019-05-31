@@ -1,13 +1,13 @@
 # Getting started with HTTP mock
 
 HTTP mock comes out of the box with an integration with [PHPUnit](https://phpunit.de) in the shape of
-`InterNations\Component\HttpMock\PHPUnit\HttpMockTrait`. In order to use it, we start and stop the background HTTP
+`Pagely\Component\HttpMock\PHPUnit\HttpMockTrait`. In order to use it, we start and stop the background HTTP
 server in `setUpBeforeClass()` and `tearDownAfterClass()` respectively.
 
 ```php
 namespace Acme\Tests;
 
-use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
+use Pagely\Component\HttpMock\PHPUnit\HttpMockTrait;
 
 class ExampleTest extends PHPUnit_Framework_TestCase
 {
@@ -58,10 +58,10 @@ class ExampleTest extends PHPUnit_Framework_TestCase
             ->end();
         $this->http->setUp();
 
-        $this->assertSame('mocked body', $this->http->client->post('http://localhost:8082/foo')->send()->getBody(true));
+        $this->assertSame('mocked body', (string)$this->http->client->post('http://localhost:8082/foo')->getBody());
 
         $this->assertSame('POST', $this->http->requests->latest()->getMethod());
-        $this->assertSame('/foo', $this->http->requests->latest()->getPath());
+        $this->assertSame('/foo', $this->http->requests->latest()->getUri()->getPath());
     }
 }
  ```

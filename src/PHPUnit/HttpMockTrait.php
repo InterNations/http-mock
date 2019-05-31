@@ -1,5 +1,5 @@
 <?php
-namespace InterNations\Component\HttpMock\PHPUnit;
+namespace Pagely\Component\HttpMock\PHPUnit;
 
 trait HttpMockTrait
 {

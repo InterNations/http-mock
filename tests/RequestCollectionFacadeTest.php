@@ -1,13 +1,15 @@
 <?php
-namespace InterNations\Component\HttpMock\Tests;
+namespace Pagely\Component\HttpMock\Tests;
 
-use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\Request;
-use Guzzle\Http\Message\Response;
-use InterNations\Component\HttpMock\RequestCollectionFacade;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
+
+use Pagely\Component\HttpMock\Util;
+use Pagely\Component\HttpMock\RequestCollectionFacade;
 use InterNations\Component\Testing\AbstractTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
-use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
+use Pagely\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 
 class RequestCollectionFacadeTest extends AbstractTestCase
 {
@@ -22,10 +24,9 @@ class RequestCollectionFacadeTest extends AbstractTestCase
 
     public function setUp()
     {
-        $this->client = $this->createMock('Guzzle\Http\ClientInterface');
+        $this->client = $this->createMock(Client::class);
         $this->facade = new RequestCollectionFacade($this->client);
         $this->request = new Request('GET', '/_request/last');
-        $this->request->setClient($this->client);
     }
 
     public static function provideMethodAndUrls()
@@ -48,7 +49,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         $request = call_user_func_array([$this->facade, $method], $args);
 
         $this->assertSame('POST', $request->getMethod());
-        $this->assertSame('/foo', $request->getPath());
+        $this->assertSame('/foo', $request->getUri()->getPath());
         $this->assertSame('RECORDED=1', (string) $request->getBody());
     }
 
@@ -60,13 +61,11 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         $request = call_user_func_array([$this->facade, $method], $args);
 
         $this->assertSame('POST', $request->getMethod());
-        $this->assertSame('/foo', $request->getPath());
+        $this->assertSame('/foo', $request->getUri()->getPath());
         $this->assertSame('RECORDED=1', (string) $request->getBody());
-        $this->assertSame('host', $request->getHost());
-        $this->assertSame(1234, $request->getPort());
-        $this->assertSame('username', $request->getUsername());
-        $this->assertSame('password', $request->getPassword());
-        $this->assertSame('CUSTOM UA', $request->getUserAgent());
+        $this->assertSame('localhost', $request->getUri()->getHost());
+        $this->assertSame(1234, $request->getUri()->getPort());
+        $this->assertSame('CUSTOM UA', $request->getHeaderLine(('User-Agent')));
     }
 
     /** @dataProvider provideMethodAndUrls */
@@ -117,23 +116,19 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     {
         $this->client
             ->expects($this->once())
-            ->method($method)
-            ->with($path)
-            ->will($this->returnValue($this->request));
-
-        $this->client
-            ->expects($this->once())
-            ->method('send')
-            ->with($this->request)
+            ->method('__call')
+            ->with($method, [$path])
             ->will($this->returnValue($response));
     }
 
     private function createSimpleResponse()
     {
-        $recordedRequest = new TestRequest();
-        $recordedRequest->setMethod('POST');
-        $recordedRequest->setRequestUri('/foo');
-        $recordedRequest->setContent('RECORDED=1');
+        $recordedRequest = new TestRequest(
+            'POST',
+            'http://localhost/foo',
+            [],
+            'RECORDED=1'
+        );
 
         return new Response(
             '200',
@@ -141,7 +136,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
             serialize(
                 [
                     'server' => [],
-                    'request' => (string) $recordedRequest,
+                    'request' => Util::serializePsrMessage($recordedRequest)
                 ]
             )
         );
@@ -149,27 +144,23 @@ class RequestCollectionFacadeTest extends AbstractTestCase
 
     private function createComplexResponse()
     {
-        $recordedRequest = new TestRequest();
-        $recordedRequest->setMethod('POST');
-        $recordedRequest->setRequestUri('/foo');
-        $recordedRequest->setContent('RECORDED=1');
-        $recordedRequest->headers->set('Php-Auth-User', 'ignored');
-        $recordedRequest->headers->set('Php-Auth-Pw', 'ignored');
-        $recordedRequest->headers->set('User-Agent', 'ignored');
+        $recordedRequest = new TestRequest(
+            'POST',
+            'http://localhost:1234/foo',
+            [
+                'Php-Auth-User' => 'username',
+                'Php-Auth-Pw' => 'password',
+                'User-Agent' => 'CUSTOM UA'
+            ],
+            'RECORDED=1'
+        );
 
         return new Response(
             '200',
             ['Content-Type' => 'text/plain; charset=UTF-8'],
             serialize(
                 [
-                    'server' => [
-                        'HTTP_HOST'       => 'host',
-                        'HTTP_PORT'       => 1234,
-                        'PHP_AUTH_USER'   => 'username',
-                        'PHP_AUTH_PW'     => 'password',
-                        'HTTP_USER_AGENT' => 'CUSTOM UA',
-                    ],
-                    'request' => (string) $recordedRequest,
+                    'request' => Util::serializePsrMessage($recordedRequest),
                 ]
             )
         );

@@ -1,16 +1,16 @@
 <?php
-namespace InterNations\Component\HttpMock\Tests;
+namespace Pagely\Component\HttpMock\Tests;
 
-use InterNations\Component\HttpMock\Expectation;
-use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
-use InterNations\Component\HttpMock\Matcher\MatcherFactory;
-use InterNations\Component\HttpMock\MockBuilder;
-use InterNations\Component\HttpMock\Server;
+use Pagely\Component\HttpMock\Expectation;
+use Pagely\Component\HttpMock\Matcher\ExtractorFactory;
+use Pagely\Component\HttpMock\Matcher\MatcherFactory;
+use Pagely\Component\HttpMock\MockBuilder;
+use Pagely\Component\HttpMock\Server;
 use PHPUnit\Framework\TestCase;
 use DateTime;
 use DateTimeZone;
-use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
-use Symfony\Component\HttpFoundation\Request;
+use Pagely\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
+use Psr\Http\Message\RequestInterface as Request;
 
 /**
  * @large
@@ -48,7 +48,7 @@ class MockBuilderIntegrationTest extends TestCase
                 ->pathIs('/foo')
                 ->methodIs($this->matches->regex('/POST/'))
                 ->callback(static function (Request $request) {
-                    error_log('CLOSURE MATCHER: ' . $request->getMethod() . ' ' . $request->getPathInfo());
+                    error_log('CLOSURE MATCHER: ' . $request->getMethod() . ' ' . $request->getUri()->getPath());
                     return true;
                 })
             ->then()
@@ -65,9 +65,7 @@ class MockBuilderIntegrationTest extends TestCase
         /** @var Expectation $expectation */
         $expectation = current($expectations);
 
-        $request = new TestRequest();
-        $request->setMethod('POST');
-        $request->setRequestUri('/foo');
+        $request = new TestRequest('POST', '/foo');
 
         $run = 0;
         $oldValue = ini_set('error_log', '/dev/null');
@@ -82,16 +80,11 @@ class MockBuilderIntegrationTest extends TestCase
         ini_set('error_log', $oldValue);
         $this->assertSame(3, $run);
 
-        $expectation->getResponse()->setDate(new DateTime('2012-11-10 09:08:07', new DateTimeZone('UTC')));
-        $response = "HTTP/1.0 401 Unauthorized\r\nCache-Control: no-cache, private\r\nDate:          Sat, 10 Nov 2012 09:08:07 GMT\r\nX-Foo:         Bar\r\n\r\nresponse body";
-        $this->assertSame($response, (string)$expectation->getResponse());
-
-
         $this->server->setUp($expectations);
 
         $client = $this->server->getClient();
 
-        $this->assertSame('response body', (string) $client->post('/foo')->send()->getBody());
+        $this->assertSame('response body', (string) $client->post('/foo')->getBody());
 
         $this->assertContains('CLOSURE MATCHER: POST /foo', $this->server->getErrorOutput());
     }
@@ -118,9 +111,9 @@ class MockBuilderIntegrationTest extends TestCase
             ->end();
         $this->server->setUp($this->builder->flushExpectations());
 
-        $this->assertSame('POST 1', (string) $this->server->getClient()->post('/post-resource-1')->send()->getBody());
-        $this->assertSame('POST 2', (string) $this->server->getClient()->post('/post-resource-2')->send()->getBody());
-        $this->assertSame('POST 1', (string) $this->server->getClient()->post('/post-resource-1')->send()->getBody());
-        $this->assertSame('POST 2', (string) $this->server->getClient()->post('/post-resource-2')->send()->getBody());
+        $this->assertSame('POST 1', (string) $this->server->getClient()->post('/post-resource-1')->getBody());
+        $this->assertSame('POST 2', (string) $this->server->getClient()->post('/post-resource-2')->getBody());
+        $this->assertSame('POST 1', (string) $this->server->getClient()->post('/post-resource-1')->getBody());
+        $this->assertSame('POST 2', (string) $this->server->getClient()->post('/post-resource-2')->getBody());
     }
 }

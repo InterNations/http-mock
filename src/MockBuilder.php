@@ -1,9 +1,9 @@
 <?php
-namespace InterNations\Component\HttpMock;
+namespace Pagely\Component\HttpMock;
 
 use Closure;
-use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
-use InterNations\Component\HttpMock\Matcher\MatcherFactory;
+use Pagely\Component\HttpMock\Matcher\ExtractorFactory;
+use Pagely\Component\HttpMock\Matcher\MatcherFactory;
 
 class MockBuilder
 {

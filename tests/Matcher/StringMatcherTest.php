@@ -1,9 +1,9 @@
 <?php
-namespace InterNations\Component\HttpMock\Tests\Matcher;
+namespace Pagely\Component\HttpMock\Tests\Matcher;
 
-use InterNations\Component\HttpMock\Matcher\StringMatcher;
+use Pagely\Component\HttpMock\Matcher\StringMatcher;
 use InterNations\Component\Testing\AbstractTestCase;
-use Symfony\Component\HttpFoundation\Request;
+use GuzzleHttp\Psr7\Request;
 
 class StringMatcherTest extends AbstractTestCase
 {
@@ -13,6 +13,6 @@ class StringMatcherTest extends AbstractTestCase
         $matcher->setExtractor(static function() {
            return 0;
         });
-        self::assertTrue($matcher->getMatcher()(new Request()));
+        self::assertTrue($matcher->getMatcher()(new Request('GET', '/')));
     }
 }

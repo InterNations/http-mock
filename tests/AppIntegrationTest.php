@@ -1,15 +1,14 @@
 <?php
-namespace InterNations\Component\HttpMock\Tests;
+namespace Pagely\Component\HttpMock\Tests;
 
-use InterNations\Component\HttpMock\Server;
+use Pagely\Component\HttpMock\Server;
 use InterNations\Component\Testing\AbstractTestCase;
-use Guzzle\Http\Client;
-use Guzzle\Http\Message\RequestFactory;
-use Guzzle\Http\Message\Response as GuzzleResponse;
+use GuzzleHttp\Client;
+use Psr\Http\Message\RequestInterface;
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Request;
 use Guzzle\Http\Message\EntityEnclosingRequest;
 use SuperClosure\SerializableClosure;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Process\Process;
 
 /**
@@ -36,8 +35,13 @@ class AppIntegrationTest extends AbstractTestCase
 
     public static function tearDownAfterClass()
     {
-        static::assertSame('', (string) static::$server1->getOutput(), (string) static::$server1->getOutput());
-        static::assertSame('', (string) static::$server1->getErrorOutput(), (string) static::$server1->getErrorOutput());
+        $out = (string) static::$server1->getOutput();
+        static::assertSame('', $out, $out);
+
+        $out = (string) static::$server1->getErrorOutput();
+        //static::assertSame('', $out, $out);
+        echo $out."\n";
+
         static::$server1->stop();
     }
 
@@ -49,110 +53,130 @@ class AppIntegrationTest extends AbstractTestCase
 
     public function testSimpleUseCase()
     {
-        $response = $this->client->post(
-            '/_expectation',
-            null,
-            $this->createExpectationParams(
-                [
-                    static function ($request) {
-                        return $request instanceof Request;
-                    }
-                ],
-                new Response('fake body', 200)
-            )
-        )->send();
+        $params = $this->createExpectationParams(
+            [
+                static function ($request) {
+                    return $request instanceof RequestInterface;
+                }
+        ],
+            new Response(200, ['Host' => 'localhost'], 'fake body')
+        );
+
+        $response = $this->client->post( '/_expectation', ['json' => $params]);
         $this->assertSame('', (string) $response->getBody());
         $this->assertSame(201, $response->getStatusCode());
 
-        $response = $this->client->post('/foobar', ['X-Special' => 1], ['post' => 'data'])->send();
+        $response = $this->client->post('/foobar', [
+            'headers' => ['X-Special' => 1],
+            'form_params' => ['post' => 'data'],
+        ]);
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('fake body', (string) $response->getBody());
 
-        $response = $this->client->get('/_request/latest')->send();
+        $response = $this->client->get('/_request/latest');
 
         /** @var EntityEnclosingRequest $request */
         $request = $this->parseRequestFromResponse($response);
-        $this->assertSame('1', (string) $request->getHeader('X-Special'));
+        $this->assertSame('1', (string) $request->getHeaderLine('X-Special'));
         $this->assertSame('post=data', (string) $request->getBody());
     }
 
     public function testRecording()
     {
-        $this->client->delete('/_all')->send();
+        $this->client->delete('/_all');
 
-        $this->assertSame(404, $this->client->get('/_request/latest')->send()->getStatusCode());
-        $this->assertSame(404, $this->client->get('/_request/0')->send()->getStatusCode());
-        $this->assertSame(404, $this->client->get('/_request/first')->send()->getStatusCode());
-        $this->assertSame(404, $this->client->get('/_request/last')->send()->getStatusCode());
+        $this->assertSame(404, $this->client->get('/_request/latest')->getStatusCode());
+        $this->assertSame(404, $this->client->get('/_request/0')->getStatusCode());
+        $this->assertSame(404, $this->client->get('/_request/first')->getStatusCode());
+        $this->assertSame(404, $this->client->get('/_request/last')->getStatusCode());
 
-        $this->client->get('/req/0')->send();
-        $this->client->get('/req/1')->send();
-        $this->client->get('/req/2')->send();
-        $this->client->get('/req/3')->send();
+        $this->client->get('/req/0');
+        $this->client->get('/req/1');
+        $this->client->get('/req/2');
+        $this->client->get('/req/3');
 
         $this->assertSame(
             '/req/3',
-            $this->parseRequestFromResponse($this->client->get('/_request/last')->send())->getPath()
+            $this->parseRequestFromResponse($this->client->get('/_request/last'))->getUri()->getPath()
         );
         $this->assertSame(
             '/req/0',
-            $this->parseRequestFromResponse($this->client->get('/_request/0')->send())->getPath()
+            $this->parseRequestFromResponse($this->client->get('/_request/0'))->getUri()->getPath()
         );
         $this->assertSame(
             '/req/1',
-            $this->parseRequestFromResponse($this->client->get('/_request/1')->send())->getPath()
+            $this->parseRequestFromResponse($this->client->get('/_request/1'))->getUri()->getPath()
         );
         $this->assertSame(
             '/req/2',
-            $this->parseRequestFromResponse($this->client->get('/_request/2')->send())->getPath()
+            $this->parseRequestFromResponse($this->client->get('/_request/2'))->getUri()->getPath()
         );
         $this->assertSame(
             '/req/3',
-            $this->parseRequestFromResponse($this->client->get('/_request/3')->send())->getPath()
+            $this->parseRequestFromResponse($this->client->get('/_request/3'))->getUri()->getPath()
         );
-        $this->assertSame(404, $this->client->get('/_request/4')->send()->getStatusCode());
+        $this->assertSame(404, $this->client->get('/_request/4')->getStatusCode());
 
         $this->assertSame(
             '/req/3',
-            $this->parseRequestFromResponse($this->client->delete('/_request/last')->send())->getPath()
+            $this->parseRequestFromResponse($this->client->delete('/_request/last'))->getUri()->getPath()
         );
         $this->assertSame(
             '/req/0',
-            $this->parseRequestFromResponse($this->client->delete('/_request/first')->send())->getPath()
+            $this->parseRequestFromResponse($this->client->delete('/_request/first'))->getUri()->getPath()
         );
         $this->assertSame(
             '/req/1',
-            $this->parseRequestFromResponse($this->client->get('/_request/0')->send())->getPath()
+            $this->parseRequestFromResponse($this->client->get('/_request/0'))->getUri()->getPath()
         );
         $this->assertSame(
             '/req/2',
-            $this->parseRequestFromResponse($this->client->get('/_request/1')->send())->getPath()
+            $this->parseRequestFromResponse($this->client->get('/_request/1'))->getUri()->getPath()
         );
-        $this->assertSame(404, $this->client->get('/_request/2')->send()->getStatusCode());
+        $this->assertSame(404, $this->client->get('/_request/2')->getStatusCode());
     }
 
     public function testErrorHandling()
     {
-        $this->client->delete('/_all')->send();
+        $this->client->delete('/_all');
 
-        $response = $this->client->post('/_expectation', null, ['matcher' => ''])->send();
+        $tester = function($matcher, $response = null, $limiter = null) {
+            $payload = [];
+            if ($response === null) {
+                $payload['response'] = \GuzzleHttp\Psr7\str(new Response(200, [], 'foo'));
+            } elseif ($response !== false) {
+                $payload['response'] = $response;
+            }
+            if ($matcher === null) {
+                $matcher['matcher'] = serialize([new SerializableClosure(function() { return true; })]);
+            } elseif ($matcher !== false) {
+                $payload['matcher'] = $matcher;
+            }
+
+            if ($limiter !== false && $limiter !== null) {
+                $payload['limiter'] = $limiter;
+            }
+            return $this->client->post('/_expectation', ['json' => $payload]);
+        };
+
+        $response = $tester('hi');
         $this->assertSame(417, $response->getStatusCode());
         $this->assertSame('POST data key "matcher" must be a serialized list of closures', (string) $response->getBody());
 
-        $response = $this->client->post('/_expectation', null, ['matcher' => ['foo']])->send();
+        $response = $tester(['foo']);
         $this->assertSame(417, $response->getStatusCode());
         $this->assertSame('POST data key "matcher" must be a serialized list of closures', (string) $response->getBody());
 
-        $response = $this->client->post('/_expectation', null, [])->send();
+        $response = $tester(null, false);
         $this->assertSame(417, $response->getStatusCode());
         $this->assertSame('POST data key "response" not found in POST data', (string) $response->getBody());
 
-        $response = $this->client->post('/_expectation', null, ['response' => ''])->send();
+        $response = $tester(null, 'foo');
         $this->assertSame(417, $response->getStatusCode());
-        $this->assertSame('POST data key "response" must be a serialized Symfony response', (string) $response->getBody());
+        $this->assertSame('POST data key "response" must be an http response message in text form', (string) $response->getBody());
 
-        $response = $this->client->post('/_expectation', null, ['response' => serialize(new Response()), 'limiter' => 'foo'])->send();
+        $response = $tester(null, null, 'foo');
         $this->assertSame(417, $response->getStatusCode());
         $this->assertSame('POST data key "limiter" must be a serialized closure', (string) $response->getBody());
     }
@@ -160,13 +184,15 @@ class AppIntegrationTest extends AbstractTestCase
     public function testServerParamsAreRecorded()
     {
         $this->client
-            ->setUserAgent('CUSTOM UA')
-            ->get('/foo')
-            ->setAuth('username', 'password')
-            ->setProtocolVersion('1.0')
-            ->send();
+            ->get('/foo', [
+                'headers' => [
+                    'User-Agent' => 'CUSTOM UA'
+                ],
+                'auth' => ['username', 'password'],
+                'version' => '1.0'
+            ]);
 
-        $latestRequest = unserialize($this->client->get('/_request/latest')->send()->getBody());
+        $latestRequest = unserialize($this->client->get('/_request/latest')->getBody());
 
         $this->assertSame(HTTP_MOCK_HOST, $latestRequest['server']['SERVER_NAME']);
         $this->assertSame(HTTP_MOCK_PORT, $latestRequest['server']['SERVER_PORT']);
@@ -180,38 +206,37 @@ class AppIntegrationTest extends AbstractTestCase
     {
         $this->client->post(
             '/_expectation',
-            null,
-            $this->createExpectationParams(
+            ['json' => $this->createExpectationParams(
                 [
                     static function ($request) {
-                        return $request instanceof Request;
+                        return $request instanceof RequestInterface;
                     }
                 ],
-                new Response('first', 200)
-            )
-        )->send();
-        $this->assertSame('first', $this->client->get('/')->send()->getBody(true));
+                new Response(200, [], 'first')
+            )]
+        );
+        $this->assertSame('first', $this->client->get('/')->getBody()->getContents());
 
         $this->client->post(
             '/_expectation',
-            null,
+            ['json' =>
             $this->createExpectationParams(
                 [
                     static function ($request) {
-                        return $request instanceof Request;
+                        return $request instanceof RequestInterface;
                     }
                 ],
-                new Response('second', 200)
-            )
-        )->send();
-        $this->assertSame('second', $this->client->get('/')->send()->getBody(true));
+                new Response(200, [], 'second')
+            )]
+        );
+        $this->assertSame('second', $this->client->get('/')->getBody()->getContents());
     }
 
-    private function parseRequestFromResponse(GuzzleResponse $response)
+    private function parseRequestFromResponse(Response $response)
     {
         $body = unserialize($response->getBody());
 
-        return RequestFactory::getInstance()->fromMessage($body['request']);
+        return \GuzzleHttp\Psr7\parse_request($body['request']);
     }
 
     private function createExpectationParams(array $closures, Response $response)
@@ -222,7 +247,7 @@ class AppIntegrationTest extends AbstractTestCase
 
         return [
             'matcher'  => serialize($closures),
-            'response' => serialize($response),
+            'response' => \GuzzleHttp\Psr7\str($response)
         ];
     }
 }

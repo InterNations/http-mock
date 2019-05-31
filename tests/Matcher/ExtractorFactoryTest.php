@@ -1,9 +1,9 @@
 <?php
-namespace InterNations\Component\HttpMock\Tests\Matcher;
+namespace Pagely\Component\HttpMock\Tests\Matcher;
 
-use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
+use Pagely\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\Testing\AbstractTestCase;
-use Symfony\Component\HttpFoundation\Request;
+use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class ExtractorFactoryTest extends AbstractTestCase
@@ -17,79 +17,75 @@ class ExtractorFactoryTest extends AbstractTestCase
     public function setUp()
     {
         $this->extractorFactory = new ExtractorFactory();
-        $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
     }
 
     public function testGetMethod()
     {
-        $this->request
-            ->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('POST'));
+        $request = new Request(
+            'POST',
+            '/'
+        );
 
         $extractor = $this->extractorFactory->createMethodExtractor();
-        $this->assertSame('POST', $extractor($this->request));
+        $this->assertSame('POST', $extractor($request));
     }
 
     public function testGetPath()
     {
-        $this->request
-            ->expects($this->once())
-            ->method('getPathInfo')
-            ->will($this->returnValue('/foo/bar'));
+        $request = new Request(
+            'GET',
+            '/foo/bar'
+        );
 
         $extractor = $this->extractorFactory->createPathExtractor();
-        $this->assertSame('/foo/bar', $extractor($this->request));
+        $this->assertSame('/foo/bar', $extractor($request));
     }
 
     public function testGetPathWithBasePath()
     {
-        $this->request
-            ->expects($this->once())
-            ->method('getPathInfo')
-            ->will($this->returnValue('/foo/bar'));
+        $request = new Request(
+            'GET',
+            '/foo/bar'
+        );
 
         $extractorFactory = new ExtractorFactory('/foo');
 
         $extractor = $extractorFactory->createPathExtractor();
-        $this->assertSame('/bar', $extractor($this->request));
+        $this->assertSame('/bar', $extractor($request));
     }
 
     public function testGetPathWithBasePathTrailingSlash()
     {
-        $this->request
-            ->expects($this->once())
-            ->method('getPathInfo')
-            ->will($this->returnValue('/foo/bar'));
+        $request = new Request(
+            'GET',
+            '/foo/bar'
+        );
 
         $extractorFactory = new ExtractorFactory('/foo/');
 
         $extractor = $extractorFactory->createPathExtractor();
-        $this->assertSame('/bar', $extractor($this->request));
+        $this->assertSame('/bar', $extractor($request));
     }
 
     public function testGetPathWithBasePathThatDoesNotMatch()
     {
-        $this->request
-            ->expects($this->once())
-            ->method('getPathInfo')
-            ->will($this->returnValue('/bar'));
+        $request = new Request(
+            'GET',
+            '/bar'
+        );
 
         $extractorFactory = new ExtractorFactory('/foo');
 
         $extractor = $extractorFactory->createPathExtractor();
-        $this->assertSame('', $extractor($this->request));
+        $this->assertSame('', $extractor($request));
     }
 
     public function testGetHeaderWithExistingHeader()
     {
         $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            ['HTTP_CONTENT_TYPE' => 'application/json']
+            'GET',
+            '/',
+            ['Content-Type' => 'application/json']
         );
 
         $extractorFactory = new ExtractorFactory('/foo');
@@ -101,12 +97,9 @@ class ExtractorFactoryTest extends AbstractTestCase
     public function testGetHeaderWithNonExistingHeader()
     {
         $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            ['HTTP_X_FOO' => 'bar']
+            'GET',
+            '/',
+            ['X-Foo' => 'bar']
         );
 
         $extractorFactory = new ExtractorFactory('/foo');
@@ -118,12 +111,9 @@ class ExtractorFactoryTest extends AbstractTestCase
     public function testHeaderExistsWithExistingHeader()
     {
         $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            ['HTTP_CONTENT_TYPE' => 'application/json']
+            'GET',
+            '/',
+            ['Content-Type' => 'application/json']
         );
 
         $extractorFactory = new ExtractorFactory('/foo');
@@ -135,12 +125,9 @@ class ExtractorFactoryTest extends AbstractTestCase
     public function testHeaderExistsWithNonExistingHeader()
     {
         $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            ['HTTP_X_FOO' => 'bar']
+            'GET',
+            '/',
+            ['X-Foo' => 'bar']
         );
 
         $extractorFactory = new ExtractorFactory('/foo');

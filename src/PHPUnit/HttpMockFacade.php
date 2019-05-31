@@ -1,12 +1,12 @@
 <?php
-namespace InterNations\Component\HttpMock\PHPUnit;
+namespace Pagely\Component\HttpMock\PHPUnit;
 
-use Guzzle\Http\Client;
-use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
-use InterNations\Component\HttpMock\Matcher\MatcherFactory;
-use InterNations\Component\HttpMock\MockBuilder;
-use InterNations\Component\HttpMock\RequestCollectionFacade;
-use InterNations\Component\HttpMock\Server;
+use GuzzleHttp\Client;
+use Pagely\Component\HttpMock\Matcher\ExtractorFactory;
+use Pagely\Component\HttpMock\Matcher\MatcherFactory;
+use Pagely\Component\HttpMock\MockBuilder;
+use Pagely\Component\HttpMock\RequestCollectionFacade;
+use Pagely\Component\HttpMock\Server;
 use RuntimeException;
 
 /**

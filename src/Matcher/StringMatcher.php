@@ -1,5 +1,5 @@
 <?php
-namespace InterNations\Component\HttpMock\Matcher;
+namespace Pagely\Component\HttpMock\Matcher;
 
 class StringMatcher extends AbstractMatcher
 {

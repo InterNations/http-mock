@@ -1,9 +1,9 @@
 <?php
-namespace InterNations\Component\HttpMock;
+namespace Pagely\Component\HttpMock;
 
-use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
-use InterNations\Component\HttpMock\Matcher\MatcherFactory;
-use InterNations\Component\HttpMock\Matcher\MatcherInterface;
+use Pagely\Component\HttpMock\Matcher\ExtractorFactory;
+use Pagely\Component\HttpMock\Matcher\MatcherFactory;
+use Pagely\Component\HttpMock\Matcher\MatcherInterface;
 use SuperClosure\SerializableClosure;
 use Closure;
 
@@ -140,6 +140,11 @@ class Expectation
     public function getResponse()
     {
         return $this->responseBuilder->getResponse();
+    }
+
+    public function getResponseCallback()
+    {
+        return $this->responseBuilder->getResponseCallback();
     }
 
     public function getLimiter()

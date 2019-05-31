@@ -1,5 +1,5 @@
 <?php
-namespace InterNations\Component\HttpMock\Matcher;
+namespace Pagely\Component\HttpMock\Matcher;
 
 use SuperClosure\SerializableClosure;
 use Closure;
