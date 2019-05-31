@@ -16,4 +16,6 @@ will be different.
 
 ## Usage
 
+`composer require pagely/http-mock`
+
 Read the [docs](doc/index.md)
