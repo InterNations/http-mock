@@ -80,6 +80,11 @@ class AppIntegrationTest extends AbstractTestCase
         $request = $this->parseRequestFromResponse($response);
         $this->assertSame('1', (string) $request->getHeaderLine('X-Special'));
         $this->assertSame('post=data', (string) $request->getBody());
+
+        // should be the same as latest
+        $response = $this->client->get('/_request/last');
+        $request = $this->parseRequestFromResponse($response);
+        $this->assertSame('1', (string) $request->getHeaderLine('X-Special'));
     }
 
     public function testRecording()
