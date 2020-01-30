@@ -1,7 +1,6 @@
 language: php
 
 php:
-  - 7.1
   - 7.2
   - 7.3
 
@@ -11,5 +10,5 @@ before_script:
 sudo: false
 
 script:
-  - ./vendor/bin/phpcs --standard=vendor/internations/kodierungsregelwerksammlung/ruleset.xml ./src/
+  - composer lint:check
   - ./vendor/bin/phpunit

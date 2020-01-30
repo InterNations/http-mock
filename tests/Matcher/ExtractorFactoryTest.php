@@ -1,9 +1,10 @@
 <?php
-namespace Pagely\Component\HttpMock\Tests\Matcher;
 
-use Pagely\Component\HttpMock\Matcher\ExtractorFactory;
-use InterNations\Component\Testing\AbstractTestCase;
+namespace InterNations\Component\HttpMock\Tests\Matcher;
+
 use GuzzleHttp\Psr7\Request;
+use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
+use InterNations\Component\Testing\AbstractTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class ExtractorFactoryTest extends AbstractTestCase

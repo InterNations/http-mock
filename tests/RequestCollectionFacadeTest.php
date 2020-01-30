@@ -1,15 +1,15 @@
 <?php
-namespace Pagely\Component\HttpMock\Tests;
+
+namespace InterNations\Component\HttpMock\Tests;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-
-use Pagely\Component\HttpMock\Util;
-use Pagely\Component\HttpMock\RequestCollectionFacade;
+use InterNations\Component\HttpMock\RequestCollectionFacade;
+use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
+use InterNations\Component\HttpMock\Util;
 use InterNations\Component\Testing\AbstractTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
-use Pagely\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 
 class RequestCollectionFacadeTest extends AbstractTestCase
 {
@@ -136,7 +136,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
             serialize(
                 [
                     'server' => [],
-                    'request' => Util::serializePsrMessage($recordedRequest)
+                    'request' => Util::serializePsrMessage($recordedRequest),
                 ]
             )
         );
@@ -150,7 +150,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
             [
                 'Php-Auth-User' => 'username',
                 'Php-Auth-Pw' => 'password',
-                'User-Agent' => 'CUSTOM UA'
+                'User-Agent' => 'CUSTOM UA',
             ],
             'RECORDED=1'
         );

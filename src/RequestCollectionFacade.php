@@ -1,5 +1,6 @@
 <?php
-namespace Pagely\Component\HttpMock;
+
+namespace InterNations\Component\HttpMock;
 
 use Countable;
 use GuzzleHttp\Client;
@@ -41,12 +42,13 @@ class RequestCollectionFacade implements Countable
     }
 
     /**
-     * @param integer $position
+     * @param int $position
+     *
      * @return UnifiedRequest
      */
     public function at($position)
     {
-       return $this->getRecordedRequest('/_request/' . $position);
+        return $this->getRecordedRequest('/_request/' . $position);
     }
 
     /**
@@ -75,8 +77,10 @@ class RequestCollectionFacade implements Countable
 
     /**
      * @param Response $response
-     * @param string $path
+     * @param string   $path
+     *
      * @throws UnexpectedValueException
+     *
      * @return RequestInterface
      */
     private function parseRequestFromResponse(ResponseInterface $response, $path)
@@ -85,11 +89,7 @@ class RequestCollectionFacade implements Countable
             $contents = $response->getBody()->getContents();
             $requestInfo = Util::deserialize($contents);
         } catch (UnexpectedValueException $e) {
-            throw new UnexpectedValueException(
-                sprintf('Cannot deserialize response from "%s": "%s"', $path, $contents),
-                null,
-                $e
-            );
+            throw new UnexpectedValueException(sprintf('Cannot deserialize response from "%s": "%s"', $path, $contents), null, $e);
         }
 
         $request = \GuzzleHttp\Psr7\parse_request($requestInfo['request']);
@@ -118,9 +118,7 @@ class RequestCollectionFacade implements Countable
         $statusCode = $response->getStatusCode();
 
         if ($statusCode !== 200) {
-            throw new UnexpectedValueException(
-                sprintf('Expected status code 200 from "%s", got %d', $path, $statusCode)
-            );
+            throw new UnexpectedValueException(sprintf('Expected status code 200 from "%s", got %d', $path, $statusCode));
         }
 
         $contentType = $response->hasHeader('content-type')
@@ -128,9 +126,7 @@ class RequestCollectionFacade implements Countable
             : '';
 
         if (substr($contentType, 0, 10) !== 'text/plain') {
-            throw new UnexpectedValueException(
-                sprintf('Expected content type "text/plain" from "%s", got "%s"', $path, $contentType)
-            );
+            throw new UnexpectedValueException(sprintf('Expected content type "text/plain" from "%s", got "%s"', $path, $contentType));
         }
 
         return $this->parseRequestFromResponse($response, $path);

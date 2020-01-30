@@ -1,15 +1,14 @@
 <?php
-namespace Pagely\Component\HttpMock\Tests;
 
-use Pagely\Component\HttpMock\Expectation;
-use Pagely\Component\HttpMock\Matcher\ExtractorFactory;
-use Pagely\Component\HttpMock\Matcher\MatcherFactory;
-use Pagely\Component\HttpMock\MockBuilder;
-use Pagely\Component\HttpMock\Server;
+namespace InterNations\Component\HttpMock\Tests;
+
+use InterNations\Component\HttpMock\Expectation;
+use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
+use InterNations\Component\HttpMock\Matcher\MatcherFactory;
+use InterNations\Component\HttpMock\MockBuilder;
+use InterNations\Component\HttpMock\Server;
+use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 use PHPUnit\Framework\TestCase;
-use DateTime;
-use DateTimeZone;
-use Pagely\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 use Psr\Http\Message\RequestInterface as Request;
 
 /**
@@ -49,6 +48,7 @@ class MockBuilderIntegrationTest extends TestCase
                 ->methodIs($this->matches->regex('/POST/'))
                 ->callback(static function (Request $request) {
                     error_log('CLOSURE MATCHER: ' . $request->getMethod() . ' ' . $request->getUri()->getPath());
+
                     return true;
                 })
             ->then()
@@ -75,7 +75,7 @@ class MockBuilderIntegrationTest extends TestCase
             $unserializedClosure = unserialize(serialize($closure));
             $this->assertTrue($unserializedClosure($request));
 
-            $run++;
+            ++$run;
         }
         ini_set('error_log', $oldValue);
         $this->assertSame(3, $run);

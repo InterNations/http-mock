@@ -1,10 +1,11 @@
 <?php
-namespace Pagely\Component\HttpMock\Tests\PHPUnit;
 
+namespace InterNations\Component\HttpMock\Tests\PHPUnit;
+
+use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
 use InterNations\Component\Testing\AbstractTestCase;
-use Pagely\Component\HttpMock\PHPUnit\HttpMockTrait;
-use Psr\Http\Message\ResponseInterface as Response;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface as Response;
 
 /** @large */
 class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
@@ -38,7 +39,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
             [
                 '/foo',
                 '/bar',
-            ]
+            ],
         ];
     }
 
@@ -91,7 +92,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
     {
         $this->http['firstNamedServer']->mock
             ->when()
-                ->callback(static function () {error_log('error output');})
+                ->callback(static function () {error_log('error output'); })
             ->then()
             ->end();
         $this->http['firstNamedServer']->setUp();
@@ -156,7 +157,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame(200, $secondResponse->getStatusCode());
         $thirdResponse = $this->http['firstNamedServer']->client->post('/');
         $this->assertSame(410, $thirdResponse->getStatusCode());
-        $this->assertSame('Expectation no longer applicable', (string)$thirdResponse->getBody());
+        $this->assertSame('Expectation no longer applicable', (string) $thirdResponse->getBody());
 
         $this->http['firstNamedServer']->mock
             ->any()
@@ -180,10 +181,10 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
             ->when()
                 ->methodIs('POST')
             ->then()
-                ->callback(static function(Response $response) {return $response->withBody(\GuzzleHttp\Psr7\stream_for('CALLBACK'));})
+                ->callback(static function (Response $response) {return $response->withBody(\GuzzleHttp\Psr7\stream_for('CALLBACK')); })
             ->end();
         $this->http['firstNamedServer']->setUp();
-        $this->assertSame('CALLBACK', (string)$this->http['firstNamedServer']->client->post('/')->getBody());
+        $this->assertSame('CALLBACK', (string) $this->http['firstNamedServer']->client->post('/')->getBody());
     }
 
     public function testComplexResponse()
@@ -200,9 +201,9 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         $response = $this->http['firstNamedServer']->client
             ->post('/', [
                 'headers' => ['x-client-header' => 'header-value'],
-                'form_params' => ['post-key' => 'post-value']
+                'form_params' => ['post-key' => 'post-value'],
             ]);
-        $this->assertSame('BODY', (string)$response->getBody());
+        $this->assertSame('BODY', (string) $response->getBody());
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeaderLine('X-Foo'));
 
@@ -223,10 +224,10 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         $this->http['firstNamedServer']->setUp();
         $response = $this->http['firstNamedServer']->client
             ->put('/', [
-				'headers' => ['x-client-header' => 'header-value'],
-				'form_params' => ['put-key' => 'put-value']
-			]);
-        $this->assertSame('BODY', (string)$response->getBody());
+                'headers' => ['x-client-header' => 'header-value'],
+                'form_params' => ['put-key' => 'put-value'],
+            ]);
+        $this->assertSame('BODY', (string) $response->getBody());
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeaderLine('X-Foo'));
         parse_str($this->http['firstNamedServer']->requests->latest()->getBody()->getContents(), $body);
@@ -245,11 +246,11 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
             ->end();
         $this->http['firstNamedServer']->setUp();
         $response = $this->http['firstNamedServer']->client
-			->post('/', [
-				'headers' => ['x-client-header' => 'header-value'],
-				'form_params' => ['post-key' => 'post-value']
-			]);
-        $this->assertSame('BODY', (string)$response->getBody());
+            ->post('/', [
+                'headers' => ['x-client-header' => 'header-value'],
+                'form_params' => ['post-key' => 'post-value'],
+            ]);
+        $this->assertSame('BODY', (string) $response->getBody());
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeaderLine('X-Foo'));
         parse_str($this->http['firstNamedServer']->requests->latest()->getBody()->getContents(), $body);

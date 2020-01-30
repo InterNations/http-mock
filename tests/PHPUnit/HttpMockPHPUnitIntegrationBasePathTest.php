@@ -1,8 +1,9 @@
 <?php
-namespace Pagely\Component\HttpMock\Tests\PHPUnit;
 
+namespace InterNations\Component\HttpMock\Tests\PHPUnit;
+
+use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
 use InterNations\Component\Testing\AbstractTestCase;
-use Pagely\Component\HttpMock\PHPUnit\HttpMockTrait;
 
 /** @large */
 class HttpMockPHPUnitIntegrationBasePathTest extends AbstractTestCase

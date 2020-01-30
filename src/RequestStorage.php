@@ -1,5 +1,6 @@
 <?php
-namespace Pagely\Component\HttpMock;
+
+namespace InterNations\Component\HttpMock;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -29,6 +30,7 @@ class RequestStorage
         }
 
         $r = Util::deserialize(file_get_contents($fileName));
+
         return $r;
     }
 

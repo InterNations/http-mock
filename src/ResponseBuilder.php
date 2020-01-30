@@ -1,9 +1,10 @@
 <?php
-namespace Pagely\Component\HttpMock;
 
+namespace InterNations\Component\HttpMock;
+
+use Closure;
 use GuzzleHttp\Psr7\Response;
 use SuperClosure\SerializableClosure;
-use Closure;
 
 class ResponseBuilder
 {
@@ -58,7 +59,6 @@ class ResponseBuilder
     {
         return $this->response;
     }
-
 
     public function getResponseCallback()
     {

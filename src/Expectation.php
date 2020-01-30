@@ -1,11 +1,12 @@
 <?php
-namespace Pagely\Component\HttpMock;
 
-use Pagely\Component\HttpMock\Matcher\ExtractorFactory;
-use Pagely\Component\HttpMock\Matcher\MatcherFactory;
-use Pagely\Component\HttpMock\Matcher\MatcherInterface;
-use SuperClosure\SerializableClosure;
+namespace InterNations\Component\HttpMock;
+
 use Closure;
+use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
+use InterNations\Component\HttpMock\Matcher\MatcherFactory;
+use InterNations\Component\HttpMock\Matcher\MatcherInterface;
+use SuperClosure\SerializableClosure;
 
 class Expectation
 {
@@ -29,8 +30,7 @@ class Expectation
         MatcherFactory $matcherFactory,
         ExtractorFactory $extractorFactory,
         Closure $limiter
-    )
-    {
+    ) {
         $this->matcherFactory = $matcherFactory;
         $this->responseBuilder = new ResponseBuilder($mockBuilder);
         $this->extractorFactory = $extractorFactory;

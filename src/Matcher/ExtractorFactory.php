@@ -1,5 +1,6 @@
 <?php
-namespace Pagely\Component\HttpMock\Matcher;
+
+namespace InterNations\Component\HttpMock\Matcher;
 
 use Psr\Http\Message\RequestInterface as Request;
 
@@ -49,6 +50,7 @@ class ExtractorFactory
             if (empty($r)) {
                 return null;
             }
+
             return $r;
         };
     }

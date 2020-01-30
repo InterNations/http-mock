@@ -1,15 +1,15 @@
 <?php
-namespace Pagely\Component\HttpMock\Tests;
 
-use Pagely\Component\HttpMock\Server;
-use InterNations\Component\Testing\AbstractTestCase;
-use GuzzleHttp\Client;
-use Psr\Http\Message\RequestInterface;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Psr7\Request;
+namespace InterNations\Component\HttpMock\Tests;
+
 use Guzzle\Http\Message\EntityEnclosingRequest;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
+use InterNations\Component\HttpMock\Server;
+use InterNations\Component\Testing\AbstractTestCase;
+use Psr\Http\Message\RequestInterface;
 use SuperClosure\SerializableClosure;
-use Symfony\Component\Process\Process;
 
 /**
  * @large
@@ -40,7 +40,7 @@ class AppIntegrationTest extends AbstractTestCase
 
         $out = (string) static::$server1->getErrorOutput();
         //static::assertSame('', $out, $out);
-        echo $out."\n";
+        echo $out . "\n";
 
         static::$server1->stop();
     }
@@ -57,12 +57,12 @@ class AppIntegrationTest extends AbstractTestCase
             [
                 static function ($request) {
                     return $request instanceof RequestInterface;
-                }
+                },
         ],
             new Response(200, ['Host' => 'localhost'], 'fake body')
         );
 
-        $response = $this->client->post( '/_expectation', ['json' => $params]);
+        $response = $this->client->post('/_expectation', ['json' => $params]);
         $this->assertSame('', (string) $response->getBody());
         $this->assertSame(201, $response->getStatusCode());
 
@@ -146,7 +146,7 @@ class AppIntegrationTest extends AbstractTestCase
     {
         $this->client->delete('/_all');
 
-        $tester = function($matcher, $response = null, $limiter = null) {
+        $tester = function ($matcher, $response = null, $limiter = null) {
             $payload = [];
             if ($response === null) {
                 $payload['response'] = \GuzzleHttp\Psr7\str(new Response(200, [], 'foo'));
@@ -154,7 +154,7 @@ class AppIntegrationTest extends AbstractTestCase
                 $payload['response'] = $response;
             }
             if ($matcher === null) {
-                $matcher['matcher'] = serialize([new SerializableClosure(function() { return true; })]);
+                $matcher['matcher'] = serialize([new SerializableClosure(function () { return true; })]);
             } elseif ($matcher !== false) {
                 $payload['matcher'] = $matcher;
             }
@@ -162,6 +162,7 @@ class AppIntegrationTest extends AbstractTestCase
             if ($limiter !== false && $limiter !== null) {
                 $payload['limiter'] = $limiter;
             }
+
             return $this->client->post('/_expectation', ['json' => $payload]);
         };
 
@@ -191,10 +192,10 @@ class AppIntegrationTest extends AbstractTestCase
         $this->client
             ->get('/foo', [
                 'headers' => [
-                    'User-Agent' => 'CUSTOM UA'
+                    'User-Agent' => 'CUSTOM UA',
                 ],
                 'auth' => ['username', 'password'],
-                'version' => '1.0'
+                'version' => '1.0',
             ]);
 
         $latestRequest = unserialize($this->client->get('/_request/latest')->getBody());
@@ -215,7 +216,7 @@ class AppIntegrationTest extends AbstractTestCase
                 [
                     static function ($request) {
                         return $request instanceof RequestInterface;
-                    }
+                    },
                 ],
                 new Response(200, [], 'first')
             )]
@@ -224,12 +225,11 @@ class AppIntegrationTest extends AbstractTestCase
 
         $this->client->post(
             '/_expectation',
-            ['json' =>
-            $this->createExpectationParams(
+            ['json' => $this->createExpectationParams(
                 [
                     static function ($request) {
                         return $request instanceof RequestInterface;
-                    }
+                    },
                 ],
                 new Response(200, [], 'second')
             )]
@@ -251,8 +251,8 @@ class AppIntegrationTest extends AbstractTestCase
         }
 
         return [
-            'matcher'  => serialize($closures),
-            'response' => \GuzzleHttp\Psr7\str($response)
+            'matcher' => serialize($closures),
+            'response' => \GuzzleHttp\Psr7\str($response),
         ];
     }
 }

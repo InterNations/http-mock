@@ -1,16 +1,17 @@
-<?php // @codingStandardsIgnoreLine
-namespace Pagely\Component\HttpMock;
+<?php
 
-use Exception;
+// @codingStandardsIgnoreLine
+
+namespace InterNations\Component\HttpMock;
+
 use Error;
+use Exception;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use RuntimeException;
 use Slim\App;
 use Slim\Container;
-use Slim\Exception\NotFoundException;
 use Slim\Http\StatusCode;
-
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
 
 $autoloadFiles = [
     __DIR__ . '/../vendor/autoload.php',
@@ -28,16 +29,13 @@ foreach ($autoloadFiles as $autoloadFile) {
 }
 
 if (!$autoloaderFound) {
-    throw new RuntimeException(
-        sprintf('Could not locate autoloader file. Tried "%s"', implode($autoloadFiles, '", "'))
-    );
+    throw new RuntimeException(sprintf('Could not locate autoloader file. Tried "%s"', implode($autoloadFiles, '", "')));
 }
-
 
 $container = new Container([
     'settings' => [
         'displayErrorDetails' => true,
-    ]
+    ],
 ]);
 $container['storage'] = new RequestStorage(getmypid(), __DIR__ . '/../state/');
 $app = new App($container);
@@ -54,7 +52,6 @@ $app->delete(
 $app->post(
     '/_expectation',
     function (Request $request, Response $response) use ($container) {
-
         $data = json_decode($request->getBody()->getContents(), true);
         $matcher = [];
 
@@ -77,12 +74,9 @@ $app->post(
             );
         }
 
-        try
-        {
+        try {
             $responseToSave = Util::responseDeserialize($data['response']);
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             return $response->withStatus(StatusCode::HTTP_EXPECTATION_FAILED)->write(
                 'POST data key "response" must be an http response message in text form'
             );
@@ -111,7 +105,7 @@ $app->post(
             if ($responseCallback !== null && !is_callable($responseCallback)) {
                 return $response->withStatus(StatusCode::HTTP_EXPECTATION_FAILED)->write(
                     'POST data key "responseCallback" must be a serialized closure: '
-                    .print_r($data['responseCallback'], true)
+                    . print_r($data['responseCallback'], true)
                 );
             }
         }
@@ -124,7 +118,7 @@ $app->post(
                 'response' => $data['response'],
                 'limiter' => $limiter,
                 'responseCallback' => $responseCallback,
-                'runs' => 0
+                'runs' => 0,
             ]
         );
 
@@ -132,15 +126,15 @@ $app->post(
     }
 );
 
-$container['phpErrorHandler'] = function($container) {
+$container['phpErrorHandler'] = function ($container) {
     return function (Request $request, Response $response, Error $e) use ($container) {
-         return $response->withStatus(500)
+        return $response->withStatus(500)
             ->withHeader('Content-Type', 'text/plain')
-            ->write($e->getMessage()."\n".$e->getTraceAsString()."\n");
+            ->write($e->getMessage() . "\n" . $e->getTraceAsString() . "\n");
     };
 };
 
-$container['notFoundHandler'] = function($container) {
+$container['notFoundHandler'] = function ($container) {
     return function (Request $request, Response $response) use ($container) {
         $container['storage']->append(
             $request,
@@ -175,11 +169,13 @@ $container['notFoundHandler'] = function($container) {
             ++$expectations[$pos]['runs'];
             $container['storage']->store($request, 'expectations', $expectations);
 
-            $r =  Util::responseDeserialize($expectation['response']);
+            $r = Util::responseDeserialize($expectation['response']);
             if (!empty($expectation['responseCallback'])) {
                 $callback = $expectation['responseCallback'];
+
                 return $callback($r);
             }
+
             return $r;
         }
 
@@ -191,7 +187,7 @@ $container['notFoundHandler'] = function($container) {
     };
 };
 
-$container['errorHandler'] = function($container) {
+$container['errorHandler'] = function ($container) {
     return function (Request $request, Response $response, Exception $e) use ($container) {
         return $response->withStatus(StatusCode::HTTP_INTERNAL_SERVER_ERROR)->write(
             'Server error: ' . $e->getMessage());
@@ -202,6 +198,7 @@ $app->get(
     '/_request/count',
     function (Request $request, Response $response) use ($container) {
         $count = count($container['storage']->read($request, 'requests'));
+
         return $response->withStatus(StatusCode::HTTP_OK)
             ->write($count)
             ->withHeader('Content-Type', 'text/plain');
@@ -211,7 +208,7 @@ $app->get(
 $app->get(
     '/_request/{index:[0-9]+}',
     function (Request $request, Response $response, $args) use ($container) {
-        $index = (int)$args['index'];
+        $index = (int) $args['index'];
         $requestData = $container['storage']->read($request, 'requests');
 
         if (!isset($requestData[$index])) {

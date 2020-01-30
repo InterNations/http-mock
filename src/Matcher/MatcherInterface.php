@@ -1,8 +1,9 @@
 <?php
-namespace Pagely\Component\HttpMock\Matcher;
 
-use SuperClosure\SerializableClosure;
+namespace InterNations\Component\HttpMock\Matcher;
+
 use Closure;
+use SuperClosure\SerializableClosure;
 
 interface MatcherInterface
 {

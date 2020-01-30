@@ -1,24 +1,25 @@
 <?php
-namespace Pagely\Component\HttpMock\PHPUnit;
+
+namespace InterNations\Component\HttpMock\PHPUnit;
 
 use GuzzleHttp\Client;
-use Pagely\Component\HttpMock\Matcher\ExtractorFactory;
-use Pagely\Component\HttpMock\Matcher\MatcherFactory;
-use Pagely\Component\HttpMock\MockBuilder;
-use Pagely\Component\HttpMock\RequestCollectionFacade;
-use Pagely\Component\HttpMock\Server;
+use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
+use InterNations\Component\HttpMock\Matcher\MatcherFactory;
+use InterNations\Component\HttpMock\MockBuilder;
+use InterNations\Component\HttpMock\RequestCollectionFacade;
+use InterNations\Component\HttpMock\Server;
 use RuntimeException;
 
 /**
- * @property-read Server $server The HTTP mock server that is currently running
- * @property-read MatcherFactory $matches An instance of the matcher factory
- * @property-read MockBuilder $mock An instance of the mock builder
- * @property-read RequestCollectionFacade $requests Convenient access to recorded requests
- * @property-read Client $client A pre configured HTTP for client for the currently running server
+ * @property Server                  $server   The HTTP mock server that is currently running
+ * @property MatcherFactory          $matches  An instance of the matcher factory
+ * @property MockBuilder             $mock     An instance of the mock builder
+ * @property RequestCollectionFacade $requests Convenient access to recorded requests
+ * @property Client                  $client   A pre configured HTTP for client for the currently running server
  */
 class HttpMockFacade
 {
-    /** @var array  */
+    /** @var array */
     private $services = [];
 
     private $basePath;

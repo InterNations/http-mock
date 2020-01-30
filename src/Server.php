@@ -1,11 +1,11 @@
 <?php
-namespace Pagely\Component\HttpMock;
 
-use hmmmath\Fibonacci\FibonacciFactory;
-use Symfony\Component\Process\Process;
-use RuntimeException;
+namespace InterNations\Component\HttpMock;
 
 use GuzzleHttp\Client;
+use hmmmath\Fibonacci\FibonacciFactory;
+use RuntimeException;
+use Symfony\Component\Process\Process;
 
 class Server extends Process
 {
@@ -69,6 +69,7 @@ class Server extends Process
 
     /**
      * @param Expectation[] $expectations
+     *
      * @throws RuntimeException
      */
     public function setUp(array $expectations)
@@ -78,15 +79,15 @@ class Server extends Process
             $response = $this->getClient()->post(
                 '/_expectation',
                 ['json' => [
-                    'matcher'  => serialize($expectation->getMatcherClosures()),
-                    'limiter'  => serialize($expectation->getLimiter()),
+                    'matcher' => serialize($expectation->getMatcherClosures()),
+                    'limiter' => serialize($expectation->getLimiter()),
                     'response' => Util::serializePsrMessage($expectation->getResponse()),
                     'responseCallback' => serialize($expectation->getResponseCallback()),
                 ]]
             );
 
             if ($response->getStatusCode() !== 201) {
-                throw new RuntimeException('Could not set up expectations: '.$response->getBody()->getContents());
+                throw new RuntimeException('Could not set up expectations: ' . $response->getBody()->getContents());
             }
         }
     }

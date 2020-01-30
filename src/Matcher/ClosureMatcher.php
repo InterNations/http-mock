@@ -1,5 +1,6 @@
 <?php
-namespace Pagely\Component\HttpMock\Matcher;
+
+namespace InterNations\Component\HttpMock\Matcher;
 
 use Closure;
 

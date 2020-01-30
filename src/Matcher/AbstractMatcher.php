@@ -1,9 +1,10 @@
 <?php
-namespace Pagely\Component\HttpMock\Matcher;
+
+namespace InterNations\Component\HttpMock\Matcher;
 
 use Closure;
-use SuperClosure\SerializableClosure;
 use Psr\Http\Message\RequestInterface as Request;
+use SuperClosure\SerializableClosure;
 
 abstract class AbstractMatcher implements MatcherInterface
 {

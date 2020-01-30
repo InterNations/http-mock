@@ -1,11 +1,12 @@
 <?php
-namespace Pagely\Component\HttpMock\Tests\PHPUnit;
 
-use Pagely\Component\HttpMock\PHPUnit\HttpMockTrait;
+namespace InterNations\Component\HttpMock\Tests\PHPUnit;
+
+use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
 use InterNations\Component\Testing\AbstractTestCase;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Http\StatusCode;
 
 /** @large */
@@ -39,7 +40,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             [
                 '/foo',
                 '/bar',
-            ]
+            ],
         ];
     }
 
@@ -92,7 +93,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
     {
         $this->http->mock
             ->when()
-                ->callback(static function () {error_log('error output');})
+                ->callback(static function () {error_log('error output'); })
             ->then()
             ->end();
         $this->http->setUp();
@@ -141,7 +142,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame(200, $firstResponse->getStatusCode());
         $secondResponse = $this->http->client->post('/');
         $this->assertSame(410, $secondResponse->getStatusCode());
-        $this->assertSame('Expectation no longer applicable', (string)$secondResponse->getBody());
+        $this->assertSame('Expectation no longer applicable', (string) $secondResponse->getBody());
 
         $this->http->mock
             ->exactly(2)
@@ -157,7 +158,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame(200, $secondResponse->getStatusCode());
         $thirdResponse = $this->http->client->post('/');
         $this->assertSame(410, $thirdResponse->getStatusCode());
-        $this->assertSame('Expectation no longer applicable', (string)$thirdResponse->getBody());
+        $this->assertSame('Expectation no longer applicable', (string) $thirdResponse->getBody());
 
         $this->http->mock
             ->any()
@@ -181,12 +182,12 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             ->when()
                 ->methodIs('POST')
             ->then()
-                ->callback(static function(Response $response) {
+                ->callback(static function (Response $response) {
                     return $response->withBody(\GuzzleHttp\Psr7\stream_For('CALLBACK'));
                 })
             ->end();
         $this->http->setUp();
-        $this->assertSame('CALLBACK', (string)$this->http->client->post('/')->getBody());
+        $this->assertSame('CALLBACK', (string) $this->http->client->post('/')->getBody());
     }
 
     public function testComplexResponse()
@@ -205,7 +206,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
                 'headers' => ['x-client-header' => 'header-value'],
                 'form_params' => ['post-key' => 'post-value'],
             ]);
-        $this->assertSame('BODY', (string)$response->getBody());
+        $this->assertSame('BODY', (string) $response->getBody());
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeaderLine('X-Foo'));
         parse_str($this->http->requests->latest()->getBody()->getContents(), $body);
@@ -226,9 +227,9 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $response = $this->http->client
             ->put('/', [
                 'headers' => ['x-client-header' => 'header-value'],
-                'form_params' => ['put-key' => 'put-value']
+                'form_params' => ['put-key' => 'put-value'],
             ]);
-        $this->assertSame('BODY', (string)$response->getBody());
+        $this->assertSame('BODY', (string) $response->getBody());
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeaderLine('X-Foo'));
         parse_str($this->http->requests->latest()->getBody()->getContents(), $body);
@@ -249,9 +250,9 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $response = $this->http->client
             ->post('/', [
                 'headers' => ['x-client-header' => 'header-value'],
-                'form_params' => ['post-key' => 'post-value']
+                'form_params' => ['post-key' => 'post-value'],
             ]);
-        $this->assertSame('BODY', (string)$response->getBody());
+        $this->assertSame('BODY', (string) $response->getBody());
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeaderLine('X-Foo'));
         parse_str($this->http->requests->latest()->getBody()->getContents(), $body);
@@ -280,6 +281,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
                 ->callback(
                     function (Request $request) {
                         parse_str($request->getUri()->getQuery(), $query);
+
                         return isset($query['key1']);
                     }
                 )
