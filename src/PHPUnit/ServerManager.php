@@ -1,4 +1,5 @@
 <?php
+
 namespace InterNations\Component\HttpMock\PHPUnit;
 
 use InterNations\Component\HttpMock\Server;

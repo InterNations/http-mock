@@ -1,9 +1,10 @@
 <?php
+
 namespace InterNations\Component\HttpMock\Matcher;
 
 use Closure;
+use Psr\Http\Message\RequestInterface as Request;
 use SuperClosure\SerializableClosure;
-use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractMatcher implements MatcherInterface
 {

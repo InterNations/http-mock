@@ -2,7 +2,7 @@
 
 Once a SUT (system under test) has fired HTTP requests, we often want to validate that our assumption about the nature
 of those requests are valid. For that purpose HTTP mock stores every request for later inspection. The recorded requests
-are presented as an instance of `InterNations\Component\HttpMock\Request\UnifiedRequest`.
+are presented as an instance of `Slim\Http\Response`.
 
 ```php
 $this->http->mock

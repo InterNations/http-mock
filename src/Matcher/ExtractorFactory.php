@@ -1,7 +1,8 @@
 <?php
+
 namespace InterNations\Component\HttpMock\Matcher;
 
-use Symfony\Component\HttpFoundation\Request;
+use Psr\Http\Message\RequestInterface as Request;
 
 class ExtractorFactory
 {
@@ -17,7 +18,7 @@ class ExtractorFactory
         $basePath = $this->basePath;
 
         return static function (Request $request) use ($basePath) {
-            return substr_replace($request->getPathInfo(), '', 0, strlen($basePath));
+            return substr_replace($request->getUri()->getPath(), '', 0, strlen($basePath));
         };
     }
 
@@ -31,28 +32,33 @@ class ExtractorFactory
     public function createParamExtractor($param)
     {
         return static function (Request $request) use ($param) {
-            return $request->query->get($param);
+            return $request->getParam($param);
         };
     }
 
     public function createParamExistsExtractor($param)
     {
         return static function (Request $request) use ($param) {
-            return $request->query->has($param);
+            return $request->getParam($param, false) !== false;
         };
     }
 
     public function createHeaderExtractor($header)
     {
         return static function (Request $request) use ($header) {
-            return $request->headers->get($header);
+            $r = $request->getHeaderLine($header);
+            if (empty($r)) {
+                return null;
+            }
+
+            return $r;
         };
     }
 
     public function createHeaderExistsExtractor($header)
     {
         return static function (Request $request) use ($header) {
-            return $request->headers->has($header);
+            return $request->hasHeader($header);
         };
     }
 }

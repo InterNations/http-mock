@@ -1,8 +1,9 @@
 <?php
+
 namespace InterNations\Component\HttpMock\Matcher;
 
-use SuperClosure\SerializableClosure;
 use Closure;
+use SuperClosure\SerializableClosure;
 
 interface MatcherInterface
 {

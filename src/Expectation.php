@@ -1,11 +1,12 @@
 <?php
+
 namespace InterNations\Component\HttpMock;
 
+use Closure;
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherInterface;
 use SuperClosure\SerializableClosure;
-use Closure;
 
 class Expectation
 {
@@ -29,8 +30,7 @@ class Expectation
         MatcherFactory $matcherFactory,
         ExtractorFactory $extractorFactory,
         Closure $limiter
-    )
-    {
+    ) {
         $this->matcherFactory = $matcherFactory;
         $this->responseBuilder = new ResponseBuilder($mockBuilder);
         $this->extractorFactory = $extractorFactory;
@@ -140,6 +140,11 @@ class Expectation
     public function getResponse()
     {
         return $this->responseBuilder->getResponse();
+    }
+
+    public function getResponseCallback()
+    {
+        return $this->responseBuilder->getResponseCallback();
     }
 
     public function getLimiter()

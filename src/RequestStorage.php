@@ -1,7 +1,8 @@
 <?php
+
 namespace InterNations\Component\HttpMock;
 
-use Symfony\Component\HttpFoundation\Request;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 class RequestStorage
 {
@@ -28,7 +29,9 @@ class RequestStorage
             return [];
         }
 
-        return Util::deserialize(file_get_contents($fileName));
+        $r = Util::deserialize(file_get_contents($fileName));
+
+        return $r;
     }
 
     public function append(Request $request, $name, $data)
@@ -47,7 +50,7 @@ class RequestStorage
 
     private function getFileName(Request $request, $name)
     {
-        return $this->directory . $this->pid . '-' . $name . '-' . $request->server->get('SERVER_PORT');
+        return $this->directory . $this->pid . '-' . $name . '-' . $request->getUri()->getPort();
     }
 
     public function clear(Request $request, $name)
