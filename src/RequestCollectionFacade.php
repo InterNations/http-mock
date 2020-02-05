@@ -4,6 +4,8 @@ namespace InterNations\Component\HttpMock;
 
 use Countable;
 use GuzzleHttp\Client;
+use function GuzzleHttp\Psr7\parse_request;
+use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use UnexpectedValueException;
@@ -17,52 +19,32 @@ class RequestCollectionFacade implements Countable
         $this->client = $client;
     }
 
-    /**
-     * @return UnifiedRequest
-     */
-    public function latest()
+    public function latest() : RequestInterface
     {
         return $this->getRecordedRequest('/_request/last');
     }
 
-    /**
-     * @return UnifiedRequest
-     */
-    public function last()
+    public function last() : RequestInterface
     {
         return $this->getRecordedRequest('/_request/last');
     }
 
-    /**
-     * @return UnifiedRequest
-     */
-    public function first()
+    public function first() : RequestInterface
     {
         return $this->getRecordedRequest('/_request/first');
     }
 
-    /**
-     * @param int $position
-     *
-     * @return UnifiedRequest
-     */
-    public function at($position)
+    public function at($position) : RequestInterface
     {
         return $this->getRecordedRequest('/_request/' . $position);
     }
 
-    /**
-     * @return UnifiedRequest
-     */
-    public function pop()
+    public function pop() : RequestInterface
     {
         return $this->deleteRecordedRequest('/_request/last');
     }
 
-    /**
-     * @return UnifiedRequest
-     */
-    public function shift()
+    public function shift() : RequestInterface
     {
         return $this->deleteRecordedRequest('/_request/first');
     }
@@ -75,15 +57,7 @@ class RequestCollectionFacade implements Countable
         return (int) $response->getBody()->getContents();
     }
 
-    /**
-     * @param Response $response
-     * @param string   $path
-     *
-     * @throws UnexpectedValueException
-     *
-     * @return RequestInterface
-     */
-    private function parseRequestFromResponse(ResponseInterface $response, $path)
+    private function parseRequestFromResponse(ResponseInterface $response, $path) : Request
     {
         try {
             $contents = $response->getBody()->getContents();
@@ -92,9 +66,7 @@ class RequestCollectionFacade implements Countable
             throw new UnexpectedValueException(sprintf('Cannot deserialize response from "%s": "%s"', $path, $contents), null, $e);
         }
 
-        $request = \GuzzleHttp\Psr7\parse_request($requestInfo['request']);
-
-        return $request;
+        return parse_request($requestInfo['request']);
     }
 
     private function getRecordedRequest($path)

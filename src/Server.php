@@ -9,10 +9,13 @@ use Symfony\Component\Process\Process;
 
 class Server extends Process
 {
+    /** @var int */
     private $port;
 
+    /** @var string */
     private $host;
 
+    /** @var Client */
     private $client;
 
     public function __construct($port, $host)
@@ -40,7 +43,7 @@ class Server extends Process
         $this->pollWait();
     }
 
-    public function stop($timeout = 10, $signal = null)
+    public function stop($timeout = 10, int $signal = null)
     {
         return parent::stop($timeout, $signal);
     }
@@ -52,9 +55,7 @@ class Server extends Process
 
     private function createClient()
     {
-        $client = new Client(['base_uri' => $this->getBaseUrl(), 'http_errors' => false]);
-
-        return $client;
+        return new Client(['base_uri' => $this->getBaseUrl(), 'http_errors' => false]);
     }
 
     public function getBaseUrl()
@@ -103,23 +104,14 @@ class Server extends Process
 
     private function pollWait()
     {
-        $success = false;
-        foreach (FibonacciFactory::sequence(50000, 10000, 8) as $sleepTime) {
+        foreach (FibonacciFactory::sequence(50000, 10000) as $sleepTime) {
             try {
                 usleep($sleepTime);
-                $r = $this->getClient()->head('/_me');
-                if ($r->getStatusCode() != 418) {
-                    continue;
-                }
-                $success = true;
+                $this->getClient()->head('/_me');
                 break;
-            } catch (ServerException $e) {
+            } catch (\Exception $e) {
                 continue;
             }
-        }
-
-        if (!$success) {
-            throw $e;
         }
     }
 }
