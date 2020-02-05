@@ -2,13 +2,12 @@
 
 namespace InterNations\Component\HttpMock\Tests;
 
-use Guzzle\Http\Message\EntityEnclosingRequest;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use InterNations\Component\HttpMock\Server;
 use InterNations\Component\Testing\AbstractTestCase;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use SuperClosure\SerializableClosure;
 
 /**
@@ -76,7 +75,6 @@ class AppIntegrationTest extends AbstractTestCase
 
         $response = $this->client->get('/_request/latest');
 
-        /** @var EntityEnclosingRequest $request */
         $request = $this->parseRequestFromResponse($response);
         $this->assertSame('1', (string) $request->getHeaderLine('X-Special'));
         $this->assertSame('post=data', (string) $request->getBody());
@@ -237,7 +235,7 @@ class AppIntegrationTest extends AbstractTestCase
         $this->assertSame('second', $this->client->get('/')->getBody()->getContents());
     }
 
-    private function parseRequestFromResponse(Response $response)
+    private function parseRequestFromResponse(ResponseInterface $response)
     {
         $body = unserialize($response->getBody());
 
