@@ -2,6 +2,8 @@
 
 namespace InterNations\Component\HttpMock;
 
+use function GuzzleHttp\Psr7\parse_response;
+use function GuzzleHttp\Psr7\str;
 use UnexpectedValueException;
 
 final class Util
@@ -26,12 +28,11 @@ final class Util
 
     public static function responseDeserialize($string)
     {
-        return \GuzzleHttp\Psr7\parse_response($string);
+        return parse_response($string);
     }
 
     public static function serializePsrMessage($message)
     {
-        $fixedHeaders = [];
         $headers = $message->getHeaders();
         foreach ($headers as $key => $list) {
             foreach ($list as $value) {
@@ -46,6 +47,6 @@ final class Util
             }
         }
 
-        return \GuzzleHttp\Psr7\str($message);
+        return str($message);
     }
 }
