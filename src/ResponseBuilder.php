@@ -26,14 +26,14 @@ class ResponseBuilder
         $this->response = new Response();
     }
 
-    public function statusCode($statusCode) : self
+    public function statusCode(int $statusCode) : self
     {
         $this->response = $this->response->withStatus($statusCode);
 
         return $this;
     }
 
-    public function body($body)
+    public function body(string $body) : self
     {
         $this->response = $this->response->withBody(stream_for($body));
 
@@ -47,7 +47,7 @@ class ResponseBuilder
         return $this;
     }
 
-    public function header($header, $value) : self
+    public function header(string $header, string $value) : self
     {
         $this->response = $this->response->withHeader($header, $value);
 
