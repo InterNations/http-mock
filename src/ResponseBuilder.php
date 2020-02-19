@@ -49,7 +49,7 @@ class ResponseBuilder
 
     public function header(string $header, string $value) : self
     {
-        $this->response = $this->response->withHeader($key, $value);
+        $this->response = $this->response->withHeader($header, $value);
 
         return $this;
     }
