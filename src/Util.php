@@ -40,11 +40,12 @@ final class Util
                     $newKey = substr($key, 5);
                     $newKey = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', $newKey))));
                     $message = $message->withoutHeader($key)->withHeader($newKey, $value);
-                } else {
-                    $newKey = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', $key))));
-                    $message = $message->withoutHeader($key)->withHeader($newKey, $value);
                 }
             }
+        }
+
+        if (!$message->hasHeader('cache-control')) {
+            $message->withHeader('cache-control', 'no-cache, private');
         }
 
         return str($message);
