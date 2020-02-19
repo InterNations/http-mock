@@ -11,9 +11,6 @@ use SuperClosure\SerializerInterface;
 
 class ResponseBuilder
 {
-    protected const UPPER = '_ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    protected const LOWER = '-abcdefghijklmnopqrstuvwxyz';
-
     /** @var MockBuilder */
     private $mockBuilder;
 
@@ -52,8 +49,6 @@ class ResponseBuilder
 
     public function header(string $header, string $value) : self
     {
-        /** sanitize headers **/
-        $key = strtr($header, self::UPPER, self::LOWER);
         $this->response = $this->response->withHeader($key, $value);
 
         return $this;
