@@ -69,7 +69,7 @@ trait HttpMockTrait
             function (HttpMockFacade $facade) {
                 $this->assertSame(
                     '',
-                    (string) $facade->server->getIncrementalErrorOutput(),
+                    (string) $facade->getErrorOutput(),
                     'HTTP mock server standard error output should be empty'
                 );
             }

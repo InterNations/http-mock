@@ -8,6 +8,12 @@ use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
 use InterNations\Component\HttpMock\Server;
 use RuntimeException;
+use function explode;
+use function implode;
+use function strlen;
+use function substr;
+use function trim;
+use const PHP_EOL;
 
 /**
  * @property-read Server $server The HTTP mock server that is currently running
@@ -83,5 +89,61 @@ class HttpMockFacade
     public function each(callable $callback)
     {
         $callback($this);
+    }
+
+    /**
+     * Get error output (if exists)
+     *
+     * @return string
+     */
+    public function getErrorOutput()
+    {
+        return static::cleanErrorOutput($this->server->getIncrementalErrorOutput());
+    }
+
+    /**
+     * Get error output (if exists)
+     *
+     * @param string $output
+     *
+     * @return string
+     */
+    public static function cleanErrorOutput($output)
+    {
+        if (!trim($output)) {
+            return '';
+        }
+
+        $errorLines = [];
+
+        foreach (explode(PHP_EOL, $output) as $line) {
+            if(!$line) {
+                continue;
+            }
+            if (!static::endsWith($line, ['Accepted', 'Closing', ' started'])) {
+                //throw new AssertionFailedError($message ?: "PHP Web Server seems to have logged an error: $line");
+                $errorLines[] = $line;
+            }
+        }
+
+        return $errorLines ? implode(PHP_EOL, $errorLines) : '';
+    }
+
+    /**
+     * Returns true if $haystack contains at least one of $needles.
+     *
+     * @param string          $haystack
+     * @param string|string[] $needles
+     *
+     * @return bool
+     */
+    protected static function endsWith($haystack, $needles)
+    {
+        foreach((array)$needles as $needle) {
+            if (substr($haystack, -strlen($needle)) == $needle) {
+                return true;
+            }
+        }
+        return false;
     }
 }
