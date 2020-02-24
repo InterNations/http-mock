@@ -114,4 +114,46 @@ class Server extends Process
             }
         }
     }
+
+    public function getIncrementalErrorOutput()
+    {
+        return self::cleanErrorOutput(parent::getIncrementalErrorOutput());
+    }
+
+    public function getErrorOutput()
+    {
+        return self::cleanErrorOutput(parent::getErrorOutput());
+    }
+
+    public static function cleanErrorOutput($output)
+    {
+        if (!trim($output)) {
+            return '';
+        }
+
+        $errorLines = [];
+
+        foreach (explode(PHP_EOL, $output) as $line) {
+            if (!$line) {
+                continue;
+            }
+
+            if (!self::stringEndsWithAny($line, ['Accepted', 'Closing', ' started'])) {
+                $errorLines[] = $line;
+            }
+        }
+
+        return $errorLines ? implode(PHP_EOL, $errorLines) : '';
+    }
+
+    private static function stringEndsWithAny($haystack, array $needles)
+    {
+        foreach ($needles as $needle) {
+            if (substr($haystack, (-1 * strlen($needle))) === $needle) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
