@@ -125,7 +125,7 @@ class Server extends Process
         return self::cleanErrorOutput(parent::getErrorOutput());
     }
 
-    public static function cleanErrorOutput($output)
+    private static function cleanErrorOutput($output)
     {
         if (!trim($output)) {
             return '';

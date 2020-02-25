@@ -237,15 +237,18 @@ class AppIntegrationTest extends AbstractTestCase
 
     public function testServerLogsAreNotInErrorOutput()
     {
-        $expectedErrorOutput = '[Sun Feb 23 10:18:43 2020] [::1]:55146 [404]: (null) / - No such file or directory';
-        $serverLogsExample = '[Sun Feb 23 10:18:31 2020] PHP 7.4.2 Development Server (http://localhost:8086) started' . PHP_EOL .
-                             '[Sun Feb 23 10:18:43 2020] [::1]:55146 Accepted' . PHP_EOL .
-                             $expectedErrorOutput . PHP_EOL .
-                             '[Sun Feb 23 10:18:43 2020] [::1]:55146 Closing' . PHP_EOL;
+        $this->client->delete('/_all');
 
-        $cleanedServerLogs = Server::cleanErrorOutput($serverLogsExample);
+        $expectedServerErrorOutput = '[404]: (null) / - No such file or directory';
 
-        $this->assertEquals($expectedErrorOutput, $cleanedServerLogs);
+        self::$server1->addErrorOutput('PHP 7.4.2 Development Server (http://localhost:8086) started' . PHP_EOL);
+        self::$server1->addErrorOutput('Accepted' . PHP_EOL);
+        self::$server1->addErrorOutput($expectedServerErrorOutput . PHP_EOL);
+        self::$server1->addErrorOutput('Closing' . PHP_EOL);
+
+        $actualServerErrorOutput = self::$server1->getErrorOutput();
+
+        $this->assertEquals($expectedServerErrorOutput, $actualServerErrorOutput);
     }
 
     private function parseRequestFromResponse(ResponseInterface $response)
