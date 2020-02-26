@@ -221,6 +221,8 @@ class AppIntegrationTest extends AbstractTestCase
         $actualServerErrorOutput = self::$server1->getErrorOutput();
 
         $this->assertEquals($expectedServerErrorOutput, $actualServerErrorOutput);
+
+        self::$server1->clearErrorOutput();
     }
 
     private function parseRequestFromResponse(GuzzleResponse $response)
