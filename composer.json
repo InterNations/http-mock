@@ -13,10 +13,10 @@
         }
     ],
      "require": {
-         "php": "~7.1",
+        "php": "~7.1",
         "silex/silex": "~2.0",
         "guzzle/guzzle": ">=3.8",
-        "symfony/process": "~3|~4",
+        "symfony/process": "~3|~4|~5",
         "jeremeamia/superclosure": "~2",
         "lstrojny/hmmmath": ">=0.5.0"
     },
