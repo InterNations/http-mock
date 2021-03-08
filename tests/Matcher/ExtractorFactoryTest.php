@@ -112,7 +112,7 @@ class ExtractorFactoryTest extends AbstractTestCase
         $extractorFactory = new ExtractorFactory('/foo');
 
         $extractor = $extractorFactory->createHeaderExtractor('content-type');
-        $this->assertSame(null, $extractor($request));
+        $this->assertNull($extractor($request));
     }
 
     public function testHeaderExistsWithExistingHeader()
