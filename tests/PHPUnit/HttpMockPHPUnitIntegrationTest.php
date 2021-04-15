@@ -12,22 +12,22 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
 {
     use HttpMockTrait;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         static::setUpHttpMockBeforeClass();
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         static::tearDownHttpMockAfterClass();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->setUpHttpMock();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->tearDownHttpMock();
     }
@@ -103,7 +103,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             $this->tearDown();
             $this->fail('Exception expected');
         } catch (\Exception $e) {
-            $this->assertContains('HTTP mock server standard error output should be empty', $e->getMessage());
+            $this->assertStringContainsString('HTTP mock server standard error output should be empty', $e->getMessage());
         }
     }
 
@@ -324,17 +324,5 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             Response::HTTP_NOT_FOUND,
             $this->http->client->get('/?p3=foo')->send()->getStatusCode()
         );
-    }
-
-    public function testFatalError()
-    {
-        if (version_compare(PHP_VERSION, '7.0', '<')) {
-            $this->markTestSkipped('Comment in to test if fatal errors are properly handled');
-        }
-
-        $this->expectException('Error');
-
-        $this->expectExceptionMessage('Cannot instantiate abstract class');
-        new TestCase();
     }
 }

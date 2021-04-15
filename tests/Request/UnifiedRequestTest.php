@@ -1,7 +1,8 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests\Request;
 
-use Guzzle\Http\Message\EntityEnclosingRequestInterface;
+//use Guzzle\Http\Message\EntityEnclosingRequestInterface;
+use GuzzleHttp\Psr7\Request;
 use InterNations\Component\HttpMock\Request\UnifiedRequest;
 use InterNations\Component\Testing\AbstractTestCase;
 use Guzzle\Http\Message\RequestInterface;
@@ -18,10 +19,7 @@ class UnifiedRequestTest extends AbstractTestCase
     /** @var UnifiedRequest */
     private $unifiedRequest;
 
-    /** @var UnifiedRequest */
-    private $unifiedEnclosingEntityRequest;
-
-    public function setUp()
+    public function setUp(): void
     {
         $this->wrappedRequest = $this->createMock('Guzzle\Http\Message\RequestInterface');
         $this->wrappedEntityEnclosingRequest = $this->createMock('Guzzle\Http\Message\EntityEnclosingRequestInterface');

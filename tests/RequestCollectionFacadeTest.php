@@ -20,7 +20,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     /** @var RequestCollectionFacade */
     private $facade;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->client = $this->createMock('Guzzle\Http\ClientInterface');
         $this->facade = new RequestCollectionFacade($this->client);

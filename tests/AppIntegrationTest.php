@@ -7,7 +7,7 @@ use Guzzle\Http\Client;
 use Guzzle\Http\Message\RequestFactory;
 use Guzzle\Http\Message\Response as GuzzleResponse;
 use Guzzle\Http\Message\EntityEnclosingRequest;
-use SuperClosure\SerializableClosure;
+use Opis\Closure\SerializableClosure;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Process\Process;
@@ -28,20 +28,20 @@ class AppIntegrationTest extends AbstractTestCase
      */
     private $client;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         static::$server1 = new Server(HTTP_MOCK_PORT, HTTP_MOCK_HOST);
         static::$server1->start();
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         static::assertSame('', (string) static::$server1->getOutput(), (string) static::$server1->getOutput());
         static::assertSame('', (string) static::$server1->getErrorOutput(), (string) static::$server1->getErrorOutput());
         static::$server1->stop();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         static::$server1->clean();
         $this->client = static::$server1->getClient();
