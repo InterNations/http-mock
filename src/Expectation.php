@@ -24,17 +24,22 @@ class Expectation
     /** @var ExtractorFactory */
     private $extractorFactory;
 
+    /** @var boolean */
+    private $countARunEvenIfLimiterDoesntMatch;
+
     public function __construct(
         MockBuilder $mockBuilder,
         MatcherFactory $matcherFactory,
         ExtractorFactory $extractorFactory,
-        Closure $limiter
+        Closure $limiter,
+        bool $countARunEvenIfLimiterDoesntMatch = false
     )
     {
         $this->matcherFactory = $matcherFactory;
         $this->responseBuilder = new ResponseBuilder($mockBuilder);
         $this->extractorFactory = $extractorFactory;
         $this->limiter = $limiter;
+        $this->countARunEvenIfLimiterDoesntMatch = $countARunEvenIfLimiterDoesntMatch;
     }
 
     public function pathIs($matcher)
@@ -145,6 +150,11 @@ class Expectation
     public function getLimiter()
     {
         return new SerializableClosure($this->limiter);
+    }
+
+    public function getCountARunEvenIfNotSelected()
+    {
+        return $this->countARunEvenIfLimiterDoesntMatch;
     }
 
     private function appendMatcher($matcher, Closure $extractor = null)

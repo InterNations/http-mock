@@ -107,3 +107,32 @@ $this->http->mock
 
 By using `once()`, the second request will lead to a 404 HTTP Not Found, as if the request would have been undefined.
 Other methods to limit validity are `once()`, `twice()`, `thrice()` and `exactly(int $count)`.
+
+## Getting different response on successive identical queries
+
+In the previous section we saw how we could make a stub at most for N queries. But it's also possible to set up different responses on
+successive identical queries.
+
+```php
+      $this->builder
+          ->first()
+          ->when()
+              ->pathIs('/resource')
+              ->methodIs('POST')
+          ->then()
+              ->body('called once');
+      $this->builder
+          ->second()
+          ->when()
+              ->pathIs('/resource')
+              ->methodIs('POST')
+          ->then()
+              ->body('called twice');
+      $this->builder
+          ->nth(2) // "2" because the count starts at 0
+          ->when()
+              ->pathIs('/resource')
+              ->methodIs('POST')
+          ->then()
+              ->body('called 3 times');
+```
