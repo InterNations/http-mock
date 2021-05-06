@@ -123,4 +123,35 @@ class MockBuilderIntegrationTest extends TestCase
         $this->assertSame('POST 1', (string) $this->server->getClient()->post('/post-resource-1')->send()->getBody());
         $this->assertSame('POST 2', (string) $this->server->getClient()->post('/post-resource-2')->send()->getBody());
     }
+
+    public function testCreateSuccessiveExpectationsOnSameWhen()
+    {
+      $this->builder
+          ->first()
+          ->when()
+              ->pathIs('/resource')
+              ->methodIs('POST')
+          ->then()
+              ->body('called once');
+      $this->builder
+          ->second()
+          ->when()
+              ->pathIs('/resource')
+              ->methodIs('POST')
+          ->then()
+              ->body('called twice');
+      $this->builder
+          ->nth(2)
+          ->when()
+              ->pathIs('/resource')
+              ->methodIs('POST')
+          ->then()
+              ->body('called 3 times');
+
+      $this->server->setUp($this->builder->flushExpectations());
+
+      $this->assertSame('called once', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+      $this->assertSame('called twice', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+      $this->assertSame('called 3 times', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+    }
 }
