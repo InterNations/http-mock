@@ -19,6 +19,9 @@ class MockBuilder
     /** @var ExtractorFactory */
     private $extractorFactory;
 
+    /** @var int */
+    private $priority;
+
     public function __construct(MatcherFactory $matcherFactory, ExtractorFactory $extractorFactory)
     {
         $this->matcherFactory = $matcherFactory;
@@ -46,6 +49,7 @@ class MockBuilder
         $this->limiter = static function ($runs) use ($times) {
             return $runs < $times;
         };
+        $this->priority = 1;
 
         return $this;
     }
@@ -70,6 +74,7 @@ class MockBuilder
         $this->limiter = static function ($runs) use ($position) {
             return $runs === ($position - 1);
         };
+        $this->priority = 2;
 
         return $this;
     }
@@ -79,6 +84,7 @@ class MockBuilder
         $this->limiter = static function () {
             return true;
         };
+        $this->priority = 0;
 
         return $this;
     }
@@ -86,7 +92,13 @@ class MockBuilder
     /** @return Expectation */
     public function when()
     {
-        $this->expectations[] = new Expectation($this, $this->matcherFactory, $this->extractorFactory, $this->limiter);
+        $this->expectations[] = new Expectation(
+            $this,
+            $this->matcherFactory,
+            $this->extractorFactory,
+            $this->limiter,
+            $this->priority
+        );
 
         $this->any();
 
@@ -97,6 +109,13 @@ class MockBuilder
     {
         $expectations = $this->expectations;
         $this->expectations = [];
+
+        usort(
+            $expectations,
+            static function (Expectation $left, Expectation $right): int {
+                return $left->getPriority() <=> $right->getPriority();
+            }
+        );
 
         return $expectations;
     }
