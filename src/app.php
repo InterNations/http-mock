@@ -110,6 +110,10 @@ $app->post(
 $app->error(
     static function (Exception $e, Request $request, $code, GetResponseForExceptionEvent $event = null) use ($app) {
         if ($e instanceof NotFoundHttpException) {
+            if (method_exists($event, 'allowCustomResponseCode')) {
+                $event->allowCustomResponseCode();
+            }
+
             $app['storage']->append(
                 $request,
                 'requests',
@@ -141,10 +145,6 @@ $app->error(
                 if (!$applicable) {
                     $notFoundResponse = new Response('Expectation not met', Response::HTTP_GONE);
                     continue;
-                }
-
-                if (method_exists($event, 'allowCustomResponseCode')) {
-                    $event->allowCustomResponseCode();
                 }
 
                 return $expectation['response'];
