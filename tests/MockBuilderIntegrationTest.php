@@ -141,7 +141,7 @@ class MockBuilderIntegrationTest extends TestCase
           ->then()
               ->body('called twice');
       $this->builder
-          ->nth(2)
+          ->nth(3)
           ->when()
               ->pathIs('/resource')
               ->methodIs('POST')

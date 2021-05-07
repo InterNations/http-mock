@@ -133,18 +133,15 @@ $app->error(
                     }
                 }
 
-                if (isset($expectation['limiter']) && !$expectation['limiter']($expectation['runs'])) {
-                    $notFoundResponse = new Response('Expectation no longer applicable', Response::HTTP_GONE);
-                    if ($expectation['countARunEvenIfLimiterDoesntMatch']) {
-                        ++$expectations[$pos]['runs'];
-                        $app['storage']->store($request, 'expectations', $expectations);
-
-                    }
-                    continue;
-                }
+                $applicable = !isset($expectation['limiter']) || $expectation['limiter']($expectation['runs']);
 
                 ++$expectations[$pos]['runs'];
                 $app['storage']->store($request, 'expectations', $expectations);
+
+                if (!$applicable) {
+                    $notFoundResponse = new Response('Expectation not met', Response::HTTP_GONE);
+                    continue;
+                }
 
                 if (method_exists($event, 'allowCustomResponseCode')) {
                     $event->allowCustomResponseCode();

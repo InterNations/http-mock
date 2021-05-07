@@ -129,7 +129,7 @@ successive identical queries.
           ->then()
               ->body('called twice');
       $this->builder
-          ->nth(2) // "2" because the count starts at 0
+          ->nth(3)
           ->when()
               ->pathIs('/resource')
               ->methodIs('POST')
