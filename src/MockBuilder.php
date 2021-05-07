@@ -16,9 +16,6 @@ class MockBuilder
     /** @var Closure */
     private $limiter;
 
-    /** @var boolean */
-    private $countARunEvenIfLimiterDoesntMatch;
-
     /** @var ExtractorFactory */
     private $extractorFactory;
 
@@ -49,32 +46,30 @@ class MockBuilder
         $this->limiter = static function ($runs) use ($times) {
             return $runs < $times;
         };
-        $this->countARunEvenIfLimiterDoesntMatch = false;
 
         return $this;
     }
 
     public function first()
     {
-        return $this->nth(0);
+        return $this->nth(1);
     }
 
     public function second()
     {
-        return $this->nth(1);
+        return $this->nth(2);
     }
 
     public function third()
     {
-        return $this->nth(2);
+        return $this->nth(3);
     }
 
     public function nth($position)
     {
         $this->limiter = static function ($runs) use ($position) {
-            return $runs === $position;
+            return $runs === ($position - 1);
         };
-        $this->countARunEvenIfLimiterDoesntMatch = true;
 
         return $this;
     }
@@ -84,7 +79,6 @@ class MockBuilder
         $this->limiter = static function () {
             return true;
         };
-        $this->countARunEvenIfLimiterDoesntMatch = false;
 
         return $this;
     }
@@ -92,7 +86,7 @@ class MockBuilder
     /** @return Expectation */
     public function when()
     {
-        $this->expectations[] = new Expectation($this, $this->matcherFactory, $this->extractorFactory, $this->limiter, $this->countARunEvenIfLimiterDoesntMatch);
+        $this->expectations[] = new Expectation($this, $this->matcherFactory, $this->extractorFactory, $this->limiter);
 
         $this->any();
 

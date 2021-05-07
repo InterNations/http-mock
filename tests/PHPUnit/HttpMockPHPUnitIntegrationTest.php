@@ -140,7 +140,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame(200, $firstResponse->getStatusCode());
         $secondResponse = $this->http->client->post('/')->send();
         $this->assertSame(410, $secondResponse->getStatusCode());
-        $this->assertSame('Expectation no longer applicable', $secondResponse->getBody(true));
+        $this->assertSame('Expectation not met', $secondResponse->getBody(true));
 
         $this->http->mock
             ->exactly(2)
@@ -156,7 +156,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame(200, $secondResponse->getStatusCode());
         $thirdResponse = $this->http->client->post('/')->send();
         $this->assertSame(410, $thirdResponse->getStatusCode());
-        $this->assertSame('Expectation no longer applicable', $thirdResponse->getBody(true));
+        $this->assertSame('Expectation not met', $thirdResponse->getBody(true));
 
         $this->http->mock
             ->any()
