@@ -7,6 +7,10 @@ use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 
 class MockBuilder
 {
+    private const PRIORITY_ANY = 0;
+    private const PRIORITY_EXACTLY = 10;
+    private const PRIORITY_NTH = 100;
+
     /** @var Expectation[] */
     private $expectations = [];
 
@@ -49,7 +53,7 @@ class MockBuilder
         $this->limiter = static function ($runs) use ($times) {
             return $runs < $times;
         };
-        $this->priority = 1;
+        $this->priority = self::PRIORITY_EXACTLY;
 
         return $this;
     }
@@ -74,7 +78,7 @@ class MockBuilder
         $this->limiter = static function ($runs) use ($position) {
             return $runs === ($position - 1);
         };
-        $this->priority = 2;
+        $this->priority = $position * self::PRIORITY_NTH;
 
         return $this;
     }
@@ -84,7 +88,7 @@ class MockBuilder
         $this->limiter = static function () {
             return true;
         };
-        $this->priority = 0;
+        $this->priority = self::PRIORITY_ANY;
 
         return $this;
     }
