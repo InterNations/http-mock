@@ -1,6 +1,8 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests;
 
+use Closure;
+use Guzzle\Http\Message\RequestInterface;
 use InterNations\Component\HttpMock\Server;
 use InterNations\Component\Testing\AbstractTestCase;
 use Guzzle\Http\Client;
@@ -217,14 +219,18 @@ class AppIntegrationTest extends AbstractTestCase
         self::$server1->clearErrorOutput();
     }
 
-    private function parseRequestFromResponse(GuzzleResponse $response)
+    private function parseRequestFromResponse(GuzzleResponse $response): RequestInterface
     {
         $body = unserialize($response->getBody());
 
         return RequestFactory::getInstance()->fromMessage($body['request']);
     }
 
-    private function createExpectationParams(array $closures, Response $response)
+    /**
+     * @param list<Closure> $closures
+     * @return array{matcher: string, response: string}
+     */
+    private function createExpectationParams(array $closures, Response $response): array
     {
         foreach ($closures as $index => $closure) {
             $closures[$index] = new SerializableClosure($closure);

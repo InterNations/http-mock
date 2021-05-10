@@ -5,12 +5,12 @@ use Symfony\Component\HttpFoundation\Request as BaseRequest;
 
 class Request extends BaseRequest
 {
-    public function setRequestUri($requestUri): void
+    public function setRequestUri(string $requestUri): void
     {
         $this->requestUri = $requestUri;
     }
 
-    public function setContent($content): void
+    public function setContent(string $content): void
     {
         $this->content = $content;
     }

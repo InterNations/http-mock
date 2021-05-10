@@ -32,18 +32,16 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $this->tearDownHttpMock();
     }
 
-    public static function getPaths()
+    public static function getPaths(): array
     {
         return [
-            [
-                '/foo',
-                '/bar',
-            ],
+            ['/foo'],
+            ['/bar'],
         ];
     }
 
     /** @dataProvider getPaths */
-    public function testSimpleRequest($path): void
+    public function testSimpleRequest(string $path): void
     {
         $this->http->mock
             ->when()

@@ -3,11 +3,14 @@ namespace InterNations\Component\HttpMock\Tests\Request;
 
 use Guzzle\Common\Collection;
 use Guzzle\Http\EntityBody;
+use Guzzle\Http\Message\EntityEnclosingRequestInterface;
 use Guzzle\Http\Message\Header;
 use Guzzle\Http\Message\Header\HeaderCollection;
+use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\QueryString;
 use InterNations\Component\HttpMock\Request\UnifiedRequest;
 use InterNations\Component\Testing\AbstractTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class UnifiedRequestTest extends AbstractTestCase
 {
@@ -23,13 +26,13 @@ class UnifiedRequestTest extends AbstractTestCase
 
     public function setUp(): void
     {
-        $this->wrappedRequest = $this->createMock('Guzzle\Http\Message\RequestInterface');
-        $this->wrappedEntityEnclosingRequest = $this->createMock('Guzzle\Http\Message\EntityEnclosingRequestInterface');
+        $this->wrappedRequest = $this->createMock(RequestInterface::class);
+        $this->wrappedEntityEnclosingRequest = $this->createMock(EntityEnclosingRequestInterface::class);
         $this->unifiedRequest = new UnifiedRequest($this->wrappedRequest);
         $this->unifiedEnclosingEntityRequest = new UnifiedRequest($this->wrappedEntityEnclosingRequest);
     }
 
-    public static function provideMethods()
+    public static function provideMethods(): array
     {
         return [
             ['getParams', [], new Collection()],
@@ -55,7 +58,7 @@ class UnifiedRequestTest extends AbstractTestCase
         ];
     }
 
-    public static function provideEntityEnclosingInterfaceMethods()
+    public static function provideEntityEnclosingInterfaceMethods(): array
     {
         return [
             ['getBody', [], EntityBody::fromString('foo')],
@@ -72,7 +75,7 @@ class UnifiedRequestTest extends AbstractTestCase
         $this->wrappedRequest
             ->expects($this->once())
             ->method($method)
-            ->will($this->returnValue($returnValue))
+            ->willReturn($returnValue)
             ->with(...$params);
         $this->assertSame($returnValue, call_user_func_array([$this->unifiedRequest, $method], $params));
 
@@ -80,7 +83,7 @@ class UnifiedRequestTest extends AbstractTestCase
         $this->wrappedEntityEnclosingRequest
             ->expects($this->once())
             ->method($method)
-            ->will($this->returnValue($returnValue))
+            ->willReturn($returnValue)
             ->with(...$params);
         $this->assertSame(
             $returnValue,
@@ -98,7 +101,7 @@ class UnifiedRequestTest extends AbstractTestCase
         $this->wrappedEntityEnclosingRequest
             ->expects($this->once())
             ->method($method)
-            ->will($this->returnValue($returnValue))
+            ->willReturn($returnValue)
             ->with(...$params);
 
         $this->assertSame(
@@ -109,11 +112,11 @@ class UnifiedRequestTest extends AbstractTestCase
         $this->wrappedRequest
             ->expects($this->any())
             ->method('getMethod')
-            ->will($this->returnValue('METHOD'));
+            ->willReturn('METHOD');
         $this->wrappedRequest
             ->expects($this->any())
             ->method('getPath')
-            ->will($this->returnValue('/foo'));
+            ->willReturn('/foo');
 
         $this->expectException('BadMethodCallException');
 

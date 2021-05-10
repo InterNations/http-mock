@@ -1,11 +1,13 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests;
 
+use Guzzle\Http\ClientInterface;
 use Guzzle\Http\Message\Request;
 use Guzzle\Http\Message\Response;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
 use InterNations\Component\Testing\AbstractTestCase;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class RequestCollectionFacadeTest extends AbstractTestCase
 {
@@ -24,7 +26,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         $this->request->setClient($this->client);
     }
 
-    public static function provideMethodAndUrls()
+    public static function provideMethodAndUrls(): array
     {
         return [
             ['latest', '/_request/last'],
@@ -37,36 +39,51 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestingLatestRequest($method, $path, array $args = [], $httpMethod = 'get'): void
+    public function testRequestingLatestRequest(
+        string $method,
+        string $path,
+        array $args = [],
+        string $httpMethod = 'get'
+    ): void
     {
         $this->mockClient($path, $this->createSimpleResponse(), $httpMethod);
 
         $request = call_user_func_array([$this->facade, $method], $args);
 
-        $this->assertSame('POST', $request->getMethod());
-        $this->assertSame('/foo', $request->getPath());
-        $this->assertSame('RECORDED=1', (string) $request->getBody());
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('/foo', $request->getPath());
+        self::assertSame('RECORDED=1', (string) $request->getBody());
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestLatestResponseWithHttpAuth($method, $path, array $args = [], $httpMethod = 'get'): void
+    public function testRequestLatestResponseWithHttpAuth(
+        string $method,
+        string $path,
+        array $args = [],
+        string $httpMethod = 'get'
+    ): void
     {
         $this->mockClient($path, $this->createComplexResponse(), $httpMethod);
 
         $request = call_user_func_array([$this->facade, $method], $args);
 
-        $this->assertSame('POST', $request->getMethod());
-        $this->assertSame('/foo', $request->getPath());
-        $this->assertSame('RECORDED=1', (string) $request->getBody());
-        $this->assertSame('host', $request->getHost());
-        $this->assertSame(1234, $request->getPort());
-        $this->assertSame('username', $request->getUsername());
-        $this->assertSame('password', $request->getPassword());
-        $this->assertSame('CUSTOM UA', $request->getUserAgent());
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('/foo', $request->getPath());
+        self::assertSame('RECORDED=1', (string) $request->getBody());
+        self::assertSame('host', $request->getHost());
+        self::assertSame(1234, $request->getPort());
+        self::assertSame('username', $request->getUsername());
+        self::assertSame('password', $request->getPassword());
+        self::assertSame('CUSTOM UA', $request->getUserAgent());
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_InvalidStatusCode($method, $path, array $args = [], $httpMethod = 'get'): void
+    public function testRequestResponseWithInvalidStatusCode(
+        string $method,
+        string $path,
+        array $args = [],
+        string $httpMethod = 'get'
+    ): void
     {
         $this->mockClient($path, $this->createResponseWithInvalidStatusCode(), $httpMethod);
 
@@ -77,7 +94,12 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_EmptyContentType($method, $path, array $args = [], $httpMethod = 'get'): void
+    public function testRequestResponseWithEmptyContentType(
+        string $method,
+        string $path,
+        array $args = [],
+        string $httpMethod = 'get'
+    ): void
     {
         $this->mockClient($path, $this->createResponseWithEmptyContentType(), $httpMethod);
 
@@ -88,7 +110,12 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_InvalidContentType($method, $path, array $args = [], $httpMethod = 'get'): void
+    public function testRequestResponseWithInvalidContentType(
+        string $method,
+        string $path,
+        array $args = [],
+        string $httpMethod = 'get'
+    ): void
     {
         $this->mockClient($path, $this->createResponseWithInvalidContentType(), $httpMethod);
 
@@ -99,11 +126,11 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_DeserializationError(
-        $method,
-        $path,
+    public function testRequestResponseWithDeserializationError(
+        string $method,
+        string $path,
         array $args = [],
-        $httpMethod = 'get'
+        string $httpMethod = 'get'
     ): void
     {
         $this->mockClient($path, $this->createResponseThatCannotBeDeserialized(), $httpMethod);
@@ -114,22 +141,22 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         call_user_func_array([$this->facade, $method], $args);
     }
 
-    private function mockClient($path, Response $response, $method): void
+    private function mockClient(string $path, Response $response, string $method): void
     {
         $this->client
-            ->expects($this->once())
+            ->expects(self::once())
             ->method($method)
             ->with($path)
-            ->will($this->returnValue($this->request));
+            ->willReturn($this->request);
 
         $this->client
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('send')
             ->with($this->request)
-            ->will($this->returnValue($response));
+            ->willReturn($response);
     }
 
-    private function createSimpleResponse()
+    private function createSimpleResponse(): Response
     {
         $recordedRequest = new TestRequest();
         $recordedRequest->setMethod('POST');
@@ -148,7 +175,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         );
     }
 
-    private function createComplexResponse()
+    private function createComplexResponse(): Response
     {
         $recordedRequest = new TestRequest();
         $recordedRequest->setMethod('POST');
@@ -176,22 +203,22 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         );
     }
 
-    private function createResponseWithInvalidStatusCode()
+    private function createResponseWithInvalidStatusCode(): Response
     {
         return new Response(404);
     }
 
-    private function createResponseWithInvalidContentType()
+    private function createResponseWithInvalidContentType(): Response
     {
         return new Response(200, ['Content-Type' => 'text/html']);
     }
 
-    private function createResponseWithEmptyContentType()
+    private function createResponseWithEmptyContentType(): Response
     {
         return new Response(200, []);
     }
 
-    private function createResponseThatCannotBeDeserialized()
+    private function createResponseThatCannotBeDeserialized(): Response
     {
         return new Response(200, ['Content-Type' => 'text/plain'], 'invalid response');
     }
