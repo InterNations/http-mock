@@ -8,20 +8,14 @@ use SplObjectStorage;
 final class ServerManager
 // @codingStandardsIgnoreEnd
 {
-    /** @var SplObjectStorage|Server[] */
-    private $servers;
+    /** @var SplObjectStorage|iterable<Server> */
+    private SplObjectStorage $servers;
 
-    private static $instance;
+    private static ?self $instance = null;
 
-    /**
-     */
     public static function getInstance(): self
     {
-        if (!static::$instance) {
-            static::$instance = new static();
-        }
-
-        return static::$instance;
+        return self::$instance ?: (self::$instance = new self());
     }
 
     public function add(Server $server): void

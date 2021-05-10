@@ -2,34 +2,34 @@
 namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
 use InterNations\Component\Testing\AbstractTestCase;
-use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
+use InterNations\Component\HttpMock\PHPUnit\HttpMock;
 
 /** @large */
 class HttpMockPHPUnitIntegrationBasePathTest extends AbstractTestCase
 {
-    use HttpMockTrait;
+    use HttpMock;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         static::setUpHttpMockBeforeClass(null, null, '/custom-base-path');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         static::tearDownHttpMockAfterClass();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->setUpHttpMock();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->tearDownHttpMock();
     }
 
-    public function testSimpleRequest()
+    public function testSimpleRequest(): void
     {
         $this->http->mock
             ->when()

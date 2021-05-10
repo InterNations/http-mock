@@ -3,14 +3,11 @@ namespace InterNations\Component\HttpMock\Tests\Request;
 
 use Guzzle\Common\Collection;
 use Guzzle\Http\EntityBody;
-use Guzzle\Http\Message\EntityEnclosingRequestInterface;
 use Guzzle\Http\Message\Header;
 use Guzzle\Http\Message\Header\HeaderCollection;
 use Guzzle\Http\QueryString;
 use InterNations\Component\HttpMock\Request\UnifiedRequest;
 use InterNations\Component\Testing\AbstractTestCase;
-use Guzzle\Http\Message\RequestInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class UnifiedRequestTest extends AbstractTestCase
 {
@@ -20,13 +17,11 @@ class UnifiedRequestTest extends AbstractTestCase
     /** @var EntityEnclosingRequestInterface|MockObject */
     private $wrappedEntityEnclosingRequest;
 
-    /** @var UnifiedRequest */
-    private $unifiedRequest;
+    private UnifiedRequest $unifiedRequest;
 
-    /** @var UnifiedRequest */
-    private $unifiedEnclosingEntityRequest;
+    private UnifiedRequest $unifiedEnclosingEntityRequest;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->wrappedRequest = $this->createMock('Guzzle\Http\Message\RequestInterface');
         $this->wrappedEntityEnclosingRequest = $this->createMock('Guzzle\Http\Message\EntityEnclosingRequestInterface');
@@ -72,7 +67,7 @@ class UnifiedRequestTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethods */
-    public function testMethodsFromRequestInterface($method, array $params = [], $returnValue = 'REQ')
+    public function testMethodsFromRequestInterface($method, array $params = [], $returnValue = 'REQ'): void
     {
         $this->wrappedRequest
             ->expects($this->once())
@@ -94,7 +89,11 @@ class UnifiedRequestTest extends AbstractTestCase
     }
 
     /** @dataProvider provideEntityEnclosingInterfaceMethods */
-    public function testEntityEnclosingInterfaceMethods($method, array $params = [], $returnValue = 'Return Value')
+    public function testEntityEnclosingInterfaceMethods(
+        $method,
+        array $params = [],
+        $returnValue = 'Return Value'
+    ): void
     {
         $this->wrappedEntityEnclosingRequest
             ->expects($this->once())
@@ -129,7 +128,7 @@ class UnifiedRequestTest extends AbstractTestCase
         call_user_func_array([$this->unifiedRequest, $method], $params);
     }
 
-    public function testUserAgent()
+    public function testUserAgent(): void
     {
         $this->assertNull($this->unifiedRequest->getUserAgent());
 

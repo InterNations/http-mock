@@ -4,23 +4,21 @@ namespace InterNations\Component\HttpMock\Tests\Matcher;
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\Testing\AbstractTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class ExtractorFactoryTest extends AbstractTestCase
 {
-    /** @var ExtractorFactory */
-    private $extractorFactory;
+    private ExtractorFactory $extractorFactory;
 
     /** @var Request|MockObject */
     private $request;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->extractorFactory = new ExtractorFactory();
         $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
     }
 
-    public function testGetMethod()
+    public function testGetMethod(): void
     {
         $this->request
             ->expects($this->once())
@@ -31,7 +29,7 @@ class ExtractorFactoryTest extends AbstractTestCase
         $this->assertSame('POST', $extractor($this->request));
     }
 
-    public function testGetPath()
+    public function testGetPath(): void
     {
         $this->request
             ->expects($this->once())
@@ -42,7 +40,7 @@ class ExtractorFactoryTest extends AbstractTestCase
         $this->assertSame('/foo/bar', $extractor($this->request));
     }
 
-    public function testGetPathWithBasePath()
+    public function testGetPathWithBasePath(): void
     {
         $this->request
             ->expects($this->once())
@@ -55,7 +53,7 @@ class ExtractorFactoryTest extends AbstractTestCase
         $this->assertSame('/bar', $extractor($this->request));
     }
 
-    public function testGetPathWithBasePathTrailingSlash()
+    public function testGetPathWithBasePathTrailingSlash(): void
     {
         $this->request
             ->expects($this->once())
@@ -68,7 +66,7 @@ class ExtractorFactoryTest extends AbstractTestCase
         $this->assertSame('/bar', $extractor($this->request));
     }
 
-    public function testGetPathWithBasePathThatDoesNotMatch()
+    public function testGetPathWithBasePathThatDoesNotMatch(): void
     {
         $this->request
             ->expects($this->once())
@@ -81,7 +79,7 @@ class ExtractorFactoryTest extends AbstractTestCase
         $this->assertSame('', $extractor($this->request));
     }
 
-    public function testGetHeaderWithExistingHeader()
+    public function testGetHeaderWithExistingHeader(): void
     {
         $request = new Request(
             [],
@@ -98,7 +96,7 @@ class ExtractorFactoryTest extends AbstractTestCase
         $this->assertSame('application/json', $extractor($request));
     }
 
-    public function testGetHeaderWithNonExistingHeader()
+    public function testGetHeaderWithNonExistingHeader(): void
     {
         $request = new Request(
             [],
@@ -115,7 +113,7 @@ class ExtractorFactoryTest extends AbstractTestCase
         $this->assertNull($extractor($request));
     }
 
-    public function testHeaderExistsWithExistingHeader()
+    public function testHeaderExistsWithExistingHeader(): void
     {
         $request = new Request(
             [],
@@ -132,7 +130,7 @@ class ExtractorFactoryTest extends AbstractTestCase
         $this->assertTrue($extractor($request));
     }
 
-    public function testHeaderExistsWithNonExistingHeader()
+    public function testHeaderExistsWithNonExistingHeader(): void
     {
         $request = new Request(
             [],

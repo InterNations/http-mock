@@ -5,9 +5,10 @@ use UnexpectedValueException;
 
 final class Util
 {
-    public static function deserialize($string)
+    /** @return mixed */
+    public static function deserialize(string $string)
     {
-        $result = static::silentDeserialize($string);
+        $result = self::silentDeserialize($string);
 
         if ($result === false) {
             throw new UnexpectedValueException('Cannot deserialize string');
@@ -16,7 +17,8 @@ final class Util
         return $result;
     }
 
-    public static function silentDeserialize($string)
+    /** @return mixed */
+    public static function silentDeserialize(string $string)
     {
         // @codingStandardsIgnoreStart
         return @unserialize($string);

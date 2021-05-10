@@ -50,7 +50,15 @@ $app->post(
         $matcher = [];
 
         if ($request->request->has('matcher')) {
-            $matcher = Util::silentDeserialize($request->request->get('matcher'));
+            $matcherParameter = $request->request->get('matcher');
+            if (!is_string($matcherParameter)) {
+                return new Response(
+                    'POST data key "matcher" must be a serialized list of closures',
+                    Response::HTTP_EXPECTATION_FAILED
+                );
+            }
+
+            $matcher = Util::silentDeserialize($matcherParameter);
             $validator = static function ($closure) {
                 return is_callable($closure);
             };

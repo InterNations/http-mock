@@ -1,12 +1,10 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests;
 
-use Guzzle\Http\ClientInterface;
 use Guzzle\Http\Message\Request;
 use Guzzle\Http\Message\Response;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
 use InterNations\Component\Testing\AbstractTestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 
 class RequestCollectionFacadeTest extends AbstractTestCase
@@ -14,13 +12,11 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     /** @var ClientInterface|MockObject */
     private $client;
 
-    /** @var Request */
-    private $request;
+    private Request $request;
 
-    /** @var RequestCollectionFacade */
-    private $facade;
+    private RequestCollectionFacade $facade;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->client = $this->createMock('Guzzle\Http\ClientInterface');
         $this->facade = new RequestCollectionFacade($this->client);
@@ -41,7 +37,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestingLatestRequest($method, $path, array $args = [], $httpMethod = 'get')
+    public function testRequestingLatestRequest($method, $path, array $args = [], $httpMethod = 'get'): void
     {
         $this->mockClient($path, $this->createSimpleResponse(), $httpMethod);
 
@@ -53,7 +49,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestLatestResponseWithHttpAuth($method, $path, array $args = [], $httpMethod = 'get')
+    public function testRequestLatestResponseWithHttpAuth($method, $path, array $args = [], $httpMethod = 'get'): void
     {
         $this->mockClient($path, $this->createComplexResponse(), $httpMethod);
 
@@ -70,7 +66,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_InvalidStatusCode($method, $path, array $args = [], $httpMethod = 'get')
+    public function testRequestResponse_InvalidStatusCode($method, $path, array $args = [], $httpMethod = 'get'): void
     {
         $this->mockClient($path, $this->createResponseWithInvalidStatusCode(), $httpMethod);
 
@@ -81,7 +77,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_EmptyContentType($method, $path, array $args = [], $httpMethod = 'get')
+    public function testRequestResponse_EmptyContentType($method, $path, array $args = [], $httpMethod = 'get'): void
     {
         $this->mockClient($path, $this->createResponseWithEmptyContentType(), $httpMethod);
 
@@ -92,7 +88,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_InvalidContentType($method, $path, array $args = [], $httpMethod = 'get')
+    public function testRequestResponse_InvalidContentType($method, $path, array $args = [], $httpMethod = 'get'): void
     {
         $this->mockClient($path, $this->createResponseWithInvalidContentType(), $httpMethod);
 
@@ -103,7 +99,12 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     }
 
     /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_DeserializationError($method, $path, array $args = [], $httpMethod = 'get')
+    public function testRequestResponse_DeserializationError(
+        $method,
+        $path,
+        array $args = [],
+        $httpMethod = 'get'
+    ): void
     {
         $this->mockClient($path, $this->createResponseThatCannotBeDeserialized(), $httpMethod);
 
@@ -113,7 +114,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         call_user_func_array([$this->facade, $method], $args);
     }
 
-    private function mockClient($path, Response $response, $method)
+    private function mockClient($path, Response $response, $method): void
     {
         $this->client
             ->expects($this->once())

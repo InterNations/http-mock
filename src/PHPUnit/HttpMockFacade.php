@@ -1,7 +1,6 @@
 <?php
 namespace InterNations\Component\HttpMock\PHPUnit;
 
-use Guzzle\Http\Client;
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
@@ -18,12 +17,12 @@ use RuntimeException;
  */
 class HttpMockFacade
 {
-    /** @var array  */
+    /** @var array<string,object> */
     private array $services = [];
 
-    private $basePath;
+    private ?string $basePath;
 
-    public function __construct($port, $host, $basePath)
+    public function __construct(int $port, string $host, ?string $basePath = null)
     {
         $server = new Server($port, $host);
         $server->start();
@@ -31,7 +30,8 @@ class HttpMockFacade
         $this->basePath = $basePath;
     }
 
-    public static function getProperties()
+    /** @return list<string> */
+    public static function getProperties(): array
     {
         return ['server', 'matches', 'mock', 'requests', 'client'];
     }
@@ -41,37 +41,28 @@ class HttpMockFacade
         $this->server->setUp($this->mock->flushExpectations());
     }
 
-    public function __get($property)
+    public function __get(string $property): object
     {
-        if (isset($this->services[$property])) {
-            return $this->services[$property];
-        }
-
-        return $this->services[$property] = $this->createService($property);
+        return $this->services[$property] ?? ($this->services[$property] = $this->createService($property));
     }
 
-    private function createService($property)
+    private function createService(string $property): object
     {
         switch ($property) {
             case 'matches':
                 return new MatcherFactory();
-                break;
 
             case 'mock':
                 return new MockBuilder($this->matches, new ExtractorFactory($this->basePath));
-                break;
 
             case 'client':
                 return $this->server->getClient();
-                break;
 
             case 'requests':
                 return new RequestCollectionFacade($this->client);
-                break;
 
             default:
                 throw new RuntimeException(sprintf('Invalid property "%s" read', $property));
-                break;
         }
     }
 

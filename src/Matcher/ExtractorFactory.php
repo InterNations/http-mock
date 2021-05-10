@@ -3,16 +3,16 @@ namespace InterNations\Component\HttpMock\Matcher;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class ExtractorFactory
+final class ExtractorFactory
 {
-    private $basePath;
+    private string $basePath;
 
-    public function __construct($basePath = '')
+    public function __construct(?string $basePath = null)
     {
         $this->basePath = rtrim($basePath, '/');
     }
 
-    public function createPathExtractor()
+    public function createPathExtractor(): callable
     {
         $basePath = $this->basePath;
 
@@ -21,35 +21,35 @@ class ExtractorFactory
         };
     }
 
-    public function createMethodExtractor()
+    public function createMethodExtractor(): callable
     {
         return static function (Request $request) {
             return $request->getMethod();
         };
     }
 
-    public function createParamExtractor($param)
+    public function createParamExtractor(string $param): callable
     {
         return static function (Request $request) use ($param) {
             return $request->query->get($param);
         };
     }
 
-    public function createParamExistsExtractor($param)
+    public function createParamExistsExtractor(string $param): callable
     {
         return static function (Request $request) use ($param) {
             return $request->query->has($param);
         };
     }
 
-    public function createHeaderExtractor($header)
+    public function createHeaderExtractor(string $header): callable
     {
         return static function (Request $request) use ($header) {
             return $request->headers->get($header);
         };
     }
 
-    public function createHeaderExistsExtractor($header)
+    public function createHeaderExistsExtractor(string $header): callable
     {
         return static function (Request $request) use ($header) {
             return $request->headers->has($header);

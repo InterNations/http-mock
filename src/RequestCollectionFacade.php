@@ -12,7 +12,7 @@ use UnexpectedValueException;
 
 class RequestCollectionFacade implements Countable
 {
-    private $client;
+    private ClientInterface $client;
 
     public function __construct(ClientInterface $client)
     {
@@ -61,7 +61,7 @@ class RequestCollectionFacade implements Countable
         return $this->deleteRecordedRequest('/_request/first');
     }
 
-    public function count()
+    public function count(): int
     {
         $response = $this->client
             ->get('/_request/count')
@@ -89,13 +89,18 @@ class RequestCollectionFacade implements Countable
         $params = $this->configureRequest(
             $request,
             $requestInfo['server'],
-            isset($requestInfo['enclosure']) ? $requestInfo['enclosure'] : []
+            $requestInfo['enclosure'] ?? []
         );
 
         return new UnifiedRequest($request, $params);
     }
 
-    private function configureRequest(RequestInterface $request, array $server, array $enclosure)
+    /**
+     * @param array<string,string> $server
+     * @param array<string,string> $enclosure
+     * @return array<string,string>
+     */
+    private function configureRequest(RequestInterface $request, array $server, array $enclosure): array
     {
         if (isset($server['HTTP_HOST'])) {
             $request->setHost($server['HTTP_HOST']);
@@ -106,7 +111,7 @@ class RequestCollectionFacade implements Countable
         }
 
         if (isset($server['PHP_AUTH_USER'])) {
-            $request->setAuth($server['PHP_AUTH_USER'], isset($server['PHP_AUTH_PW']) ? $server['PHP_AUTH_PW'] : null);
+            $request->setAuth($server['PHP_AUTH_USER'], $server['PHP_AUTH_PW'] ?? null);
         }
 
         $params = [];
@@ -122,7 +127,7 @@ class RequestCollectionFacade implements Countable
         return $params;
     }
 
-    private function getRecordedRequest($path)
+    private function getRecordedRequest(string $path): UnifiedRequest
     {
         $response = $this->client
             ->get($path)
@@ -131,7 +136,7 @@ class RequestCollectionFacade implements Countable
         return $this->parseResponse($response, $path);
     }
 
-    private function deleteRecordedRequest($path)
+    private function deleteRecordedRequest(string $path): UnifiedRequest
     {
         $response = $this->client
             ->delete($path)
@@ -140,9 +145,9 @@ class RequestCollectionFacade implements Countable
         return $this->parseResponse($response, $path);
     }
 
-    private function parseResponse(Response $response, $path)
+    private function parseResponse(Response $response, string $path): UnifiedRequest
     {
-        $statusCode = $response->getStatusCode();
+        $statusCode = (int) $response->getStatusCode();
 
         if ($statusCode !== 200) {
             throw new UnexpectedValueException(
@@ -154,7 +159,7 @@ class RequestCollectionFacade implements Countable
             ? $response->getContentType()
             : '';
 
-        if (substr($contentType, 0, 10) !== 'text/plain') {
+        if (strpos($contentType, 'text/plain') !== 0) {
             throw new UnexpectedValueException(
                 sprintf('Expected content type "text/plain" from "%s", got "%s"', $path, $contentType)
             );

@@ -5,6 +5,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CallbackResponse extends Response
 {
+    /** @var callable */
     private $callback;
 
     public function setCallback(callable $callback): void
@@ -14,10 +15,12 @@ class CallbackResponse extends Response
 
     public function sendCallback(): void
     {
-        if ($this->callback) {
-            $callback = $this->callback;
-            $callback($this);
+        if (!$this->callback) {
+            return;
         }
+
+        $callback = $this->callback;
+        $callback($this);
     }
 
     public function send(): void

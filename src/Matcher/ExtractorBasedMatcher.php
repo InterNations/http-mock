@@ -5,7 +5,7 @@ use Closure;
 use SuperClosure\SerializableClosure;
 use Symfony\Component\HttpFoundation\Request;
 
-abstract class AbstractMatcher implements MatcherInterface
+abstract class ExtractorBasedMatcher implements Matcher
 {
     protected ?Closure $extractor = null;
 

@@ -9,14 +9,14 @@ use Guzzle\Http\Message\Header;
 use Guzzle\Http\Message\Header\HeaderCollection;
 use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\QueryString;
-use Guzzle\Http\Url;
 
-class UnifiedRequest
+final class UnifiedRequest
 {
     private RequestInterface $wrapped;
 
     private ?string $userAgent = null;
 
+    /** @param array<string,mixed> $params */
     public function __construct(RequestInterface $wrapped, array $params = [])
     {
         $this->wrapped = $wrapped;
@@ -34,7 +34,7 @@ class UnifiedRequest
      */
     public function getBody(): ?EntityBodyInterface
     {
-        return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
+        return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__);
     }
 
     /**
@@ -46,7 +46,7 @@ class UnifiedRequest
      */
     public function getPostField(string $field)
     {
-        return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
+        return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, [$field]);
     }
 
     /**
@@ -55,7 +55,7 @@ class UnifiedRequest
      */
     public function getPostFields(): QueryString
     {
-        return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
+        return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__);
     }
 
     /**
@@ -65,7 +65,7 @@ class UnifiedRequest
      */
     public function getPostFiles(): array
     {
-        return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
+        return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__);
     }
 
     /**
@@ -77,7 +77,7 @@ class UnifiedRequest
      */
     public function getPostFile(string $fieldName): ?array
     {
-        return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
+        return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, [$fieldName]);
     }
 
     /**
@@ -258,7 +258,11 @@ class UnifiedRequest
         return $this->wrapped->getCookie($name);
     }
 
-    protected function invokeWrappedIfEntityEnclosed($method, array $params = [])
+    /**
+     * @param array<mixed> $params
+     * @return mixed
+     */
+    protected function invokeWrappedIfEntityEnclosed(string $method, array $params = [])
     {
         if (!$this->wrapped instanceof EntityEnclosingRequestInterface) {
             throw new BadMethodCallException(
@@ -275,12 +279,15 @@ class UnifiedRequest
         return call_user_func_array([$this->wrapped, $method], $params);
     }
 
+    /** @param array<string, mixed> $params */
     private function init(array $params): void
     {
         foreach ($params as $property => $value) {
-            if (property_exists($this, $property)) {
-                $this->{$property} = $value;
+            if (!property_exists($this, $property)) {
+                continue;
             }
+
+            $this->{$property} = $value;
         }
     }
 }

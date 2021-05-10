@@ -10,13 +10,13 @@ use Guzzle\Http\Exception\CurlException;
 
 class Server extends Process
 {
-    private $port;
+    private int $port;
 
-    private $host;
+    private string $host;
 
-    private $client;
+    private ?Client $client = null;
 
-    public function __construct($port, $host)
+    public function __construct(int $port, string $host)
     {
         $this->port = $port;
         $this->host = $host;
@@ -34,6 +34,7 @@ class Server extends Process
         $this->setTimeout(null);
     }
 
+    /** @param array<string,string> $env */
     public function start(callable $callback = null, array $env = []): void
     {
         parent::start($callback, $env);
@@ -41,17 +42,21 @@ class Server extends Process
         $this->pollWait();
     }
 
-    public function stop($timeout = 10, $signal = null)
+    /**
+     * @param int|float $timeout
+     * @param int $signal
+     */
+    public function stop($timeout = 10, $signal = null): ?int
     {
         return parent::stop($timeout, $signal);
     }
 
-    public function getClient()
+    public function getClient(): Client
     {
         return $this->client ?: $this->client = $this->createClient();
     }
 
-    private function createClient()
+    private function createClient(): Client
     {
         $client = new Client($this->getBaseUrl());
         $client->getEventDispatcher()->addListener(
@@ -64,18 +69,18 @@ class Server extends Process
         return $client;
     }
 
-    public function getBaseUrl()
+    public function getBaseUrl(): string
     {
         return sprintf('http://%s', $this->getConnectionString());
     }
 
-    public function getConnectionString()
+    public function getConnectionString(): string
     {
         return sprintf('%s:%d', $this->host, $this->port);
     }
 
     /**
-     * @param Expectation[] $expectations
+     * @param array<Expectation> $expectations
      * @throws RuntimeException
      */
     public function setUp(array $expectations): void
@@ -120,17 +125,17 @@ class Server extends Process
         }
     }
 
-    public function getIncrementalErrorOutput()
+    public function getIncrementalErrorOutput(): string
     {
         return self::cleanErrorOutput(parent::getIncrementalErrorOutput());
     }
 
-    public function getErrorOutput()
+    public function getErrorOutput(): string
     {
         return self::cleanErrorOutput(parent::getErrorOutput());
     }
 
-    private static function cleanErrorOutput($output)
+    private static function cleanErrorOutput(string $output): string
     {
         if (!trim($output)) {
             return '';
@@ -143,15 +148,18 @@ class Server extends Process
                 continue;
             }
 
-            if (!self::stringEndsWithAny($line, ['Accepted', 'Closing', ' started'])) {
-                $errorLines[] = $line;
+            if (self::stringEndsWithAny($line, ['Accepted', 'Closing', ' started'])) {
+                continue;
             }
+
+            $errorLines[] = $line;
         }
 
         return $errorLines ? implode(PHP_EOL, $errorLines) : '';
     }
 
-    private static function stringEndsWithAny($haystack, array $needles)
+    /** @param list<string> $needles */
+    private static function stringEndsWithAny(string $haystack, array $needles): bool
     {
         foreach ($needles as $needle) {
             if (substr($haystack, (-1 * strlen($needle))) === $needle) {

@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class StringMatcherTest extends AbstractTestCase
 {
-    public function testConversionToString()
+    public function testConversionToString(): void
     {
         $matcher = new StringMatcher('0');
         $matcher->setExtractor(static function() {

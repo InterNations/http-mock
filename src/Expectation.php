@@ -3,14 +3,14 @@ namespace InterNations\Component\HttpMock;
 
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
-use InterNations\Component\HttpMock\Matcher\MatcherInterface;
+use InterNations\Component\HttpMock\Matcher\Matcher;
 use SuperClosure\SerializableClosure;
 use Closure;
 use Symfony\Component\HttpFoundation\Response;
 
 class Expectation
 {
-    /** @var MatcherInterface[] */
+    /** @var array<Matcher> */
     private array $matcher = [];
     private MatcherFactory $matcherFactory;
     private ResponseBuilder $responseBuilder;
@@ -36,7 +36,7 @@ class Expectation
         $this->priority = $priority;
     }
 
-    /** @param string|MatcherInterface $matcher */
+    /** @param string|Matcher $matcher */
     public function pathIs($matcher): self
     {
         $this->appendMatcher($matcher, $this->extractorFactory->createPathExtractor());
@@ -44,7 +44,7 @@ class Expectation
         return $this;
     }
 
-    /** @param string|MatcherInterface $matcher */
+    /** @param string|Matcher $matcher */
     public function methodIs($matcher): self
     {
         $this->appendMatcher($matcher, $this->extractorFactory->createMethodExtractor());
@@ -52,7 +52,7 @@ class Expectation
         return $this;
     }
 
-    /** @param string|MatcherInterface $matcher */
+    /** @param string|Matcher $matcher */
     public function queryParamIs(string $param, $matcher): self
     {
         $this->appendMatcher($matcher, $this->extractorFactory->createParamExtractor($param));
@@ -74,7 +74,7 @@ class Expectation
         return $this;
     }
 
-    /** @param array<string,MatcherInterface|string> $paramMap */
+    /** @param array<string,Matcher|string> $paramMap */
     public function queryParamsAre(array $paramMap): self
     {
         foreach ($paramMap as $param => $value) {
@@ -84,7 +84,7 @@ class Expectation
         return $this;
     }
 
-    /** @param string[] $params */
+    /** @param array<string> $params */
     public function queryParamsExist(array $params): self
     {
         foreach ($params as $param) {
@@ -94,7 +94,7 @@ class Expectation
         return $this;
     }
 
-    /** @param string[] $params */
+    /** @param array<string> $params */
     public function queryParamsNotExist(array $params): self
     {
         foreach ($params as $param) {
@@ -104,7 +104,7 @@ class Expectation
         return $this;
     }
 
-    /** @param string|MatcherInterface $value */
+    /** @param string|Matcher $value */
     public function headerIs(string $name, $value): self
     {
         $this->appendMatcher($value, $this->extractorFactory->createHeaderExtractor($name));
@@ -126,7 +126,7 @@ class Expectation
         return $this;
     }
 
-    /** @return SerializableClosure[]  */
+    /** @return array<SerializableClosure>  */
     public function getMatcherClosures(): array
     {
         $closures = [];
@@ -158,7 +158,7 @@ class Expectation
         return new SerializableClosure($this->limiter);
     }
 
-    /** @param string|MatcherInterface $matcher */
+    /** @param string|Matcher $matcher */
     private function appendMatcher($matcher, Closure $extractor = null): void
     {
         $matcher = $this->createMatcher($matcher);
@@ -170,9 +170,9 @@ class Expectation
         $this->matcher[] = $matcher;
     }
 
-    /** @param string|MatcherInterface $matcher */
-    private function createMatcher($matcher): MatcherInterface
+    /** @param string|Matcher $matcher */
+    private function createMatcher($matcher): Matcher
     {
-        return $matcher instanceof MatcherInterface ? $matcher : $this->matcherFactory->str($matcher);
+        return $matcher instanceof Matcher ? $matcher : $this->matcherFactory->str($matcher);
     }
 }

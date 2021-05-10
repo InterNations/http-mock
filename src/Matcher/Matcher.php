@@ -4,7 +4,7 @@ namespace InterNations\Component\HttpMock\Matcher;
 use SuperClosure\SerializableClosure;
 use Closure;
 
-interface MatcherInterface
+interface Matcher
 {
     public function getMatcher(): SerializableClosure;
     public function setExtractor(Closure $extractor): void;

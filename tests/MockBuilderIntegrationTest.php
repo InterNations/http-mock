@@ -1,7 +1,6 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests;
 
-use InterNations\Component\HttpMock\Expectation;
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
@@ -18,16 +17,13 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class MockBuilderIntegrationTest extends TestCase
 {
-    /** @var MockBuilder */
-    private $builder;
+    private MockBuilder $builder;
 
-    /** @var MatcherFactory */
-    private $matches;
+    private MatcherFactory $matches;
 
-    /** @var Server */
-    private $server;
+    private Server $server;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->matches = new MatcherFactory();
         $this->builder = new MockBuilder($this->matches, new ExtractorFactory());
@@ -36,12 +32,12 @@ class MockBuilderIntegrationTest extends TestCase
         $this->server->clean();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->server->stop();
     }
 
-    public function testCreateExpectation()
+    public function testCreateExpectation(): void
     {
         $builder = $this->builder
             ->when()
@@ -96,7 +92,7 @@ class MockBuilderIntegrationTest extends TestCase
         $this->assertContains('CLOSURE MATCHER: POST /foo', $this->server->getErrorOutput());
     }
 
-    public function testCreateTwoExpectationsAfterEachOther()
+    public function testCreateTwoExpectationsAfterEachOther(): void
     {
         $this->builder
             ->when()
@@ -124,7 +120,7 @@ class MockBuilderIntegrationTest extends TestCase
         $this->assertSame('POST 2', (string) $this->server->getClient()->post('/post-resource-2')->send()->getBody());
     }
 
-    public function testCreateSuccessiveExpectationsOnSameWhen()
+    public function testCreateSuccessiveExpectationsOnSameWhen(): void
     {
       $this->builder
           ->first()
@@ -155,7 +151,7 @@ class MockBuilderIntegrationTest extends TestCase
       $this->assertSame('called 3 times', (string) $this->server->getClient()->post('/resource')->send()->getBody());
     }
 
-    public function testCreateSuccessiveExpectationsWithAny()
+    public function testCreateSuccessiveExpectationsWithAny(): void
     {
         $this->builder
             ->first()
@@ -186,7 +182,7 @@ class MockBuilderIntegrationTest extends TestCase
         $this->assertSame('any', (string) $this->server->getClient()->post('/resource')->send()->getBody());
     }
 
-    public function testCreateSuccessiveExpectationsInUnexpectedOrder()
+    public function testCreateSuccessiveExpectationsInUnexpectedOrder(): void
     {
         $this->builder
             ->second()
@@ -209,7 +205,7 @@ class MockBuilderIntegrationTest extends TestCase
         $this->assertSame('2', (string) $this->server->getClient()->post('/resource')->send()->getBody());
     }
 
-    public function testCreateSuccessiveExpectationsWithOnce()
+    public function testCreateSuccessiveExpectationsWithOnce(): void
     {
         $this->builder
             ->first()

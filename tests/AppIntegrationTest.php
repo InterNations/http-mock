@@ -6,11 +6,9 @@ use InterNations\Component\Testing\AbstractTestCase;
 use Guzzle\Http\Client;
 use Guzzle\Http\Message\RequestFactory;
 use Guzzle\Http\Message\Response as GuzzleResponse;
-use Guzzle\Http\Message\EntityEnclosingRequest;
 use SuperClosure\SerializableClosure;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Process\Process;
 
 /**
  * @large
@@ -18,36 +16,30 @@ use Symfony\Component\Process\Process;
  */
 class AppIntegrationTest extends AbstractTestCase
 {
-    /**
-     * @var Server
-     */
-    private static $server1;
+    private static Server $server1;
 
-    /**
-     * @var Client
-     */
-    private $client;
+    private Client $client;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         static::$server1 = new Server(HTTP_MOCK_PORT, HTTP_MOCK_HOST);
         static::$server1->start();
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         static::assertSame('', (string) static::$server1->getOutput(), (string) static::$server1->getOutput());
         static::assertSame('', (string) static::$server1->getErrorOutput(), (string) static::$server1->getErrorOutput());
         static::$server1->stop();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         static::$server1->clean();
         $this->client = static::$server1->getClient();
     }
 
-    public function testSimpleUseCase()
+    public function testSimpleUseCase(): void
     {
         $response = $this->client->post(
             '/_expectation',
@@ -56,7 +48,7 @@ class AppIntegrationTest extends AbstractTestCase
                 [
                     static function ($request) {
                         return $request instanceof Request;
-                    }
+                    },
                 ],
                 new Response('fake body', 200)
             )
@@ -77,7 +69,7 @@ class AppIntegrationTest extends AbstractTestCase
         $this->assertSame('post=data', (string) $request->getBody());
     }
 
-    public function testRecording()
+    public function testRecording(): void
     {
         $this->client->delete('/_all')->send();
 
@@ -132,7 +124,7 @@ class AppIntegrationTest extends AbstractTestCase
         $this->assertSame(404, $this->client->get('/_request/2')->send()->getStatusCode());
     }
 
-    public function testErrorHandling()
+    public function testErrorHandling(): void
     {
         $this->client->delete('/_all')->send();
 
@@ -157,7 +149,7 @@ class AppIntegrationTest extends AbstractTestCase
         $this->assertSame('POST data key "limiter" must be a serialized closure', (string) $response->getBody());
     }
 
-    public function testServerParamsAreRecorded()
+    public function testServerParamsAreRecorded(): void
     {
         $this->client
             ->setUserAgent('CUSTOM UA')
@@ -176,7 +168,7 @@ class AppIntegrationTest extends AbstractTestCase
         $this->assertSame('CUSTOM UA', $latestRequest['server']['HTTP_USER_AGENT']);
     }
 
-    public function testNewestExpectationsAreFirstEvaluated()
+    public function testNewestExpectationsAreFirstEvaluated(): void
     {
         $this->client->post(
             '/_expectation',
@@ -185,7 +177,7 @@ class AppIntegrationTest extends AbstractTestCase
                 [
                     static function ($request) {
                         return $request instanceof Request;
-                    }
+                    },
                 ],
                 new Response('first', 200)
             )
@@ -199,7 +191,7 @@ class AppIntegrationTest extends AbstractTestCase
                 [
                     static function ($request) {
                         return $request instanceof Request;
-                    }
+                    },
                 ],
                 new Response('second', 200)
             )
@@ -207,7 +199,7 @@ class AppIntegrationTest extends AbstractTestCase
         $this->assertSame('second', $this->client->get('/')->send()->getBody(true));
     }
 
-    public function testServerLogsAreNotInErrorOutput()
+    public function testServerLogsAreNotInErrorOutput(): void
     {
         $this->client->delete('/_all');
 

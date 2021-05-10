@@ -2,32 +2,32 @@
 namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
 use InterNations\Component\Testing\AbstractTestCase;
-use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
+use InterNations\Component\HttpMock\PHPUnit\HttpMock;
 use Symfony\Component\HttpFoundation\Response;
 use PHPUnit\Framework\TestCase;
 
 /** @large */
 class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
 {
-    use HttpMockTrait;
+    use HttpMock;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         static::setUpHttpMockBeforeClass(null, null, null, 'firstNamedServer');
         static::setUpHttpMockBeforeClass(static::getHttpMockDefaultPort() + 1, null, null, 'secondNamedServer');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         static::tearDownHttpMockAfterClass();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->setUpHttpMock();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->tearDownHttpMock();
     }
@@ -38,12 +38,12 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
             [
                 '/foo',
                 '/bar',
-            ]
+            ],
         ];
     }
 
     /** @dataProvider getPaths */
-    public function testSimpleRequest($path)
+    public function testSimpleRequest($path): void
     {
         $this->http['firstNamedServer']->mock
             ->when()
@@ -87,11 +87,11 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         $this->http['firstNamedServer']->requests->pop();
     }
 
-    public function testErrorLogOutput()
+    public function testErrorLogOutput(): void
     {
         $this->http['firstNamedServer']->mock
             ->when()
-                ->callback(static function () {error_log('error output');})
+                ->callback(static function (): void {error_log('error output');})
             ->then()
             ->end();
         $this->http['firstNamedServer']->setUp();
@@ -107,26 +107,26 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         }
     }
 
-    public function testFailedRequest()
+    public function testFailedRequest(): void
     {
         $response = $this->http['firstNamedServer']->client->get('/foo')->send();
         $this->assertSame(404, $response->getStatusCode());
         $this->assertSame('No matching expectation found', (string) $response->getBody());
     }
 
-    public function testStopServer()
+    public function testStopServer(): void
     {
         $this->http['firstNamedServer']->server->stop();
     }
 
     /** @depends testStopServer */
-    public function testHttpServerIsRestartedIfATestStopsIt()
+    public function testHttpServerIsRestartedIfATestStopsIt(): void
     {
         $response = $this->http['firstNamedServer']->client->get('/')->send();
         $this->assertSame(404, $response->getStatusCode());
     }
 
-    public function testLimitDurationOfAResponse()
+    public function testLimitDurationOfAResponse(): void
     {
         $this->http['firstNamedServer']->mock
             ->once()
@@ -174,19 +174,19 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame(200, $thirdResponse->getStatusCode());
     }
 
-    public function testCallbackOnResponse()
+    public function testCallbackOnResponse(): void
     {
         $this->http['firstNamedServer']->mock
             ->when()
                 ->methodIs('POST')
             ->then()
-                ->callback(static function(Response $response) {$response->setContent('CALLBACK');})
+                ->callback(static function(Response $response): void {$response->setContent('CALLBACK');})
             ->end();
         $this->http['firstNamedServer']->setUp();
         $this->assertSame('CALLBACK', $this->http['firstNamedServer']->client->post('/')->send()->getBody(true));
     }
 
-    public function testComplexResponse()
+    public function testComplexResponse(): void
     {
         $this->http['firstNamedServer']->mock
             ->when()
@@ -205,7 +205,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame('post-value', $this->http['firstNamedServer']->requests->latest()->getPostField('post-key'));
     }
 
-    public function testPutRequest()
+    public function testPutRequest(): void
     {
         $this->http['firstNamedServer']->mock
             ->when()
@@ -224,7 +224,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame('put-value', $this->http['firstNamedServer']->requests->latest()->getPostField('put-key'));
     }
 
-    public function testPostRequest()
+    public function testPostRequest(): void
     {
         $this->http['firstNamedServer']->mock
             ->when()
@@ -243,7 +243,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame('post-value', $this->http['firstNamedServer']->requests->latest()->getPostField('post-key'));
     }
 
-    public function testFatalError()
+    public function testFatalError(): void
     {
         if (version_compare(PHP_VERSION, '7.0', '<')) {
             $this->markTestSkipped('Comment in to test if fatal errors are properly handled');

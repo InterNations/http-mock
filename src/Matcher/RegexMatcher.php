@@ -3,7 +3,7 @@ namespace InterNations\Component\HttpMock\Matcher;
 
 use Closure;
 
-class RegexMatcher extends AbstractMatcher
+class RegexMatcher extends ExtractorBasedMatcher
 {
     private string $regex;
 
