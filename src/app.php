@@ -89,18 +89,13 @@ $app->post(
             }
         }
 
-        $countARunEvenIfLimiterDoesntMatch = false;
-        if ($request->request->has('countARunEvenIfLimiterDoesntMatch')) {
-            $countARunEvenIfLimiterDoesntMatch = Util::silentDeserialize($request->request->get('countARunEvenIfLimiterDoesntMatch'));
-        }
-
         // Fix issue with silex default error handling
         $response->headers->set('X-Status-Code', $response->getStatusCode());
 
         $app['storage']->prepend(
             $request,
             'expectations',
-            ['matcher' => $matcher, 'response' => $response, 'limiter' => $limiter, 'runs' => 0, 'countARunEvenIfLimiterDoesntMatch' => $countARunEvenIfLimiterDoesntMatch]
+            ['matcher' => $matcher, 'response' => $response, 'limiter' => $limiter, 'runs' => 0]
         );
 
         return new Response('', Response::HTTP_CREATED);
