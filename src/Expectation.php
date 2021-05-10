@@ -24,17 +24,22 @@ class Expectation
     /** @var ExtractorFactory */
     private $extractorFactory;
 
+    /** @var int */
+    private $priority;
+
     public function __construct(
         MockBuilder $mockBuilder,
         MatcherFactory $matcherFactory,
         ExtractorFactory $extractorFactory,
-        Closure $limiter
+        Closure $limiter,
+        int $priority
     )
     {
         $this->matcherFactory = $matcherFactory;
         $this->responseBuilder = new ResponseBuilder($mockBuilder);
         $this->extractorFactory = $extractorFactory;
         $this->limiter = $limiter;
+        $this->priority = $priority;
     }
 
     public function pathIs($matcher)
@@ -130,6 +135,11 @@ class Expectation
         }
 
         return $closures;
+    }
+
+    public function getPriority()
+    {
+        return $this->priority;
     }
 
     public function then()

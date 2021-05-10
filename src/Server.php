@@ -86,8 +86,8 @@ class Server extends Process
                 '/_expectation',
                 null,
                 [
-                    'matcher'  => serialize($expectation->getMatcherClosures()),
-                    'limiter'  => serialize($expectation->getLimiter()),
+                    'matcher' => serialize($expectation->getMatcherClosures()),
+                    'limiter' => serialize($expectation->getLimiter()),
                     'response' => serialize($expectation->getResponse()),
                 ]
             )->send();

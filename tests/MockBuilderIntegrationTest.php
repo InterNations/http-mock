@@ -123,4 +123,122 @@ class MockBuilderIntegrationTest extends TestCase
         $this->assertSame('POST 1', (string) $this->server->getClient()->post('/post-resource-1')->send()->getBody());
         $this->assertSame('POST 2', (string) $this->server->getClient()->post('/post-resource-2')->send()->getBody());
     }
+
+    public function testCreateSuccessiveExpectationsOnSameWhen()
+    {
+      $this->builder
+          ->first()
+          ->when()
+              ->pathIs('/resource')
+              ->methodIs('POST')
+          ->then()
+              ->body('called once');
+      $this->builder
+          ->second()
+          ->when()
+              ->pathIs('/resource')
+              ->methodIs('POST')
+          ->then()
+              ->body('called twice');
+      $this->builder
+          ->nth(3)
+          ->when()
+              ->pathIs('/resource')
+              ->methodIs('POST')
+          ->then()
+              ->body('called 3 times');
+
+      $this->server->setUp($this->builder->flushExpectations());
+
+      $this->assertSame('called once', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+      $this->assertSame('called twice', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+      $this->assertSame('called 3 times', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+    }
+
+    public function testCreateSuccessiveExpectationsWithAny()
+    {
+        $this->builder
+            ->first()
+            ->when()
+                ->pathIs('/resource')
+                ->methodIs('POST')
+            ->then()
+                ->body('1');
+        $this->builder
+            ->second()
+            ->when()
+                ->pathIs('/resource')
+                ->methodIs('POST')
+            ->then()
+                ->body('2');
+        $this->builder
+            ->any()
+                ->when()
+                ->pathIs('/resource')
+            ->methodIs('POST')
+            ->then()
+                ->body('any');
+
+        $this->server->setUp($this->builder->flushExpectations());
+
+        $this->assertSame('1', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+        $this->assertSame('2', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+        $this->assertSame('any', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+    }
+
+    public function testCreateSuccessiveExpectationsInUnexpectedOrder()
+    {
+        $this->builder
+            ->second()
+            ->when()
+                ->pathIs('/resource')
+                ->methodIs('POST')
+            ->then()
+                ->body('2');
+        $this->builder
+            ->first()
+            ->when()
+                ->pathIs('/resource')
+                ->methodIs('POST')
+            ->then()
+                ->body('1');
+
+        $this->server->setUp($this->builder->flushExpectations());
+
+        $this->assertSame('1', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+        $this->assertSame('2', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+    }
+
+    public function testCreateSuccessiveExpectationsWithOnce()
+    {
+        $this->builder
+            ->first()
+            ->when()
+                ->pathIs('/resource')
+                ->methodIs('POST')
+            ->then()
+                ->body('1');
+        $this->builder
+            ->second()
+            ->when()
+                ->pathIs('/resource')
+                ->methodIs('POST')
+            ->then()
+                ->body('2');
+        $this->builder
+            ->twice()
+            ->when()
+                ->pathIs('/resource')
+                ->methodIs('POST')
+            ->then()
+                ->body('twice');
+
+        $this->server->setUp($this->builder->flushExpectations());
+
+        $this->assertSame('1', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+        $this->assertSame('2', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+        $this->assertSame('twice', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+        $this->assertSame('twice', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+        $this->assertSame('Expectation not met', (string) $this->server->getClient()->post('/resource')->send()->getBody());
+    }
 }

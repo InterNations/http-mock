@@ -105,6 +105,10 @@ $app->post(
 $app->error(
     static function (Exception $e, Request $request, $code, GetResponseForExceptionEvent $event = null) use ($app) {
         if ($e instanceof NotFoundHttpException) {
+            if (method_exists($event, 'allowCustomResponseCode')) {
+                $event->allowCustomResponseCode();
+            }
+
             $app['storage']->append(
                 $request,
                 'requests',
@@ -128,16 +132,14 @@ $app->error(
                     }
                 }
 
-                if (isset($expectation['limiter']) && !$expectation['limiter']($expectation['runs'])) {
-                    $notFoundResponse = new Response('Expectation no longer applicable', Response::HTTP_GONE);
-                    continue;
-                }
+                $applicable = !isset($expectation['limiter']) || $expectation['limiter']($expectation['runs']);
 
                 ++$expectations[$pos]['runs'];
                 $app['storage']->store($request, 'expectations', $expectations);
 
-                if (method_exists($event, 'allowCustomResponseCode')) {
-                    $event->allowCustomResponseCode();
+                if (!$applicable) {
+                    $notFoundResponse = new Response('Expectation not met', Response::HTTP_GONE);
+                    continue;
                 }
 
                 return $expectation['response'];
