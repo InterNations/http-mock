@@ -6,14 +6,13 @@ use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherInterface;
 use SuperClosure\SerializableClosure;
 use Closure;
+use Symfony\Component\HttpFoundation\Response;
 
 class Expectation
 {
     /** @var MatcherInterface[] */
     private array $matcher = [];
-
     private MatcherFactory $matcherFactory;
-
     private ResponseBuilder $responseBuilder;
 
     private Closure $limiter;
@@ -37,42 +36,46 @@ class Expectation
         $this->priority = $priority;
     }
 
-    public function pathIs($matcher)
+    /** @param string|MatcherInterface $matcher */
+    public function pathIs($matcher): self
     {
         $this->appendMatcher($matcher, $this->extractorFactory->createPathExtractor());
 
         return $this;
     }
 
-    public function methodIs($matcher)
+    /** @param string|MatcherInterface $matcher */
+    public function methodIs($matcher): self
     {
         $this->appendMatcher($matcher, $this->extractorFactory->createMethodExtractor());
 
         return $this;
     }
 
-    public function queryParamIs($param, $matcher)
+    /** @param string|MatcherInterface $matcher */
+    public function queryParamIs(string $param, $matcher): self
     {
         $this->appendMatcher($matcher, $this->extractorFactory->createParamExtractor($param));
 
         return $this;
     }
 
-    public function queryParamExists($param)
+    public function queryParamExists(string $param): self
     {
         $this->appendMatcher(true, $this->extractorFactory->createParamExistsExtractor($param));
 
         return $this;
     }
 
-    public function queryParamNotExists($param)
+    public function queryParamNotExists(string $param): self
     {
         $this->appendMatcher(false, $this->extractorFactory->createParamExistsExtractor($param));
 
         return $this;
     }
 
-    public function queryParamsAre(array $paramMap)
+    /** @param array<string,MatcherInterface|string> $paramMap */
+    public function queryParamsAre(array $paramMap): self
     {
         foreach ($paramMap as $param => $value) {
             $this->queryParamIs($param, $value);
@@ -81,7 +84,8 @@ class Expectation
         return $this;
     }
 
-    public function queryParamsExist(array $params)
+    /** @param string[] $params */
+    public function queryParamsExist(array $params): self
     {
         foreach ($params as $param) {
             $this->queryParamExists($param);
@@ -90,7 +94,8 @@ class Expectation
         return $this;
     }
 
-    public function queryParamsNotExist(array $params)
+    /** @param string[] $params */
+    public function queryParamsNotExist(array $params): self
     {
         foreach ($params as $param) {
             $this->queryParamNotExists($param);
@@ -99,21 +104,22 @@ class Expectation
         return $this;
     }
 
-    public function headerIs($name, $value)
+    /** @param string|MatcherInterface $value */
+    public function headerIs(string $name, $value): self
     {
         $this->appendMatcher($value, $this->extractorFactory->createHeaderExtractor($name));
 
         return $this;
     }
 
-    public function headerExists($name)
+    public function headerExists(string $name): self
     {
         $this->appendMatcher(true, $this->extractorFactory->createHeaderExistsExtractor($name));
 
         return $this;
     }
 
-    public function callback(Closure $callback)
+    public function callback(Closure $callback): self
     {
         $this->appendMatcher($this->matcherFactory->closure($callback));
 
@@ -132,26 +138,27 @@ class Expectation
         return $closures;
     }
 
-    public function getPriority()
+    public function getPriority(): int
     {
         return $this->priority;
     }
 
-    public function then()
+    public function then(): ResponseBuilder
     {
         return $this->responseBuilder;
     }
 
-    public function getResponse()
+    public function getResponse(): Response
     {
         return $this->responseBuilder->getResponse();
     }
 
-    public function getLimiter()
+    public function getLimiter(): SerializableClosure
     {
         return new SerializableClosure($this->limiter);
     }
 
+    /** @param string|MatcherInterface $matcher */
     private function appendMatcher($matcher, Closure $extractor = null): void
     {
         $matcher = $this->createMatcher($matcher);
@@ -163,7 +170,8 @@ class Expectation
         $this->matcher[] = $matcher;
     }
 
-    private function createMatcher($matcher)
+    /** @param string|MatcherInterface $matcher */
+    private function createMatcher($matcher): MatcherInterface
     {
         return $matcher instanceof MatcherInterface ? $matcher : $this->matcherFactory->str($matcher);
     }
