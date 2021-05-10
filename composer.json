@@ -30,5 +30,8 @@
     },
     "autoload-dev": {
         "psr-4": {"InterNations\\Component\\HttpMock\\Tests\\": "tests/"}
+    },
+    "scripts": {
+        "tests": "phpunit"
     }
 }

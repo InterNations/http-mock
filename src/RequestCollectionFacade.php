@@ -44,7 +44,7 @@ class RequestCollectionFacade implements Countable
     }
 
     /**
-     * @param integer $position
+     * @param int $position
      * @return UnifiedRequest
      */
     public function at($position)

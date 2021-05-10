@@ -141,7 +141,7 @@ class UnifiedRequest
      *
      * @param string $header The header to check.
      *
-     * @return boolean Returns TRUE or FALSE if the header is present
+     * @return bool Returns TRUE or FALSE if the header is present
      */
     public function hasHeader($header)
     {
@@ -222,7 +222,7 @@ class UnifiedRequest
     /**
      * Get the port that the request will be sent on if it has been set
      *
-     * @return integer|null
+     * @return int|null
      */
     public function getPort()
     {
@@ -253,7 +253,7 @@ class UnifiedRequest
      * Get the full URL of the request (e.g. 'http://www.guzzle-project.com/')
      * scheme://username:password@domain:port/path?query_string#fragment
      *
-     * @param boolean $asObject Set to TRUE to retrieve the URL as a clone of the URL object owned by the request.
+     * @param bool $asObject Set to TRUE to retrieve the URL as a clone of the URL object owned by the request.
      *
      * @return string|Url
      */
