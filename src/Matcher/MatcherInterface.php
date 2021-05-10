@@ -6,10 +6,6 @@ use Closure;
 
 interface MatcherInterface
 {
-    /**
-     * @return SerializableClosure
-     */
-    public function getMatcher();
-
-    public function setExtractor(Closure $extractor);
+    public function getMatcher(): SerializableClosure;
+    public function setExtractor(Closure $extractor): void;
 }

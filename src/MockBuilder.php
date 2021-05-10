@@ -12,19 +12,15 @@ class MockBuilder
     private const PRIORITY_NTH = 100;
 
     /** @var Expectation[] */
-    private $expectations = [];
+    private array $expectations = [];
 
-    /** @var MatcherFactory */
-    private $matcherFactory;
+    private MatcherFactory $matcherFactory;
 
-    /** @var Closure */
-    private $limiter;
+    private Closure $limiter;
 
-    /** @var ExtractorFactory */
-    private $extractorFactory;
+    private ExtractorFactory $extractorFactory;
 
-    /** @var int */
-    private $priority;
+    private int $priority;
 
     public function __construct(MatcherFactory $matcherFactory, ExtractorFactory $extractorFactory)
     {
@@ -93,8 +89,8 @@ class MockBuilder
         return $this;
     }
 
-    /** @return Expectation */
-    public function when()
+    /***/
+    public function when(): Expectation
     {
         $this->expectations[] = new Expectation(
             $this,

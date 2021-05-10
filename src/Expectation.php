@@ -10,22 +10,17 @@ use Closure;
 class Expectation
 {
     /** @var MatcherInterface[] */
-    private $matcher = [];
+    private array $matcher = [];
 
-    /** @var MatcherFactory */
-    private $matcherFactory;
+    private MatcherFactory $matcherFactory;
 
-    /** @var ResponseBuilder */
-    private $responseBuilder;
+    private ResponseBuilder $responseBuilder;
 
-    /** @var Closure */
-    private $limiter;
+    private Closure $limiter;
 
-    /** @var ExtractorFactory */
-    private $extractorFactory;
+    private ExtractorFactory $extractorFactory;
 
-    /** @var int */
-    private $priority;
+    private int $priority;
 
     public function __construct(
         MockBuilder $mockBuilder,
@@ -126,7 +121,7 @@ class Expectation
     }
 
     /** @return SerializableClosure[]  */
-    public function getMatcherClosures()
+    public function getMatcherClosures(): array
     {
         $closures = [];
 
@@ -157,7 +152,7 @@ class Expectation
         return new SerializableClosure($this->limiter);
     }
 
-    private function appendMatcher($matcher, Closure $extractor = null)
+    private function appendMatcher($matcher, Closure $extractor = null): void
     {
         $matcher = $this->createMatcher($matcher);
 

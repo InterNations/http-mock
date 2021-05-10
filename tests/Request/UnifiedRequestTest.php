@@ -1,7 +1,12 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests\Request;
 
+use Guzzle\Common\Collection;
+use Guzzle\Http\EntityBody;
 use Guzzle\Http\Message\EntityEnclosingRequestInterface;
+use Guzzle\Http\Message\Header;
+use Guzzle\Http\Message\Header\HeaderCollection;
+use Guzzle\Http\QueryString;
 use InterNations\Component\HttpMock\Request\UnifiedRequest;
 use InterNations\Component\Testing\AbstractTestCase;
 use Guzzle\Http\Message\RequestInterface;
@@ -32,23 +37,23 @@ class UnifiedRequestTest extends AbstractTestCase
     public static function provideMethods()
     {
         return [
-            ['getParams'],
-            ['getHeaders'],
-            ['getHeaderLines'],
+            ['getParams', [], new Collection()],
+            ['getHeaders', [], new HeaderCollection()],
+            ['getHeaderLines', [], ['Foo' => 'Bar']],
             ['getRawHeaders'],
-            ['getQuery'],
+            ['getQuery', [], new QueryString()],
             ['getMethod'],
             ['getScheme'],
             ['getHost'],
             ['getProtocolVersion'],
             ['getPath'],
-            ['getPort'],
+            ['getPort', [], 8080],
             ['getUsername'],
             ['getPassword'],
             ['getUrl'],
-            ['getCookies'],
-            ['getHeader', ['header']],
-            ['hasHeader', ['header']],
+            ['getCookies', [], []],
+            ['getHeader', ['header'], new Header('Foo', 'Bar')],
+            ['hasHeader', ['header'], true],
             ['getUrl', [false]],
             ['getUrl', [true]],
             ['getCookie', ['cookieName']],
@@ -58,47 +63,47 @@ class UnifiedRequestTest extends AbstractTestCase
     public static function provideEntityEnclosingInterfaceMethods()
     {
         return [
-            ['getBody'],
+            ['getBody', [], EntityBody::fromString('foo')],
             ['getPostField', ['postField']],
-            ['getPostFields'],
-            ['getPostFiles'],
-            ['getPostFile', ['fileName']],
+            ['getPostFields', [], new QueryString()],
+            ['getPostFiles', [], []],
+            ['getPostFile', ['fileName'], []],
         ];
     }
 
     /** @dataProvider provideMethods */
-    public function testMethodsFromRequestInterface($method, array $params = [])
+    public function testMethodsFromRequestInterface($method, array $params = [], $returnValue = 'REQ')
     {
         $this->wrappedRequest
             ->expects($this->once())
             ->method($method)
-            ->will($this->returnValue('REQ'))
+            ->will($this->returnValue($returnValue))
             ->with(...$params);
-        $this->assertSame('REQ', call_user_func_array([$this->unifiedRequest, $method], $params));
+        $this->assertSame($returnValue, call_user_func_array([$this->unifiedRequest, $method], $params));
 
 
         $this->wrappedEntityEnclosingRequest
             ->expects($this->once())
             ->method($method)
-            ->will($this->returnValue('ENTITY_ENCL_REQ'))
+            ->will($this->returnValue($returnValue))
             ->with(...$params);
         $this->assertSame(
-            'ENTITY_ENCL_REQ',
+            $returnValue,
             call_user_func_array([$this->unifiedEnclosingEntityRequest, $method], $params)
         );
     }
 
     /** @dataProvider provideEntityEnclosingInterfaceMethods */
-    public function testEntityEnclosingInterfaceMethods($method, array $params = [])
+    public function testEntityEnclosingInterfaceMethods($method, array $params = [], $returnValue = 'Return Value')
     {
         $this->wrappedEntityEnclosingRequest
             ->expects($this->once())
             ->method($method)
-            ->will($this->returnValue('ENTITY_ENCL_REQ'))
+            ->will($this->returnValue($returnValue))
             ->with(...$params);
 
         $this->assertSame(
-            'ENTITY_ENCL_REQ',
+            $returnValue,
             call_user_func_array([$this->unifiedEnclosingEntityRequest, $method], $params)
         );
 

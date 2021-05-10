@@ -1,16 +1,18 @@
 <?php
 namespace InterNations\Component\HttpMock\Matcher;
 
+use Closure;
+
 class StringMatcher extends AbstractMatcher
 {
-    private $string;
+    private string $string;
 
-    public function __construct($string)
+    public function __construct(string $string)
     {
         $this->string = $string;
     }
 
-    protected function createMatcher()
+    protected function createMatcher(): Closure
     {
         $string = $this->string;
 

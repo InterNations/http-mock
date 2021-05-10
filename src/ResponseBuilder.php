@@ -7,11 +7,9 @@ use Closure;
 
 class ResponseBuilder
 {
-    /** @var MockBuilder */
-    private $mockBuilder;
+    private MockBuilder $mockBuilder;
 
-    /** @var CallbackResponse */
-    private $response;
+    private CallbackResponse $response;
 
     public function __construct(MockBuilder $mockBuilder)
     {

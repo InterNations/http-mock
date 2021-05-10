@@ -19,7 +19,7 @@ trait HttpMockTrait
     /** @var HttpMockFacade|HttpMockFacadeMap */
     protected $http;
 
-    protected static function setUpHttpMockBeforeClass($port = null, $host = null, $basePath = null, $name = null)
+    protected static function setUpHttpMockBeforeClass($port = null, $host = null, $basePath = null, $name = null): void
     {
         $port = $port ?: static::getHttpMockDefaultPort();
         $host = $host ?: static::getHttpMockDefaultHost();
@@ -37,14 +37,14 @@ trait HttpMockTrait
         ServerManager::getInstance()->add($facade->server);
     }
 
-    protected function setUpHttpMock()
+    protected function setUpHttpMock(): void
     {
         static::assertHttpMockSetup();
 
         $this->http = clone static::$staticHttp;
     }
 
-    protected static function assertHttpMockSetup()
+    protected static function assertHttpMockSetup(): void
     {
         if (!static::$staticHttp) {
             static::fail(
@@ -57,7 +57,7 @@ trait HttpMockTrait
         }
     }
 
-    protected function tearDownHttpMock()
+    protected function tearDownHttpMock(): void
     {
         if (!$this->http) {
             return;
@@ -66,7 +66,7 @@ trait HttpMockTrait
         $http = $this->http;
         $this->http = null;
         $http->each(
-            function (HttpMockFacade $facade) {
+            function (HttpMockFacade $facade): void {
                 $this->assertSame(
                     '',
                     (string) $facade->server->getIncrementalErrorOutput(),
@@ -76,10 +76,10 @@ trait HttpMockTrait
         );
     }
 
-    protected static function tearDownHttpMockAfterClass()
+    protected static function tearDownHttpMockAfterClass(): void
     {
         static::$staticHttp->each(
-            static function (HttpMockFacade $facade) {
+            static function (HttpMockFacade $facade): void {
                 $facade->server->stop();
                 ServerManager::getInstance()->remove($facade->server);
             }

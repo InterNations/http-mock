@@ -1,16 +1,18 @@
 <?php
 namespace InterNations\Component\HttpMock\Matcher;
 
+use Closure;
+
 class RegexMatcher extends AbstractMatcher
 {
-    private $regex;
+    private string $regex;
 
-    public function __construct($regex)
+    public function __construct(string $regex)
     {
         $this->regex = $regex;
     }
 
-    protected function createMatcher()
+    protected function createMatcher(): Closure
     {
         $regex = $this->regex;
 

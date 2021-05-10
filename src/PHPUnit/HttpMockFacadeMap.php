@@ -9,7 +9,7 @@ use OutOfBoundsException;
 class HttpMockFacadeMap implements ArrayAccess
 {
     /** @var HttpMockFacade[] */
-    private $facadeMap;
+    private array $facadeMap;
 
     public function __construct(array $facadeMap)
     {
@@ -30,12 +30,12 @@ class HttpMockFacadeMap implements ArrayAccess
         return isset($this->facadeMap[$offset]);
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new BadMethodCallException(__METHOD__);
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new BadMethodCallException(__METHOD__);
     }
@@ -50,12 +50,12 @@ class HttpMockFacadeMap implements ArrayAccess
         );
     }
 
-    public function each(callable $callback)
+    public function each(callable $callback): void
     {
         array_map($callback, $this->facadeMap);
     }
 
-    public function __get($property)
+    public function __get($property): void
     {
         if (in_array($property, HttpMockFacade::getProperties(), true)) {
             throw new OutOfBoundsException(

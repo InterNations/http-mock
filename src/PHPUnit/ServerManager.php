@@ -14,9 +14,8 @@ final class ServerManager
     private static $instance;
 
     /**
-     * @return self
      */
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (!static::$instance) {
             static::$instance = new static();
@@ -25,17 +24,17 @@ final class ServerManager
         return static::$instance;
     }
 
-    public function add(Server $server)
+    public function add(Server $server): void
     {
         $this->servers->attach($server);
     }
 
-    public function remove(Server $server)
+    public function remove(Server $server): void
     {
         $this->servers->detach($server);
     }
 
-    public function cleanup()
+    public function cleanup(): void
     {
         foreach ($this->servers as $server) {
             $server->stop();

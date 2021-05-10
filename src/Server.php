@@ -34,7 +34,7 @@ class Server extends Process
         $this->setTimeout(null);
     }
 
-    public function start(callable $callback = null, array $env = [])
+    public function start(callable $callback = null, array $env = []): void
     {
         parent::start($callback, $env);
 
@@ -56,7 +56,7 @@ class Server extends Process
         $client = new Client($this->getBaseUrl());
         $client->getEventDispatcher()->addListener(
             'request.error',
-            static function (Event $event) {
+            static function (Event $event): void {
                 $event->stopPropagation();
             }
         );
@@ -78,7 +78,7 @@ class Server extends Process
      * @param Expectation[] $expectations
      * @throws RuntimeException
      */
-    public function setUp(array $expectations)
+    public function setUp(array $expectations): void
     {
         /** @var Expectation $expectation */
         foreach ($expectations as $expectation) {
@@ -98,7 +98,7 @@ class Server extends Process
         }
     }
 
-    public function clean()
+    public function clean(): void
     {
         if (!$this->isRunning()) {
             $this->start();
@@ -107,7 +107,7 @@ class Server extends Process
         $this->getClient()->delete('/_all')->send();
     }
 
-    private function pollWait()
+    private function pollWait(): void
     {
         foreach (FibonacciFactory::sequence(50000, 10000) as $sleepTime) {
             try {

@@ -20,50 +20,43 @@ class RequestCollectionFacade implements Countable
     }
 
     /**
-     * @return UnifiedRequest
      */
-    public function latest()
+    public function latest(): UnifiedRequest
     {
         return $this->getRecordedRequest('/_request/last');
     }
 
     /**
-     * @return UnifiedRequest
      */
-    public function last()
+    public function last(): UnifiedRequest
     {
         return $this->getRecordedRequest('/_request/last');
     }
 
     /**
-     * @return UnifiedRequest
      */
-    public function first()
+    public function first(): UnifiedRequest
     {
         return $this->getRecordedRequest('/_request/first');
     }
 
     /**
-     * @param int $position
-     * @return UnifiedRequest
      */
-    public function at($position)
+    public function at(int $position): UnifiedRequest
     {
        return $this->getRecordedRequest('/_request/' . $position);
     }
 
     /**
-     * @return UnifiedRequest
      */
-    public function pop()
+    public function pop(): UnifiedRequest
     {
         return $this->deleteRecordedRequest('/_request/last');
     }
 
     /**
-     * @return UnifiedRequest
      */
-    public function shift()
+    public function shift(): UnifiedRequest
     {
         return $this->deleteRecordedRequest('/_request/first');
     }
@@ -78,12 +71,9 @@ class RequestCollectionFacade implements Countable
     }
 
     /**
-     * @param Response $response
-     * @param string $path
      * @throws UnexpectedValueException
-     * @return UnifiedRequest
      */
-    private function parseRequestFromResponse(Response $response, $path)
+    private function parseRequestFromResponse(Response $response, string $path): UnifiedRequest
     {
         try {
             $requestInfo = Util::deserialize($response->getBody());

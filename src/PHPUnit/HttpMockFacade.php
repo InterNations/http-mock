@@ -19,7 +19,7 @@ use RuntimeException;
 class HttpMockFacade
 {
     /** @var array  */
-    private $services = [];
+    private array $services = [];
 
     private $basePath;
 
@@ -36,7 +36,7 @@ class HttpMockFacade
         return ['server', 'matches', 'mock', 'requests', 'client'];
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->server->setUp($this->mock->flushExpectations());
     }
@@ -80,7 +80,7 @@ class HttpMockFacade
         $this->server->clean();
     }
 
-    public function each(callable $callback)
+    public function each(callable $callback): void
     {
         $callback($this);
     }

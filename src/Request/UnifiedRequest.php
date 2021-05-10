@@ -13,15 +13,9 @@ use Guzzle\Http\Url;
 
 class UnifiedRequest
 {
-    /**
-     * @var RequestInterface
-     */
-    private $wrapped;
+    private RequestInterface $wrapped;
 
-    /**
-     * @var string
-     */
-    private $userAgent;
+    private ?string $userAgent = null;
 
     public function __construct(RequestInterface $wrapped, array $params = [])
     {
@@ -29,12 +23,7 @@ class UnifiedRequest
         $this->init($params);
     }
 
-    /**
-     * Get the user agent of the request
-     *
-     * @return string
-     */
-    public function getUserAgent()
+    public function getUserAgent(): ?string
     {
         return $this->userAgent;
     }
@@ -42,9 +31,8 @@ class UnifiedRequest
     /**
      * Get the body of the request if set
      *
-     * @return EntityBodyInterface|null
      */
-    public function getBody()
+    public function getBody(): ?EntityBodyInterface
     {
         return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
     }
@@ -56,7 +44,7 @@ class UnifiedRequest
      *
      * @return mixed|null
      */
-    public function getPostField($field)
+    public function getPostField(string $field)
     {
         return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
     }
@@ -64,9 +52,8 @@ class UnifiedRequest
     /**
      * Get the post fields that will be used in the request
      *
-     * @return QueryString
      */
-    public function getPostFields()
+    public function getPostFields(): QueryString
     {
         return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
     }
@@ -76,7 +63,7 @@ class UnifiedRequest
      *
      * @return array
      */
-    public function getPostFiles()
+    public function getPostFiles(): array
     {
         return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
     }
@@ -88,7 +75,7 @@ class UnifiedRequest
      *
      * @return array|null Returns an array wrapping an array of PostFileInterface objects
      */
-    public function getPostFile($fieldName)
+    public function getPostFile(string $fieldName): ?array
     {
         return $this->invokeWrappedIfEntityEnclosed(__FUNCTION__, func_get_args());
     }
@@ -96,9 +83,8 @@ class UnifiedRequest
     /**
      * Get application and plugin specific parameters set on the message.
      *
-     * @return Collection
      */
-    public function getParams()
+    public function getParams(): Collection
     {
         return $this->wrapped->getParams();
     }
@@ -111,7 +97,7 @@ class UnifiedRequest
      * @return Header|null Returns NULL if no matching header is found.
      *                     Returns a Header object if found.
      */
-    public function getHeader($header)
+    public function getHeader(string $header): ?Header
     {
         return $this->wrapped->getHeader($header);
     }
@@ -119,9 +105,8 @@ class UnifiedRequest
     /**
      * Get all headers as a collection
      *
-     * @return HeaderCollection
      */
-    public function getHeaders()
+    public function getHeaders(): HeaderCollection
     {
         return $this->wrapped->getHeaders();
     }
@@ -131,7 +116,7 @@ class UnifiedRequest
      *
      * @return array
      */
-    public function getHeaderLines()
+    public function getHeaderLines(): array
     {
         return $this->wrapped->getHeaderLines();
     }
@@ -143,7 +128,7 @@ class UnifiedRequest
      *
      * @return bool Returns TRUE or FALSE if the header is present
      */
-    public function hasHeader($header)
+    public function hasHeader(string $header): bool
     {
         return $this->wrapped->hasHeader($header);
     }
@@ -151,9 +136,8 @@ class UnifiedRequest
     /**
      * Get the raw message headers as a string
      *
-     * @return string
      */
-    public function getRawHeaders()
+    public function getRawHeaders(): string
     {
         return $this->wrapped->getRawHeaders();
     }
@@ -162,9 +146,8 @@ class UnifiedRequest
      * Get the collection of key value pairs that will be used as the query
      * string in the request
      *
-     * @return QueryString
      */
-    public function getQuery()
+    public function getQuery(): QueryString
     {
         return $this->wrapped->getQuery();
     }
@@ -172,9 +155,8 @@ class UnifiedRequest
     /**
      * Get the HTTP method of the request
      *
-     * @return string
      */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->wrapped->getMethod();
     }
@@ -182,9 +164,8 @@ class UnifiedRequest
     /**
      * Get the URI scheme of the request (http, https, ftp, etc)
      *
-     * @return string
      */
-    public function getScheme()
+    public function getScheme(): string
     {
         return $this->wrapped->getScheme();
     }
@@ -192,9 +173,8 @@ class UnifiedRequest
     /**
      * Get the host of the request
      *
-     * @return string
      */
-    public function getHost()
+    public function getHost(): string
     {
         return $this->wrapped->getHost();
     }
@@ -202,9 +182,8 @@ class UnifiedRequest
     /**
      * Get the HTTP protocol version of the request
      *
-     * @return string
      */
-    public function getProtocolVersion()
+    public function getProtocolVersion(): string
     {
         return $this->wrapped->getProtocolVersion();
     }
@@ -212,9 +191,8 @@ class UnifiedRequest
     /**
      * Get the path of the request (e.g. '/', '/index.html')
      *
-     * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->wrapped->getPath();
     }
@@ -222,9 +200,8 @@ class UnifiedRequest
     /**
      * Get the port that the request will be sent on if it has been set
      *
-     * @return int|null
      */
-    public function getPort()
+    public function getPort(): ?int
     {
         return $this->wrapped->getPort();
     }
@@ -232,9 +209,8 @@ class UnifiedRequest
     /**
      * Get the username to pass in the URL if set
      *
-     * @return string|null
      */
-    public function getUsername()
+    public function getUsername(): ?string
     {
         return $this->wrapped->getUsername();
     }
@@ -242,9 +218,8 @@ class UnifiedRequest
     /**
      * Get the password to pass in the URL if set
      *
-     * @return string|null
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->wrapped->getPassword();
     }
@@ -257,7 +232,7 @@ class UnifiedRequest
      *
      * @return string|Url
      */
-    public function getUrl($asObject = false)
+    public function getUrl(bool $asObject = false)
     {
         return $this->wrapped->getUrl($asObject);
     }
@@ -267,7 +242,7 @@ class UnifiedRequest
      *
      * @return array
      */
-    public function getCookies()
+    public function getCookies(): array
     {
         return $this->wrapped->getCookies();
     }
@@ -277,9 +252,8 @@ class UnifiedRequest
      *
      * @param string $name Cookie to retrieve
      *
-     * @return null|string
      */
-    public function getCookie($name)
+    public function getCookie(string $name): ?string
     {
         return $this->wrapped->getCookie($name);
     }
@@ -301,7 +275,7 @@ class UnifiedRequest
         return call_user_func_array([$this->wrapped, $method], $params);
     }
 
-    private function init(array $params)
+    private function init(array $params): void
     {
         foreach ($params as $property => $value) {
             if (property_exists($this, $property)) {
