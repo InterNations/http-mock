@@ -102,7 +102,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             $this->tearDown();
             self::fail('Exception expected');
         } catch (\Exception $e) {
-            self::assertTrue(strpos($e->getMessage(), 'HTTP mock server standard error output should be empty') !== false);
+            self::assertNotFalse(strpos($e->getMessage(), 'HTTP mock server standard error output should be empty'));
         }
     }
 
@@ -327,7 +327,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
 
     public function testFatalError(): void
     {
-        if (version_compare(PHP_VERSION, '7.0', '<')) {
+        if (PHP_VERSION_ID < 70000) {
             self::markTestSkipped('Comment in to test if fatal errors are properly handled');
         }
 

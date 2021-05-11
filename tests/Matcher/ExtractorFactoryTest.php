@@ -3,6 +3,7 @@ namespace InterNations\Component\HttpMock\Tests\Matcher;
 
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\Testing\AbstractTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 
 class ExtractorFactoryTest extends AbstractTestCase
@@ -15,7 +16,7 @@ class ExtractorFactoryTest extends AbstractTestCase
     public function setUp(): void
     {
         $this->extractorFactory = new ExtractorFactory();
-        $this->request = $this->createMock('Symfony\Component\HttpFoundation\Request');
+        $this->request = $this->createMock(Request::class);
     }
 
     public function testGetMethod(): void

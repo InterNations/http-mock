@@ -244,7 +244,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
 
     public function testFatalError(): void
     {
-        if (version_compare(PHP_VERSION, '7.0', '<')) {
+        if (PHP_VERSION_ID < 70000) {
             self::markTestSkipped('Comment in to test if fatal errors are properly handled');
         }
 
