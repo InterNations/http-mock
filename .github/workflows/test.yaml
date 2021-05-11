@@ -19,7 +19,10 @@ jobs:
                 include:
                     - php-version: 8.1
                       experimental: true
-                      dependencies: [lowest, stable]
+                      dependencies: lowest
+                    - php-version: 8.1
+                      experimental: true
+                      dependencies: stable
 
         continue-on-error: ${{ matrix.experimental }}
         steps:
@@ -36,7 +39,8 @@ jobs:
             - name: Install Composer dependencies
               uses: ramsey/composer-install@v1
               with:
-                  composer-options: --prefer-dist --prefer-${{ matrix.dependencies }}
+                  composer-options: --prefer-dist
+                  dependency-versions: ${{ matrix.dependencies }}
               continue-on-error: ${{ matrix.experimental }}
 
             - name: Setup PCOV
