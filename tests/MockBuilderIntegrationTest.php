@@ -49,8 +49,8 @@ class MockBuilderIntegrationTest extends TestCase
                 })
             ->then()
                 ->statusCode(401)
-                ->body('response body')
                 ->header('X-Foo', 'Bar')
+                ->body('response body')
             ->end();
 
         self::assertSame($this->builder, $builder);
@@ -79,8 +79,8 @@ class MockBuilderIntegrationTest extends TestCase
         self::assertSame(3, $run);
 
         $expectation->getResponse()->setDate(new DateTime('2012-11-10 09:08:07', new DateTimeZone('UTC')));
-        $response = "HTTP/1.0 401 Unauthorized\r\nCache-Control: no-cache, private\r\nDate:          Sat, 10 Nov 2012 09:08:07 GMT\r\nX-Foo:         Bar\r\n\r\nresponse body";
-        self::assertSame($response, (string)$expectation->getResponse());
+        $response = "HTTP/1.0 401 Unauthorized\r\nCache-Control: no-cache%s\r\nDate:          Sat, 10 Nov 2012 09:08:07 GMT\r\nX-Foo:         Bar\r\n\r\nresponse body";
+        self::assertStringMatchesFormat($response, (string)$expectation->getResponse());
 
 
         $this->server->setUp($expectations);
