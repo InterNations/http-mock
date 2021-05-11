@@ -102,7 +102,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
             $this->tearDown();
             $this->fail('Exception expected');
         } catch (\Exception $e) {
-            $this->assertContains('HTTP mock server standard error output should be empty', $e->getMessage());
+            $this->assertTrue(strpos($e->getMessage(), 'HTTP mock server standard error output should be empty') !== false);
         }
     }
 

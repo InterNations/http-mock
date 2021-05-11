@@ -89,7 +89,7 @@ class MockBuilderIntegrationTest extends TestCase
 
         $this->assertSame('response body', (string) $client->post('/foo')->send()->getBody());
 
-        $this->assertContains('CLOSURE MATCHER: POST /foo', $this->server->getErrorOutput());
+        $this->assertTrue(strpos($this->server->getErrorOutput(), 'CLOSURE MATCHER: POST /foo') !== false);
     }
 
     public function testCreateTwoExpectationsAfterEachOther(): void
