@@ -4,8 +4,8 @@ namespace InterNations\Component\HttpMock;
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\Matcher\Matcher;
-use SuperClosure\SerializableClosure;
 use Closure;
+use Opis\Closure\SerializableClosure;
 use Symfony\Component\HttpFoundation\Response;
 
 class Expectation

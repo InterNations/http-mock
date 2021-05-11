@@ -9,7 +9,7 @@ use InterNations\Component\Testing\AbstractTestCase;
 use Guzzle\Http\Client;
 use Guzzle\Http\Message\RequestFactory;
 use Guzzle\Http\Message\Response as GuzzleResponse;
-use SuperClosure\SerializableClosure;
+use Opis\Closure\SerializableClosure;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
