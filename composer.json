@@ -33,6 +33,6 @@
     },
     "scripts": {
         "tests": "phpunit",
-        "coding-style": "phpcs",
+        "coding-style": "phpcs"
     }
 }
