@@ -1,9 +1,9 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests\Fixtures;
 
-use Symfony\Component\HttpFoundation\Request as BaseRequest;
+use InterNations\Component\HttpMock\Request\SerializableRequest;
 
-class Request extends BaseRequest
+class Request extends SerializableRequest
 {
     public function setRequestUri(string $requestUri): void
     {

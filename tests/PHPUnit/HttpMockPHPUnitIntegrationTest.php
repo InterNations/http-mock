@@ -56,29 +56,29 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
 
         $request = $this->http->requests->latest();
         $this->assertSame('GET', $request->getMethod());
-        $this->assertSame($path, $request->getPath());
+        $this->assertSame($path, $request->getRequestUri());
 
         $request = $this->http->requests->last();
         $this->assertSame('GET', $request->getMethod());
-        $this->assertSame($path, $request->getPath());
+        $this->assertSame($path, $request->getRequestUri());
 
         $request = $this->http->requests->first();
         $this->assertSame('GET', $request->getMethod());
-        $this->assertSame($path, $request->getPath());
+        $this->assertSame($path, $request->getRequestUri());
 
         $request = $this->http->requests->at(0);
         $this->assertSame('GET', $request->getMethod());
-        $this->assertSame($path, $request->getPath());
+        $this->assertSame($path, $request->getRequestUri());
 
         $request = $this->http->requests->pop();
         $this->assertSame('GET', $request->getMethod());
-        $this->assertSame($path, $request->getPath());
+        $this->assertSame($path, $request->getRequestUri());
 
         $this->assertSame($path . ' body', (string) $this->http->client->get($path)->send()->getBody());
 
         $request = $this->http->requests->shift();
         $this->assertSame('GET', $request->getMethod());
-        $this->assertSame($path, $request->getPath());
+        $this->assertSame($path, $request->getRequestUri());
 
         $this->expectException('UnexpectedValueException');
 
@@ -201,7 +201,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame('BODY', $response->getBody(true));
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeader('X-Foo'));
-        $this->assertSame('post-value', $this->http->requests->latest()->getPostField('post-key'));
+        $this->assertSame('post-value', $this->http->requests->latest()->request->get('post-key'));
     }
 
     public function testPutRequest(): void
@@ -220,7 +220,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame('BODY', $response->getBody(true));
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeader('X-Foo'));
-        $this->assertSame('put-value', $this->http->requests->latest()->getPostField('put-key'));
+        $this->assertSame('put-value', $this->http->requests->latest()->request->get('put-key'));
     }
 
     public function testPostRequest(): void
@@ -239,7 +239,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $this->assertSame('BODY', $response->getBody(true));
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('Bar', (string) $response->getHeader('X-Foo'));
-        $this->assertSame('post-value', $this->http->requests->latest()->getPostField('post-key'));
+        $this->assertSame('post-value', $this->http->requests->latest()->request->get('post-key'));
     }
 
     public function testCountRequests(): void

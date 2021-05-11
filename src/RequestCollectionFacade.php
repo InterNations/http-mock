@@ -3,11 +3,8 @@ namespace InterNations\Component\HttpMock;
 
 use Countable;
 use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\EntityEnclosingRequestInterface;
-use Guzzle\Http\Message\RequestFactory;
-use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\Message\Response;
-use InterNations\Component\HttpMock\Request\UnifiedRequest;
+use Symfony\Component\HttpFoundation\Request;
 use UnexpectedValueException;
 
 class RequestCollectionFacade implements Countable
@@ -19,44 +16,32 @@ class RequestCollectionFacade implements Countable
         $this->client = $client;
     }
 
-    /**
-     */
-    public function latest(): UnifiedRequest
+    public function latest(): Request
     {
         return $this->getRecordedRequest('/_request/last');
     }
 
-    /**
-     */
-    public function last(): UnifiedRequest
+    public function last(): Request
     {
         return $this->getRecordedRequest('/_request/last');
     }
 
-    /**
-     */
-    public function first(): UnifiedRequest
+    public function first(): Request
     {
         return $this->getRecordedRequest('/_request/first');
     }
 
-    /**
-     */
-    public function at(int $position): UnifiedRequest
+    public function at(int $position): Request
     {
        return $this->getRecordedRequest('/_request/' . $position);
     }
 
-    /**
-     */
-    public function pop(): UnifiedRequest
+    public function pop(): Request
     {
         return $this->deleteRecordedRequest('/_request/last');
     }
 
-    /**
-     */
-    public function shift(): UnifiedRequest
+    public function shift(): Request
     {
         return $this->deleteRecordedRequest('/_request/first');
     }
@@ -73,10 +58,10 @@ class RequestCollectionFacade implements Countable
     /**
      * @throws UnexpectedValueException
      */
-    private function parseRequestFromResponse(Response $response, string $path): UnifiedRequest
+    private function parseRequestFromResponse(Response $response, string $path): Request
     {
         try {
-            $requestInfo = Util::deserialize($response->getBody());
+            return Util::deserialize($response->getBody());
         } catch (UnexpectedValueException $e) {
             throw new UnexpectedValueException(
                 sprintf('Cannot deserialize response from "%s": "%s"', $path, $response->getBody()),
@@ -84,50 +69,9 @@ class RequestCollectionFacade implements Countable
                 $e
             );
         }
-
-        $request = RequestFactory::getInstance()->fromMessage($requestInfo['request']);
-        $params = $this->configureRequest(
-            $request,
-            $requestInfo['server'],
-            $requestInfo['enclosure'] ?? []
-        );
-
-        return new UnifiedRequest($request, $params);
     }
 
-    /**
-     * @param array<string,string> $server
-     * @param array<string,string> $enclosure
-     * @return array<string,string>
-     */
-    private function configureRequest(RequestInterface $request, array $server, array $enclosure): array
-    {
-        if (isset($server['HTTP_HOST'])) {
-            $request->setHost($server['HTTP_HOST']);
-        }
-
-        if (isset($server['HTTP_PORT'])) {
-            $request->setPort($server['HTTP_PORT']);
-        }
-
-        if (isset($server['PHP_AUTH_USER'])) {
-            $request->setAuth($server['PHP_AUTH_USER'], $server['PHP_AUTH_PW'] ?? null);
-        }
-
-        $params = [];
-
-        if (isset($server['HTTP_USER_AGENT'])) {
-            $params['userAgent'] = $server['HTTP_USER_AGENT'];
-        }
-
-        if ($request instanceof EntityEnclosingRequestInterface) {
-            $request->addPostFields($enclosure);
-        }
-
-        return $params;
-    }
-
-    private function getRecordedRequest(string $path): UnifiedRequest
+    private function getRecordedRequest(string $path): Request
     {
         $response = $this->client
             ->get($path)
@@ -136,7 +80,7 @@ class RequestCollectionFacade implements Countable
         return $this->parseResponse($response, $path);
     }
 
-    private function deleteRecordedRequest(string $path): UnifiedRequest
+    private function deleteRecordedRequest(string $path): Request
     {
         $response = $this->client
             ->delete($path)
@@ -145,7 +89,7 @@ class RequestCollectionFacade implements Countable
         return $this->parseResponse($response, $path);
     }
 
-    private function parseResponse(Response $response, string $path): UnifiedRequest
+    private function parseResponse(Response $response, string $path): Request
     {
         $statusCode = (int) $response->getStatusCode();
 

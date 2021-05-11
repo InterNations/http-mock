@@ -2,6 +2,7 @@
 namespace InterNations\Component\HttpMock;
 
 use Exception;
+use InterNations\Component\HttpMock\Request\SerializableRequest;
 use RuntimeException;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +30,10 @@ if (!$autoloaderFound) {
         sprintf('Could not locate autoloader file. Tried "%s"', implode('", "', $autoloadFiles))
     );
 }
+
+Request::setFactory(function(...$args) {
+    return new SerializableRequest(...$args);
+});
 
 $app = new Application();
 $app['storage'] = new RequestStorage(getmypid(), __DIR__ . '/../state/');
@@ -116,17 +121,7 @@ $app->error(
                 $event->allowCustomResponseCode();
             }
 
-            $app['storage']->append(
-                $currentRequest,
-                'requests',
-                serialize(
-                    [
-                        'server' => $currentRequest->server->all(),
-                        'request' => (string) $currentRequest,
-                        'enclosure' => $currentRequest->request->all(),
-                    ]
-                )
-            );
+            $app['storage']->append($currentRequest, 'requests', serialize($currentRequest));
 
             $notFoundResponse = new Response('No matching expectation found', Response::HTTP_NOT_FOUND);
 

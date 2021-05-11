@@ -55,8 +55,8 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         $request = call_user_func_array([$this->facade, $method], $args);
 
         self::assertSame('POST', $request->getMethod());
-        self::assertSame('/foo', $request->getPath());
-        self::assertSame('RECORDED=1', (string) $request->getBody());
+        self::assertSame('/foo', $request->getRequestUri());
+        self::assertSame('RECORDED=1', $request->getContent());
     }
 
     /**
@@ -72,16 +72,17 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     {
         $this->mockClient($path, $this->createComplexResponse(), $httpMethod);
 
+        /** @var \Symfony\Component\HttpFoundation\Request $request */
         $request = call_user_func_array([$this->facade, $method], $args);
 
         self::assertSame('POST', $request->getMethod());
-        self::assertSame('/foo', $request->getPath());
-        self::assertSame('RECORDED=1', (string) $request->getBody());
+        self::assertSame('/foo', $request->getRequestUri());
+        self::assertSame('RECORDED=1', $request->getContent());
         self::assertSame('host', $request->getHost());
         self::assertSame(1234, $request->getPort());
-        self::assertSame('username', $request->getUsername());
+        self::assertSame('username', $request->getUser());
         self::assertSame('password', $request->getPassword());
-        self::assertSame('CUSTOM UA', $request->getUserAgent());
+        self::assertSame('CUSTOM UA', $request->headers->get('User-Agent'));
     }
 
     /**
@@ -185,12 +186,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         return new Response(
             '200',
             ['Content-Type' => 'text/plain'],
-            serialize(
-                [
-                    'server' => [],
-                    'request' => (string) $recordedRequest,
-                ]
-            )
+            serialize($recordedRequest)
         );
     }
 
@@ -200,25 +196,17 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         $recordedRequest->setMethod('POST');
         $recordedRequest->setRequestUri('/foo');
         $recordedRequest->setContent('RECORDED=1');
-        $recordedRequest->headers->set('Php-Auth-User', 'ignored');
-        $recordedRequest->headers->set('Php-Auth-Pw', 'ignored');
-        $recordedRequest->headers->set('User-Agent', 'ignored');
+        $recordedRequest->server->set('SERVER_NAME', 'host');
+        $recordedRequest->server->set('SERVER_PORT', 1234);
+        $recordedRequest->headers->set('Php-Auth-User', 'username');
+        $recordedRequest->headers->set('Php-Auth-Pw', 'password');
+        $recordedRequest->headers->set('User-Agent', 'CUSTOM UA');
+
 
         return new Response(
             '200',
             ['Content-Type' => 'text/plain; charset=UTF-8'],
-            serialize(
-                [
-                    'server' => [
-                        'HTTP_HOST'       => 'host',
-                        'HTTP_PORT'       => 1234,
-                        'PHP_AUTH_USER'   => 'username',
-                        'PHP_AUTH_PW'     => 'password',
-                        'HTTP_USER_AGENT' => 'CUSTOM UA',
-                    ],
-                    'request' => (string) $recordedRequest,
-                ]
-            )
+            serialize($recordedRequest)
         );
     }
 
