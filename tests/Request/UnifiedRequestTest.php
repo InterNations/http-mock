@@ -79,19 +79,19 @@ class UnifiedRequestTest extends AbstractTestCase
     public function testMethodsFromRequestInterface(string $method, array $params = [], $returnValue = 'REQ'): void
     {
         $this->wrappedRequest
-            ->expects($this->once())
+            ->expects(self::once())
             ->method($method)
             ->willReturn($returnValue)
             ->with(...$params);
-        $this->assertSame($returnValue, call_user_func_array([$this->unifiedRequest, $method], $params));
+        self::assertSame($returnValue, call_user_func_array([$this->unifiedRequest, $method], $params));
 
 
         $this->wrappedEntityEnclosingRequest
-            ->expects($this->once())
+            ->expects(self::once())
             ->method($method)
             ->willReturn($returnValue)
             ->with(...$params);
-        $this->assertSame(
+        self::assertSame(
             $returnValue,
             call_user_func_array([$this->unifiedEnclosingEntityRequest, $method], $params)
         );
@@ -114,7 +114,7 @@ class UnifiedRequestTest extends AbstractTestCase
             ->willReturn($returnValue)
             ->with(...$params);
 
-        $this->assertSame(
+        self::assertSame(
             $returnValue,
             call_user_func_array([$this->unifiedEnclosingEntityRequest, $method], $params)
         );
@@ -141,9 +141,9 @@ class UnifiedRequestTest extends AbstractTestCase
 
     public function testUserAgent(): void
     {
-        $this->assertNull($this->unifiedRequest->getUserAgent());
+        self::assertNull($this->unifiedRequest->getUserAgent());
 
         $unifiedRequest = new UnifiedRequest($this->wrappedRequest, ['userAgent' => 'UA']);
-        $this->assertSame('UA', $unifiedRequest->getUserAgent());
+        self::assertSame('UA', $unifiedRequest->getUserAgent());
     }
 }

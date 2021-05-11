@@ -21,62 +21,62 @@ class ExtractorFactoryTest extends AbstractTestCase
     public function testGetMethod(): void
     {
         $this->request
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMethod')
-            ->will($this->returnValue('POST'));
+            ->willReturn('POST');
 
         $extractor = $this->extractorFactory->createMethodExtractor();
-        $this->assertSame('POST', $extractor($this->request));
+        self::assertSame('POST', $extractor($this->request));
     }
 
     public function testGetPath(): void
     {
         $this->request
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getPathInfo')
-            ->will($this->returnValue('/foo/bar'));
+            ->willReturn('/foo/bar');
 
         $extractor = $this->extractorFactory->createPathExtractor();
-        $this->assertSame('/foo/bar', $extractor($this->request));
+        self::assertSame('/foo/bar', $extractor($this->request));
     }
 
     public function testGetPathWithBasePath(): void
     {
         $this->request
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getPathInfo')
-            ->will($this->returnValue('/foo/bar'));
+            ->willReturn('/foo/bar');
 
         $extractorFactory = new ExtractorFactory('/foo');
 
         $extractor = $extractorFactory->createPathExtractor();
-        $this->assertSame('/bar', $extractor($this->request));
+        self::assertSame('/bar', $extractor($this->request));
     }
 
     public function testGetPathWithBasePathTrailingSlash(): void
     {
         $this->request
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getPathInfo')
-            ->will($this->returnValue('/foo/bar'));
+            ->willReturn('/foo/bar');
 
         $extractorFactory = new ExtractorFactory('/foo/');
 
         $extractor = $extractorFactory->createPathExtractor();
-        $this->assertSame('/bar', $extractor($this->request));
+        self::assertSame('/bar', $extractor($this->request));
     }
 
     public function testGetPathWithBasePathThatDoesNotMatch(): void
     {
         $this->request
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getPathInfo')
-            ->will($this->returnValue('/bar'));
+            ->willReturn('/bar');
 
         $extractorFactory = new ExtractorFactory('/foo');
 
         $extractor = $extractorFactory->createPathExtractor();
-        $this->assertSame('', $extractor($this->request));
+        self::assertSame('', $extractor($this->request));
     }
 
     public function testGetHeaderWithExistingHeader(): void
@@ -93,7 +93,7 @@ class ExtractorFactoryTest extends AbstractTestCase
         $extractorFactory = new ExtractorFactory('/foo');
 
         $extractor = $extractorFactory->createHeaderExtractor('content-type');
-        $this->assertSame('application/json', $extractor($request));
+        self::assertSame('application/json', $extractor($request));
     }
 
     public function testGetHeaderWithNonExistingHeader(): void
@@ -110,7 +110,7 @@ class ExtractorFactoryTest extends AbstractTestCase
         $extractorFactory = new ExtractorFactory('/foo');
 
         $extractor = $extractorFactory->createHeaderExtractor('content-type');
-        $this->assertNull($extractor($request));
+        self::assertNull($extractor($request));
     }
 
     public function testHeaderExistsWithExistingHeader(): void
@@ -127,7 +127,7 @@ class ExtractorFactoryTest extends AbstractTestCase
         $extractorFactory = new ExtractorFactory('/foo');
 
         $extractor = $extractorFactory->createHeaderExistsExtractor('content-type');
-        $this->assertTrue($extractor($request));
+        self::assertTrue($extractor($request));
     }
 
     public function testHeaderExistsWithNonExistingHeader(): void
@@ -144,6 +144,6 @@ class ExtractorFactoryTest extends AbstractTestCase
         $extractorFactory = new ExtractorFactory('/foo');
 
         $extractor = $extractorFactory->createHeaderExistsExtractor('content-type');
-        $this->assertFalse($extractor($request));
+        self::assertFalse($extractor($request));
     }
 }

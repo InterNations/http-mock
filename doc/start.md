@@ -45,7 +45,7 @@ class ExampleTest extends TestCase
             ->end();
         $this->http->setUp();
 
-        $this->assertSame('mocked body', file_get_contents('http://localhost:8082/foo'));
+        self::assertSame('mocked body', file_get_contents('http://localhost:8082/foo'));
     }
 
     public function testAccessingRecordedRequests(): void
@@ -59,10 +59,10 @@ class ExampleTest extends TestCase
             ->end();
         $this->http->setUp();
 
-        $this->assertSame('mocked body', $this->http->client->post('http://localhost:8082/foo')->send()->getBody(true));
+        self::assertSame('mocked body', $this->http->client->post('http://localhost:8082/foo')->send()->getBody(true));
 
-        $this->assertSame('POST', $this->http->requests->latest()->getMethod());
-        $this->assertSame('/foo', $this->http->requests->latest()->getPath());
+        self::assertSame('POST', $this->http->requests->latest()->getMethod());
+        self::assertSame('/foo', $this->http->requests->latest()->getPath());
     }
 }
  ```
