@@ -32,6 +32,7 @@
         "psr-4": {"InterNations\\Component\\HttpMock\\Tests\\": "tests/"}
     },
     "scripts": {
-        "tests": "phpunit"
+        "tests": "phpunit",
+        "coding-style": "phpcs",
     }
 }
