@@ -14,11 +14,8 @@ class Expectation
     private array $matcher = [];
     private MatcherFactory $matcherFactory;
     private ResponseBuilder $responseBuilder;
-
     private Closure $limiter;
-
     private ExtractorFactory $extractorFactory;
-
     private int $priority;
 
     public function __construct(

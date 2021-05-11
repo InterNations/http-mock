@@ -46,7 +46,7 @@ class Server extends Process
      * @param int|float $timeout
      * @param int $signal
      */
-    public function stop($timeout = 10, $signal = null): ?int
+    public function stop($timeout = 10, $signal = null): ?int // @codingStandardsIgnoreLine
     {
         return parent::stop($timeout, $signal);
     }

@@ -7,8 +7,10 @@ use Guzzle\Http\EntityBodyInterface;
 use Guzzle\Http\Message\EntityEnclosingRequestInterface;
 use Guzzle\Http\Message\Header;
 use Guzzle\Http\Message\Header\HeaderCollection;
+use Guzzle\Http\Message\PostFileInterface;
 use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\QueryString;
+use Guzzle\Plugin\Cookie\Cookie;
 
 final class UnifiedRequest
 {
@@ -61,7 +63,7 @@ final class UnifiedRequest
     /**
      * Returns an associative array of POST field names to PostFileInterface objects
      *
-     * @return array
+     * @return array<string,PostFileInterface>
      */
     public function getPostFiles(): array
     {
@@ -73,7 +75,7 @@ final class UnifiedRequest
      *
      * @param string $fieldName POST fields to retrieve
      *
-     * @return array|null Returns an array wrapping an array of PostFileInterface objects
+     * @return array<array<PostFileInterface>>|null Returns an array wrapping an array of PostFileInterface objects
      */
     public function getPostFile(string $fieldName): ?array
     {
@@ -114,7 +116,7 @@ final class UnifiedRequest
     /**
      * Get an array of message header lines
      *
-     * @return array
+     * @return array<string>
      */
     public function getHeaderLines(): array
     {
@@ -240,7 +242,7 @@ final class UnifiedRequest
     /**
      * Get an array of Cookies
      *
-     * @return array
+     * @return array<Cookie>
      */
     public function getCookies(): array
     {

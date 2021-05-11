@@ -20,13 +20,14 @@ class RequestCollectionFacadeTest extends AbstractTestCase
 
     public function setUp(): void
     {
-        $this->client = $this->createMock('Guzzle\Http\ClientInterface');
+        $this->client = $this->createMock(ClientInterface::class);
         $this->facade = new RequestCollectionFacade($this->client);
         $this->request = new Request('GET', '/_request/last');
         $this->request->setClient($this->client);
     }
 
-    public static function provideMethodAndUrls(): array
+    /** @return array<array{0:string,1:string,2:array<mixed>,3:string}> */
+    public static function getMethodAndUrls(): array
     {
         return [
             ['latest', '/_request/last'],
@@ -38,7 +39,10 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         ];
     }
 
-    /** @dataProvider provideMethodAndUrls */
+    /**
+     * @dataProvider getMethodAndUrls
+     * @param array<mixed> $args
+     */
     public function testRequestingLatestRequest(
         string $method,
         string $path,
@@ -55,7 +59,10 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         self::assertSame('RECORDED=1', (string) $request->getBody());
     }
 
-    /** @dataProvider provideMethodAndUrls */
+    /**
+     * @dataProvider getMethodAndUrls
+     * @param array<mixed> $args
+     */
     public function testRequestLatestResponseWithHttpAuth(
         string $method,
         string $path,
@@ -77,7 +84,10 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         self::assertSame('CUSTOM UA', $request->getUserAgent());
     }
 
-    /** @dataProvider provideMethodAndUrls */
+    /**
+     * @dataProvider getMethodAndUrls
+     * @param array<mixed> $args
+     */
     public function testRequestResponseWithInvalidStatusCode(
         string $method,
         string $path,
@@ -93,7 +103,10 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         call_user_func_array([$this->facade, $method], $args);
     }
 
-    /** @dataProvider provideMethodAndUrls */
+    /**
+     * @dataProvider getMethodAndUrls
+     * @param array<mixed> $args
+     */
     public function testRequestResponseWithEmptyContentType(
         string $method,
         string $path,
@@ -109,7 +122,10 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         call_user_func_array([$this->facade, $method], $args);
     }
 
-    /** @dataProvider provideMethodAndUrls */
+    /**
+     * @dataProvider getMethodAndUrls
+     * @param array<mixed> $args
+     */
     public function testRequestResponseWithInvalidContentType(
         string $method,
         string $path,
@@ -125,7 +141,10 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         call_user_func_array([$this->facade, $method], $args);
     }
 
-    /** @dataProvider provideMethodAndUrls */
+    /**
+     * @dataProvider getMethodAndUrls
+     * @param array<mixed> $args
+     */
     public function testRequestResponseWithDeserializationError(
         string $method,
         string $path,

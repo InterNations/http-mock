@@ -32,6 +32,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         $this->tearDownHttpMock();
     }
 
+    /** @return array<array{0:string}> */
     public static function getPaths(): array
     {
         return [

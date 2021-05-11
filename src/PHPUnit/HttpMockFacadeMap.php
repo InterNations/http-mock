@@ -17,6 +17,10 @@ class HttpMockFacadeMap implements ArrayAccess
         $this->facadeMap = $facadeMap;
     }
 
+    /**
+     * @param int|string $offset
+     * @return mixed
+     */
     public function offsetGet($offset)
     {
         if (!$this->offsetExists($offset)) {
@@ -26,17 +30,23 @@ class HttpMockFacadeMap implements ArrayAccess
         return $this->facadeMap[$offset];
     }
 
+    /** @param int|string $offset */
     public function offsetExists($offset): bool
     {
         return isset($this->facadeMap[$offset]);
     }
 
-    public function offsetSet($offset, $value): void
+    /**
+     * @param int|string $offset
+     * @param mixed $value
+     */
+    public function offsetSet($offset, $value): void // @codingStandardsIgnoreLine
     {
         throw new BadMethodCallException(__METHOD__);
     }
 
-    public function offsetUnset($offset): void
+    /** @param int|string $offset */
+    public function offsetUnset($offset): void // @codingStandardsIgnoreLine
     {
         throw new BadMethodCallException(__METHOD__);
     }

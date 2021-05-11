@@ -32,6 +32,7 @@ class UnifiedRequestTest extends AbstractTestCase
         $this->unifiedEnclosingEntityRequest = new UnifiedRequest($this->wrappedEntityEnclosingRequest);
     }
 
+    /** @return array<array{0:string,1:array<mixed>,2:mixed}>> */
     public static function provideMethods(): array
     {
         return [
@@ -58,6 +59,7 @@ class UnifiedRequestTest extends AbstractTestCase
         ];
     }
 
+    /** @return array<array{0:string,1:array<mixed>,2:mixed}>> */
     public static function provideEntityEnclosingInterfaceMethods(): array
     {
         return [
@@ -69,8 +71,12 @@ class UnifiedRequestTest extends AbstractTestCase
         ];
     }
 
-    /** @dataProvider provideMethods */
-    public function testMethodsFromRequestInterface($method, array $params = [], $returnValue = 'REQ'): void
+    /**
+     * @dataProvider provideMethods
+     * @param array<mixed> $params
+     * @param mixed $returnValue
+     */
+    public function testMethodsFromRequestInterface(string $method, array $params = [], $returnValue = 'REQ'): void
     {
         $this->wrappedRequest
             ->expects($this->once())
@@ -91,15 +97,19 @@ class UnifiedRequestTest extends AbstractTestCase
         );
     }
 
-    /** @dataProvider provideEntityEnclosingInterfaceMethods */
+    /**
+     * @dataProvider provideEntityEnclosingInterfaceMethods
+     * @param array<mixed> $params
+     * @param mixed $returnValue
+     */
     public function testEntityEnclosingInterfaceMethods(
-        $method,
+        string $method,
         array $params = [],
         $returnValue = 'Return Value'
     ): void
     {
         $this->wrappedEntityEnclosingRequest
-            ->expects($this->once())
+            ->expects(self::once())
             ->method($method)
             ->willReturn($returnValue)
             ->with(...$params);
@@ -110,11 +120,9 @@ class UnifiedRequestTest extends AbstractTestCase
         );
 
         $this->wrappedRequest
-            ->expects($this->any())
             ->method('getMethod')
             ->willReturn('METHOD');
         $this->wrappedRequest
-            ->expects($this->any())
             ->method('getPath')
             ->willReturn('/foo');
 
