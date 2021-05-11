@@ -17,7 +17,7 @@
         "silex/silex": "~2.0",
         "guzzle/guzzle": ">=3.8",
         "symfony/process": "~3|~4|~5",
-        "jeremeamia/superclosure": "~2.2",
+        "jeremeamia/superclosure": "~2.3",
         "lstrojny/hmmmath": ">=0.5.0",
         "slevomat/coding-standard": "^7.0"
     },
