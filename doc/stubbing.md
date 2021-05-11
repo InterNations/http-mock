@@ -60,7 +60,7 @@ $this->http->mock
         ->statusCode(Response::HTTP_NOT_FOUND)
         ->header('X-Custom-Header', 'Header Value')
         ->body('response')
-    ->end();`
+    ->end();
 ```
 
 Additional matching methods are `queryParamExists(string $param)`, `queryParamNotExists(string $param)`,
@@ -86,7 +86,7 @@ $this->http->mock
         )
     ->then()
         ->body('response')
-    ->end();`
+    ->end();
 ```
 
 ## Limiting
