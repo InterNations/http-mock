@@ -1,29 +1,25 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests;
 
-use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\Request;
-use Guzzle\Http\Message\Response;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
 use InterNations\Component\Testing\AbstractTestCase;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Http\Message\ResponseInterface;
 
 class RequestCollectionFacadeTest extends AbstractTestCase
 {
-    /** @var ClientInterface|MockObject */
+    /** @var Client|MockObject */
     private $client;
-
-    private Request $request;
 
     private RequestCollectionFacade $facade;
 
     public function setUp(): void
     {
-        $this->client = $this->createMock(ClientInterface::class);
+        $this->client = $this->createMock(Client::class);
         $this->facade = new RequestCollectionFacade($this->client);
-        $this->request = new Request('GET', '/_request/last');
-        $this->request->setClient($this->client);
     }
 
     /** @return array<array{0:string,1:string,2:array<mixed>,3:string}> */
@@ -52,7 +48,8 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     {
         $this->mockClient($path, $this->createSimpleResponse(), $httpMethod);
 
-        $request = call_user_func_array([$this->facade, $method], $args);
+        /** @var \Symfony\Component\HttpFoundation\Request $request */
+        $request = $this->facade->{$method}(...$args);
 
         self::assertSame('POST', $request->getMethod());
         self::assertSame('/foo', $request->getRequestUri());
@@ -73,7 +70,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         $this->mockClient($path, $this->createComplexResponse(), $httpMethod);
 
         /** @var \Symfony\Component\HttpFoundation\Request $request */
-        $request = call_user_func_array([$this->facade, $method], $args);
+        $request = $this->facade->{$method}(...$args);
 
         self::assertSame('POST', $request->getMethod());
         self::assertSame('/foo', $request->getRequestUri());
@@ -161,22 +158,16 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         call_user_func_array([$this->facade, $method], $args);
     }
 
-    private function mockClient(string $path, Response $response, string $method): void
+    private function mockClient(string $path, ResponseInterface $response, string $method): void
     {
         $this->client
             ->expects(self::once())
             ->method($method)
             ->with($path)
-            ->willReturn($this->request);
-
-        $this->client
-            ->expects(self::once())
-            ->method('send')
-            ->with($this->request)
             ->willReturn($response);
     }
 
-    private function createSimpleResponse(): Response
+    private function createSimpleResponse(): ResponseInterface
     {
         $recordedRequest = new TestRequest();
         $recordedRequest->setMethod('POST');
@@ -190,7 +181,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         );
     }
 
-    private function createComplexResponse(): Response
+    private function createComplexResponse(): ResponseInterface
     {
         $recordedRequest = new TestRequest();
         $recordedRequest->setMethod('POST');
@@ -210,22 +201,22 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         );
     }
 
-    private function createResponseWithInvalidStatusCode(): Response
+    private function createResponseWithInvalidStatusCode(): ResponseInterface
     {
         return new Response(404);
     }
 
-    private function createResponseWithInvalidContentType(): Response
+    private function createResponseWithInvalidContentType(): ResponseInterface
     {
         return new Response(200, ['Content-Type' => 'text/html']);
     }
 
-    private function createResponseWithEmptyContentType(): Response
+    private function createResponseWithEmptyContentType(): ResponseInterface
     {
         return new Response(200, []);
     }
 
-    private function createResponseThatCannotBeDeserialized(): Response
+    private function createResponseThatCannotBeDeserialized(): ResponseInterface
     {
         return new Response(200, ['Content-Type' => 'text/plain'], 'invalid response');
     }

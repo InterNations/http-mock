@@ -15,11 +15,11 @@
      "require": {
         "php": "~7.4|~8.0",
         "silex/silex": "~2.0",
-        "guzzle/guzzle": ">=3.8",
         "symfony/process": "~3|~4|~5",
         "lstrojny/hmmmath": ">=0.5.0",
         "slevomat/coding-standard": "^7.0",
-        "opis/closure": "^3.6"
+        "opis/closure": "^3.6",
+        "guzzlehttp/guzzle": "^7.3"
     },
     "require-dev": {
         "internations/testing-component": "1.0.1",

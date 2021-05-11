@@ -2,16 +2,16 @@
 namespace InterNations\Component\HttpMock;
 
 use Countable;
-use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\Response;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Symfony\Component\HttpFoundation\Request;
 use UnexpectedValueException;
 
 class RequestCollectionFacade implements Countable
 {
-    private ClientInterface $client;
+    private Client $client;
 
-    public function __construct(ClientInterface $client)
+    public function __construct(Client $client)
     {
         $this->client = $client;
     }
@@ -49,10 +49,9 @@ class RequestCollectionFacade implements Countable
     public function count(): int
     {
         $response = $this->client
-            ->get('/_request/count')
-            ->send();
+            ->get('/_request/count');
 
-        return (int) $response->getBody(true);
+        return (int) (string) $response->getBody();
     }
 
     /**
@@ -73,25 +72,21 @@ class RequestCollectionFacade implements Countable
 
     private function getRecordedRequest(string $path): Request
     {
-        $response = $this->client
-            ->get($path)
-            ->send();
+        $response = $this->client->get($path);
 
         return $this->parseResponse($response, $path);
     }
 
     private function deleteRecordedRequest(string $path): Request
     {
-        $response = $this->client
-            ->delete($path)
-            ->send();
+        $response = $this->client->delete($path);
 
         return $this->parseResponse($response, $path);
     }
 
     private function parseResponse(Response $response, string $path): Request
     {
-        $statusCode = (int) $response->getStatusCode();
+        $statusCode = $response->getStatusCode();
 
         if ($statusCode !== 200) {
             throw new UnexpectedValueException(
@@ -100,7 +95,7 @@ class RequestCollectionFacade implements Countable
         }
 
         $contentType = $response->hasHeader('content-type')
-            ? $response->getContentType()
+            ? $response->getHeaderLine('content-type')
             : '';
 
         if (strpos($contentType, 'text/plain') !== 0) {
