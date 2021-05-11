@@ -1,14 +1,8 @@
 <?php
 namespace InterNations\Component\HttpMock\Request;
 
-use Exception;
 use Serializable;
-use Symfony\Component\HttpFoundation\FileBag;
-use Symfony\Component\HttpFoundation\HeaderBag;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\ServerBag;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class SerializableRequest extends Request implements Serializable
 {
@@ -40,7 +34,8 @@ class SerializableRequest extends Request implements Serializable
         ]);
     }
 
-    public function unserialize($data)
+    /** @param array<mixed> $data */
+    public function unserialize($data): void // @codingStandardsIgnoreLine
     {
         $attributes = unserialize($data);
 

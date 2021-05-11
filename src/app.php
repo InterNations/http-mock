@@ -31,9 +31,7 @@ if (!$autoloaderFound) {
     );
 }
 
-Request::setFactory(function(...$args) {
-    return new SerializableRequest(...$args);
-});
+Request::setFactory(static fn (...$args) => new SerializableRequest(...$args));
 
 $app = new Application();
 $app['storage'] = new RequestStorage(getmypid(), __DIR__ . '/../state/');
