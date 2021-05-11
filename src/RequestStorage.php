@@ -15,14 +15,14 @@ class RequestStorage
         $this->directory = $directory;
     }
 
-    /** @param mixed $data */
-    public function store(Request $request, string $name, $data): void
+    /** @param array<Request>|array<Expectation> $data */
+    public function store(Request $request, string $name, array $data): void
     {
         file_put_contents($this->getFileName($request, $name), serialize($data));
     }
 
-    /** @return mixed */
-    public function read(Request $request, string $name)
+    /** @return array<Request>|array<Expectation> */
+    public function read(Request $request, string $name): array
     {
         $fileName = $this->getFileName($request, $name);
 
@@ -33,7 +33,7 @@ class RequestStorage
         return Util::deserialize(file_get_contents($fileName));
     }
 
-    /** @param mixed $data */
+    /** @param Request|Expectation $data */
     public function append(Request $request, string $name, $data): void
     {
         $list = $this->read($request, $name);
@@ -41,7 +41,7 @@ class RequestStorage
         $this->store($request, $name, $list);
     }
 
-    /** @param mixed $data */
+    /** @param Request|Expectation $data */
     public function prepend(Request $request, string $name, $data): void
     {
         $list = $this->read($request, $name);

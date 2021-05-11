@@ -1,4 +1,4 @@
-<?php // @codingStandardsIgnoreLine
+<?php
 namespace InterNations\Component\HttpMock;
 
 use Exception;
@@ -26,18 +26,17 @@ foreach ($autoloadFiles as $autoloadFile) {
 
 if (!$autoloaderFound) {
     throw new RuntimeException(
-        sprintf('Could not locate autoloader file. Tried "%s"', implode($autoloadFiles, '", "'))
+        sprintf('Could not locate autoloader file. Tried "%s"', implode('", "', $autoloadFiles))
     );
 }
 
 $app = new Application();
-$app['debug'] = true;
 $app['storage'] = new RequestStorage(getmypid(), __DIR__ . '/../state/');
 
 $app->delete(
     '/_expectation',
-    static function (Request $request) use ($app) {
-        $app['storage']->clear($request, 'expectations');
+    static function (Request $currentRequest) use ($app) {
+        $app['storage']->clear($currentRequest, 'expectations');
 
         return new Response('', Response::HTTP_OK);
     }
@@ -45,12 +44,12 @@ $app->delete(
 
 $app->post(
     '/_expectation',
-    static function (Request $request) use ($app) {
+    static function (Request $currentRequest) use ($app) {
 
         $matcher = [];
 
-        if ($request->request->has('matcher')) {
-            $matcherParameter = $request->request->get('matcher');
+        if ($currentRequest->request->has('matcher')) {
+            $matcherParameter = $currentRequest->request->get('matcher');
             if (!is_string($matcherParameter)) {
                 return new Response(
                     'POST data key "matcher" must be a serialized list of closures',
@@ -71,11 +70,11 @@ $app->post(
             }
         }
 
-        if (!$request->request->has('response')) {
+        if (!$currentRequest->request->has('response')) {
             return new Response('POST data key "response" not found in POST data', Response::HTTP_EXPECTATION_FAILED);
         }
 
-        $response = Util::silentDeserialize($request->request->get('response'));
+        $response = Util::silentDeserialize($currentRequest->request->get('response'));
 
         if (!$response instanceof Response) {
             return new Response(
@@ -86,8 +85,8 @@ $app->post(
 
         $limiter = null;
 
-        if ($request->request->has('limiter')) {
-            $limiter = Util::silentDeserialize($request->request->get('limiter'));
+        if ($currentRequest->request->has('limiter')) {
+            $limiter = Util::silentDeserialize($currentRequest->request->get('limiter'));
 
             if (!is_callable($limiter)) {
                 return new Response(
@@ -101,7 +100,7 @@ $app->post(
         $response->headers->set('X-Status-Code', $response->getStatusCode());
 
         $app['storage']->prepend(
-            $request,
+            $currentRequest,
             'expectations',
             ['matcher' => $matcher, 'response' => $response, 'limiter' => $limiter, 'runs' => 0]
         );
@@ -111,31 +110,31 @@ $app->post(
 );
 
 $app->error(
-    static function (Exception $e, Request $request, $code, GetResponseForExceptionEvent $event = null) use ($app) {
+    static function (Exception $e, Request $currentRequest, int $code, GetResponseForExceptionEvent $event = null) use ($app) {
         if ($e instanceof NotFoundHttpException) {
             if (method_exists($event, 'allowCustomResponseCode')) {
                 $event->allowCustomResponseCode();
             }
 
             $app['storage']->append(
-                $request,
+                $currentRequest,
                 'requests',
                 serialize(
                     [
-                        'server'    => $request->server->all(),
-                        'request'   => (string) $request,
-                        'enclosure' => $request->request->all(),
+                        'server' => $currentRequest->server->all(),
+                        'request' => (string) $currentRequest,
+                        'enclosure' => $currentRequest->request->all(),
                     ]
                 )
             );
 
             $notFoundResponse = new Response('No matching expectation found', Response::HTTP_NOT_FOUND);
 
-            $expectations = $app['storage']->read($request, 'expectations');
+            $expectations = $app['storage']->read($currentRequest, 'expectations');
 
             foreach ($expectations as $pos => $expectation) {
                 foreach ($expectation['matcher'] as $matcher) {
-                    if (!$matcher($request)) {
+                    if (!$matcher($currentRequest)) {
                         continue 2;
                     }
                 }
@@ -143,7 +142,7 @@ $app->error(
                 $applicable = !isset($expectation['limiter']) || $expectation['limiter']($expectation['runs']);
 
                 ++$expectations[$pos]['runs'];
-                $app['storage']->store($request, 'expectations', $expectations);
+                $app['storage']->store($currentRequest, 'expectations', $expectations);
 
                 if (!$applicable) {
                     $notFoundResponse = new Response('Expectation not met', Response::HTTP_GONE);
@@ -162,59 +161,59 @@ $app->error(
 
 $app->get(
     '/_request/count',
-    static function (Request $request) use ($app) {
-        return count($app['storage']->read($request, 'requests'));
+    static function (Request $currentRequest) use ($app) {
+        return count($app['storage']->read($currentRequest, 'requests'));
     }
 );
 
 $app->get(
     '/_request/{index}',
-    static function (Request $request, $index) use ($app) {
-        $requestData = $app['storage']->read($request, 'requests');
+    static function (Request $currentRequest, $index) use ($app) {
+        $requests = $app['storage']->read($currentRequest, 'requests');
 
-        if (!isset($requestData[$index])) {
+        if (!isset($requests[$index])) {
             return new Response('Index ' . $index . ' not found', Response::HTTP_NOT_FOUND);
         }
 
-        return new Response($requestData[$index], Response::HTTP_OK, ['Content-Type' => 'text/plain']);
+        return new Response($requests[$index], Response::HTTP_OK, ['Content-Type' => 'text/plain']);
     }
 )->assert('index', '\d+');
 
 $app->delete(
     '/_request/{action}',
-    static function (Request $request, $action) use ($app) {
-        $requestData = $app['storage']->read($request, 'requests');
+    static function (Request $currentRequest, $action) use ($app) {
+        $requests = $app['storage']->read($currentRequest, 'requests');
         $fn = 'array_' . ($action === 'last' ? 'pop' : 'shift');
-        $requestString = $fn($requestData);
-        $app['storage']->store($request, 'requests', $requestData);
+        $request = $fn($requests);
+        $app['storage']->store($currentRequest, 'requests', $requests);
 
-        if (!$requestString) {
+        if (!$request) {
             return new Response($action . ' not possible', Response::HTTP_NOT_FOUND);
         }
 
-        return new Response($requestString, Response::HTTP_OK, ['Content-Type' => 'text/plain']);
+        return new Response($request, Response::HTTP_OK, ['Content-Type' => 'text/plain']);
     }
 )->assert('index', '(last|first)');
 
 $app->get(
     '/_request/{action}',
-    static function (Request $request, $action) use ($app) {
-        $requestData = $app['storage']->read($request, 'requests');
+    static function (Request $currentRequest, $action) use ($app) {
+        $requestData = $app['storage']->read($currentRequest, 'requests');
         $fn = 'array_' . ($action === 'last' ? 'pop' : 'shift');
-        $requestString = $fn($requestData);
+        $request = $fn($requestData);
 
-        if (!$requestString) {
+        if (!$request) {
             return new Response($action . ' not available', Response::HTTP_NOT_FOUND);
         }
 
-        return new Response($requestString, Response::HTTP_OK, ['Content-Type' => 'text/plain']);
+        return new Response($request, Response::HTTP_OK, ['Content-Type' => 'text/plain']);
     }
 )->assert('index', '(last|first)');
 
 $app->delete(
     '/_request',
-    static function (Request $request) use ($app) {
-        $app['storage']->store($request, 'requests', []);
+    static function (Request $currentRequest) use ($app) {
+        $app['storage']->store($currentRequest, 'requests', []);
 
         return new Response('', Response::HTTP_OK);
     }
@@ -222,9 +221,9 @@ $app->delete(
 
 $app->delete(
     '/_all',
-    static function (Request $request) use ($app) {
-        $app['storage']->store($request, 'requests', []);
-        $app['storage']->store($request, 'expectations', []);
+    static function (Request $currentRequest) use ($app) {
+        $app['storage']->store($currentRequest, 'requests', []);
+        $app['storage']->store($currentRequest, 'expectations', []);
 
         return new Response('', Response::HTTP_OK);
     }

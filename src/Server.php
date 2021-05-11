@@ -85,7 +85,6 @@ class Server extends Process
      */
     public function setUp(array $expectations): void
     {
-        /** @var Expectation $expectation */
         foreach ($expectations as $expectation) {
             $response = $this->getClient()->post(
                 '/_expectation',
