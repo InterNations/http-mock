@@ -12,11 +12,12 @@ jobs:
             fail-fast: false
             matrix:
                 php-version:
-                    - 7.1
-                    - 7.2
-                    - 7.3
                     - 7.4
+                    - 8.0
                 experimental: [false]
+                include:
+                    - php-version: 8.1
+                      experimental: true
 
         continue-on-error: ${{ matrix.experimental }}
         steps:
