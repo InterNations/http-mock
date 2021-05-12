@@ -174,6 +174,10 @@ class Server extends Process
                 continue;
             }
 
+            if (strpos($line, 'JIT is incompatible with third party extensions') !== false) {
+                continue;
+            }
+
             if (self::stringEndsWithAny($line, ['Accepted', 'Closing', ' started'])) {
                 continue;
             }
