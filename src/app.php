@@ -115,7 +115,7 @@ $app->post(
 $app->error(
     static function (Exception $e, Request $currentRequest, int $code, GetResponseForExceptionEvent $event = null) use ($app) {
         if ($e instanceof NotFoundHttpException) {
-            if (method_exists($event, 'allowCustomResponseCode')) {
+            if ($event && method_exists($event, 'allowCustomResponseCode')) {
                 $event->allowCustomResponseCode();
             }
 
