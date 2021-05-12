@@ -6,16 +6,19 @@
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint">
         <properties>
             <property name="enableUnionTypeHint" value="false" type="bool"/>
+            <property name="enableMixedTypeHint" value="false" type="bool"/>
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
         <properties>
             <property name="enableUnionTypeHint" value="false" type="bool"/>
+            <property name="enableMixedTypeHint" value="false" type="bool"/>
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint">
         <properties>
             <property name="enableUnionTypeHint" value="false" type="bool"/>
+            <property name="enableMixedTypeHint" value="false" type="bool"/>
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.Arrays.DisallowImplicitArrayCreation"/>
