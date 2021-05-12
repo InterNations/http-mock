@@ -5,7 +5,6 @@ use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\Server;
-use PHPUnit\Framework\TestCase;
 use DateTime;
 use DateTimeZone;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
@@ -87,7 +86,10 @@ class MockBuilderIntegrationTest extends TestCase
 
         $client = $this->server->getClient();
 
-        self::assertSame('response body', (string) $client->post('/foo')->getBody());
+        self::assertSame(
+            'response body',
+            (string) $client->sendRequest($this->getRequestFactory()->createRequest('POST', '/foo'))->getBody()
+        );
 
         self::assertNotFalse(strpos($this->server->getErrorOutput(), 'CLOSURE MATCHER: POST /foo'));
     }
@@ -114,10 +116,30 @@ class MockBuilderIntegrationTest extends TestCase
             ->end();
         $this->server->setUp($this->builder->flushExpectations());
 
-        self::assertSame('POST 1', (string) $this->server->getClient()->post('/post-resource-1')->getBody());
-        self::assertSame('POST 2', (string) $this->server->getClient()->post('/post-resource-2')->getBody());
-        self::assertSame('POST 1', (string) $this->server->getClient()->post('/post-resource-1')->getBody());
-        self::assertSame('POST 2', (string) $this->server->getClient()->post('/post-resource-2')->getBody());
+        self::assertSame(
+            'POST 1',
+            (string) $this->server->getClient()->sendRequest(
+                $this->getRequestFactory()->createRequest('POST', '/post-resource-1')
+            )->getBody()
+        );
+        self::assertSame(
+            'POST 2',
+            (string) $this->server->getClient()->sendRequest(
+                $this->getRequestFactory()->createRequest('POST', '/post-resource-2')
+            )->getBody()
+        );
+        self::assertSame(
+            'POST 1',
+            (string) $this->server->getClient()->sendRequest(
+                $this->getRequestFactory()->createRequest('POST', '/post-resource-1')
+            )->getBody()
+        );
+        self::assertSame(
+            'POST 2',
+            (string) $this->server->getClient()->sendRequest(
+                $this->getRequestFactory()->createRequest('POST', '/post-resource-2')
+            )->getBody()
+        );
     }
 
     public function testCreateSuccessiveExpectationsOnSameWhen(): void
@@ -146,9 +168,24 @@ class MockBuilderIntegrationTest extends TestCase
 
       $this->server->setUp($this->builder->flushExpectations());
 
-      self::assertSame('called once', (string) $this->server->getClient()->post('/resource')->getBody());
-      self::assertSame('called twice', (string) $this->server->getClient()->post('/resource')->getBody());
-      self::assertSame('called 3 times', (string) $this->server->getClient()->post('/resource')->getBody());
+        self::assertSame(
+            'called once',
+            (string) $this->server->getClient()->sendRequest(
+                $this->getRequestFactory()->createRequest('POST', '/resource')
+            )->getBody()
+        );
+        self::assertSame(
+            'called twice',
+            (string) $this->server->getClient()->sendRequest(
+                $this->getRequestFactory()->createRequest('POST', '/resource')
+            )->getBody()
+        );
+        self::assertSame(
+            'called 3 times',
+            (string) $this->server->getClient()->sendRequest(
+                $this->getRequestFactory()->createRequest('POST', '/resource')
+            )->getBody()
+        );
     }
 
     public function testCreateSuccessiveExpectationsWithAny(): void
@@ -177,9 +214,9 @@ class MockBuilderIntegrationTest extends TestCase
 
         $this->server->setUp($this->builder->flushExpectations());
 
-        self::assertSame('1', (string) $this->server->getClient()->post('/resource')->getBody());
-        self::assertSame('2', (string) $this->server->getClient()->post('/resource')->getBody());
-        self::assertSame('any', (string) $this->server->getClient()->post('/resource')->getBody());
+        self::assertSame('1', (string) $this->server->getClient()->sendRequest($this->getRequestFactory()->createRequest('POST', '/resource'))->getBody());
+        self::assertSame('2', (string) $this->server->getClient()->sendRequest($this->getRequestFactory()->createRequest('POST', '/resource'))->getBody());
+        self::assertSame('any', (string) $this->server->getClient()->sendRequest($this->getRequestFactory()->createRequest('POST', '/resource'))->getBody());
     }
 
     public function testCreateSuccessiveExpectationsInUnexpectedOrder(): void
@@ -201,8 +238,8 @@ class MockBuilderIntegrationTest extends TestCase
 
         $this->server->setUp($this->builder->flushExpectations());
 
-        self::assertSame('1', (string) $this->server->getClient()->post('/resource')->getBody());
-        self::assertSame('2', (string) $this->server->getClient()->post('/resource')->getBody());
+        self::assertSame('1', (string) $this->server->getClient()->sendRequest($this->getRequestFactory()->createRequest('POST', '/resource'))->getBody());
+        self::assertSame('2', (string) $this->server->getClient()->sendRequest($this->getRequestFactory()->createRequest('POST', '/resource'))->getBody());
     }
 
     public function testCreateSuccessiveExpectationsWithOnce(): void
@@ -231,10 +268,35 @@ class MockBuilderIntegrationTest extends TestCase
 
         $this->server->setUp($this->builder->flushExpectations());
 
-        self::assertSame('1', (string) $this->server->getClient()->post('/resource')->getBody());
-        self::assertSame('2', (string) $this->server->getClient()->post('/resource')->getBody());
-        self::assertSame('twice', (string) $this->server->getClient()->post('/resource')->getBody());
-        self::assertSame('twice', (string) $this->server->getClient()->post('/resource')->getBody());
-        self::assertSame('Expectation not met', (string) $this->server->getClient()->post('/resource')->getBody());
+        self::assertSame(
+            '1',
+            (string) $this->server->getClient()->sendRequest(
+                $this->getRequestFactory()->createRequest('POST', '/resource')
+            )->getBody()
+        );
+        self::assertSame(
+            '2',
+            (string) $this->server->getClient()->sendRequest(
+                $this->getRequestFactory()->createRequest('POST', '/resource')
+            )->getBody()
+        );
+        self::assertSame(
+            'twice',
+            (string) $this->server->getClient()->sendRequest(
+                $this->getRequestFactory()->createRequest('POST', '/resource')
+            )->getBody()
+        );
+        self::assertSame(
+            'twice',
+            (string) $this->server->getClient()->sendRequest(
+                $this->getRequestFactory()->createRequest('POST', '/resource')
+            )->getBody()
+        );
+        self::assertSame(
+            'Expectation not met',
+            (string) $this->server->getClient()->sendRequest(
+                $this->getRequestFactory()->createRequest('POST', '/resource')
+            )->getBody()
+        );
     }
 }

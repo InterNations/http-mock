@@ -5,24 +5,23 @@ use Closure;
 use Guzzle\Http\Message\RequestInterface;
 use InterNations\Component\HttpMock\Server;
 use InterNations\Component\HttpMock\Util;
-use InterNations\Component\Testing\AbstractTestCase;
-use GuzzleHttp\Client;
 use Guzzle\Http\Message\RequestFactory;
-use Guzzle\Http\Message\Response as GuzzleResponse;
 use Opis\Closure\SerializableClosure;
+use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use function http_build_query;
 
 /**
  * @large
  * @group integration
  */
-class AppIntegrationTest extends AbstractTestCase
+class AppIntegrationTest extends TestCase
 {
     private static Server $server1;
 
-    private Client $client;
+    private ClientInterface $client;
 
     public static function setUpBeforeClass(): void
     {
@@ -33,7 +32,11 @@ class AppIntegrationTest extends AbstractTestCase
     public static function tearDownAfterClass(): void
     {
         static::assertSame('', (string) static::$server1->getOutput(), (string) static::$server1->getOutput());
-        static::assertSame('', (string) static::$server1->getErrorOutput(), (string) static::$server1->getErrorOutput());
+        static::assertSame(
+            '',
+            (string) static::$server1->getErrorOutput(),
+            (string) static::$server1->getErrorOutput()
+        );
         static::$server1->stop();
     }
 
@@ -45,151 +48,207 @@ class AppIntegrationTest extends AbstractTestCase
 
     public function testSimpleUseCase(): void
     {
-        $response = $this->client->post(
-            '/_expectation',
-            ['form_params' => $this->createExpectationParams(
-                [
-                    static function ($request) {
-                        return $request instanceof Request;
-                    },
-                ],
-                new Response('fake body', 200)
-            )]
+        $response = $this->client->sendRequest(
+            $this->getRequestFactory()
+                ->createRequest('POST', '/_expectation')
+                ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                ->withBody(
+                    $this->getStreamFactory()->createStream(
+                        http_build_query(
+                            $this->createExpectationParams(
+                                [
+                                    static function ($request) {
+                                        return $request instanceof Request;
+                                    },
+                                ],
+                                new Response('fake body', 200)
+                            )
+                        )
+                    )
+                )
         );
         self::assertSame('', (string) $response->getBody());
         self::assertSame(201, $response->getStatusCode());
 
-        $response = $this->client->post(
-            '/foobar',
-            ['headers' => ['X-Special' => 1], 'form_params' => ['post' => 'data']]
+        $response = $this->client->sendRequest(
+            $this->getRequestFactory()
+                ->createRequest('POST', '/foobar')
+                ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                ->withHeader('X-Special', 1)
+                ->withBody($this->getStreamFactory()->createStream(http_build_query(['post' => 'data'])))
         );
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('fake body', (string) $response->getBody());
 
-        $response = $this->client->get('/_request/latest');
+        $response = $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/latest'));
 
         $request = $this->parseRequestFromResponse($response);
-        self::assertSame('1', (string) $request->headers->get('X-Special'));
+        self::assertSame('1', $request->headers->get('X-Special'));
         self::assertSame('post=data', $request->getContent());
     }
 
     public function testRecording(): void
     {
-        $this->client->delete('/_all');
+        $this->client->sendRequest($this->getRequestFactory()->createRequest('DELETE', '/_all'));
 
-        self::assertSame(404, $this->client->get('/_request/latest')->getStatusCode());
-        self::assertSame(404, $this->client->get('/_request/0')->getStatusCode());
-        self::assertSame(404, $this->client->get('/_request/first')->getStatusCode());
-        self::assertSame(404, $this->client->get('/_request/last')->getStatusCode());
+        self::assertSame(404, $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/latest'))->getStatusCode());
+        self::assertSame(404, $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/0'))->getStatusCode());
+        self::assertSame(404, $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/first'))->getStatusCode());
+        self::assertSame(404, $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/last'))->getStatusCode());
 
-        $this->client->get('/req/0');
-        $this->client->get('/req/1');
-        $this->client->get('/req/2');
-        $this->client->get('/req/3');
+        $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/req/0'));
+        $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/req/1'));
+        $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/req/2'));
+        $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/req/3'));
 
         self::assertSame(
             '/req/3',
-            $this->parseRequestFromResponse($this->client->get('/_request/last'))->getRequestUri()
+            $this->parseRequestFromResponse($this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/last')))->getRequestUri()
         );
         self::assertSame(
             '/req/0',
-            $this->parseRequestFromResponse($this->client->get('/_request/0'))->getRequestUri()
+            $this->parseRequestFromResponse($this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/0')))->getRequestUri()
         );
         self::assertSame(
             '/req/1',
-            $this->parseRequestFromResponse($this->client->get('/_request/1'))->getRequestUri()
+            $this->parseRequestFromResponse($this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/1')))->getRequestUri()
         );
         self::assertSame(
             '/req/2',
-            $this->parseRequestFromResponse($this->client->get('/_request/2'))->getRequestUri()
+            $this->parseRequestFromResponse($this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/2')))->getRequestUri()
         );
         self::assertSame(
             '/req/3',
-            $this->parseRequestFromResponse($this->client->get('/_request/3'))->getRequestUri()
+            $this->parseRequestFromResponse($this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/3')))->getRequestUri()
         );
-        self::assertSame(404, $this->client->get('/_request/4')->getStatusCode());
+        self::assertSame(404, $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/4'))->getStatusCode());
 
         self::assertSame(
             '/req/3',
-            $this->parseRequestFromResponse($this->client->delete('/_request/last'))->getRequestUri()
+            $this->parseRequestFromResponse($this->client->sendRequest($this->getRequestFactory()->createRequest('DELETE', '/_request/last')))->getRequestUri()
         );
         self::assertSame(
             '/req/0',
-            $this->parseRequestFromResponse($this->client->delete('/_request/first'))->getRequestUri()
+            $this->parseRequestFromResponse($this->client->sendRequest($this->getRequestFactory()->createRequest('DELETE', '/_request/first')))->getRequestUri()
         );
         self::assertSame(
             '/req/1',
-            $this->parseRequestFromResponse($this->client->get('/_request/0'))->getRequestUri()
+            $this->parseRequestFromResponse($this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/0')))->getRequestUri()
         );
         self::assertSame(
             '/req/2',
-            $this->parseRequestFromResponse($this->client->get('/_request/1'))->getRequestUri()
+            $this->parseRequestFromResponse($this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/1')))->getRequestUri()
         );
-        self::assertSame(404, $this->client->get('/_request/2')->getStatusCode());
+        self::assertSame(404, $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/2'))->getStatusCode());
     }
 
     public function testErrorHandling(): void
     {
-        $this->client->delete('/_all');
+        $this->client->sendRequest($this->getRequestFactory()->createRequest('DELETE', '/_all'));
 
-        $response = $this->client->post('/_expectation', ['form_params' => ['matcher' => '']]);
+        $response = $this->client->sendRequest(
+            $this->getRequestFactory()
+                ->createRequest('POST', '/_expectation')
+                ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                ->withBody($this->getStreamFactory()->createStream(http_build_query(['matcher' => ''])))
+        );
         self::assertSame(417, $response->getStatusCode());
-        self::assertSame('POST data key "matcher" must be a serialized list of closures', (string) $response->getBody());
+        self::assertSame(
+            'POST data key "matcher" must be a serialized list of closures',
+            (string) $response->getBody()
+        );
 
-        $response = $this->client->post('/_expectation', ['form_params' => ['matcher' => ['foo']]]);
+        $response = $this->client->sendRequest(
+            $this->getRequestFactory()
+                ->createRequest('POST', '/_expectation')
+                ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                ->withBody(
+                    $this->getStreamFactory()->createStream(
+                        http_build_query(['matcher' => ['foo']])
+                    )
+                )
+        );
         self::assertSame(417, $response->getStatusCode());
-        self::assertSame('POST data key "matcher" must be a serialized list of closures', (string) $response->getBody());
+        self::assertSame(
+            'POST data key "matcher" must be a serialized list of closures',
+            (string) $response->getBody()
+        );
 
-        $response = $this->client->post('/_expectation');
+        $response = $this->client->sendRequest($this->getRequestFactory()->createRequest('POST', '/_expectation'));
         self::assertSame(417, $response->getStatusCode());
         self::assertSame('POST data key "response" not found in POST data', (string) $response->getBody());
 
-        $response = $this->client->post('/_expectation', ['form_params' => ['response' => '']]);
+        $response = $this->client->sendRequest(
+            $this->getRequestFactory()
+                ->createRequest('POST', '/_expectation')
+                ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                ->withBody($this->getStreamFactory()->createStream(http_build_query(['response' => ''])))
+        );
         self::assertSame(417, $response->getStatusCode());
-        self::assertSame('POST data key "response" must be a serialized Symfony response', (string) $response->getBody());
+        self::assertSame(
+            'POST data key "response" must be a serialized Symfony response',
+            (string) $response->getBody()
+        );
 
-        $response = $this->client->post('/_expectation', ['form_params' => ['response' => serialize(new Response()), 'limiter' => 'foo']]);
+        $response = $this->client->sendRequest(
+            $this->getRequestFactory()
+                ->createRequest('POST', '/_expectation')
+                ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                ->withBody(
+                    $this->getStreamFactory()->createStream(
+                        http_build_query(['response' => serialize(new Response()), 'limiter' => 'foo'])
+                    )
+                )
+        );
         self::assertSame(417, $response->getStatusCode());
         self::assertSame('POST data key "limiter" must be a serialized closure', (string) $response->getBody());
     }
 
     public function testNewestExpectationsAreFirstEvaluated(): void
     {
-        $this->client->post(
-            '/_expectation',
-            [
-                'form_params' => $this->createExpectationParams(
-                    [
-                        static function ($request) {
-                            return $request instanceof Request;
-                        },
-                    ],
-                    new Response('first', 200)
-                ),
-            ]
+        $this->client->sendRequest(
+            $this->getRequestFactory()
+                ->createRequest('POST', '/_expectation')
+                ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                ->withBody(
+                    $this->getStreamFactory()->createStream(
+                        http_build_query(
+                            $this->createExpectationParams(
+                                [
+                                    static function ($request) {
+                                        return $request instanceof Request;
+                                    },
+                                ],
+                                new Response('first', 200)
+                            )
+                        )
+                    )
+                )
         );
-        self::assertSame('first', (string) $this->client->get('/')->getBody());
+        self::assertSame('first', (string) $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/'))->getBody());
 
-        $this->client->post(
-            '/_expectation',
-            [
-                'form_params' => $this->createExpectationParams(
-                    [
-                        static function ($request) {
-                            return $request instanceof Request;
-                        },
-                    ],
-                    new Response('second', 200)
-                ),
-            ]
+        $this->client->sendRequest(
+            $this->getRequestFactory()
+                ->createRequest('POST', '/_expectation')
+                ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                ->withBody(
+                    $this->getStreamFactory()->createStream(
+                        http_build_query(
+                            $this->createExpectationParams(
+                                [static function ($request) { return $request instanceof Request; }],
+                                new Response('second', 200)
+                            )
+                        )
+                    )
+                )
         );
-        self::assertSame('second', (string) $this->client->get('/')->getBody());
+        self::assertSame('second', (string) $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/'))->getBody());
     }
 
     public function testServerLogsAreNotInErrorOutput(): void
     {
-        $this->client->delete('/_all');
+        $this->client->sendRequest($this->getRequestFactory()->createRequest('DELETE', '/_all'));
 
         $expectedServerErrorOutput = '[404]: (null) / - No such file or directory';
 

@@ -1,13 +1,13 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
-use InterNations\Component\Testing\AbstractTestCase;
 use InterNations\Component\HttpMock\PHPUnit\HttpMock;
 use Symfony\Component\HttpFoundation\Response;
 use PHPUnit\Framework\TestCase;
+use function http_build_query;
 
 /** @large */
-class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
+class HttpMockMultiPHPUnitIntegrationTest extends \InterNations\Component\HttpMock\Tests\TestCase
 {
     use HttpMock;
 
@@ -52,7 +52,12 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
             ->end();
         $this->http['firstNamedServer']->setUp();
 
-        self::assertSame($path . ' body', (string) $this->http['firstNamedServer']->client->get($path)->getBody());
+        self::assertSame(
+            $path . ' body',
+            (string) $this->http['firstNamedServer']->client->sendRequest(
+                $this->getRequestFactory()->createRequest('GET', $path)
+            )->getBody()
+        );
 
         $request = $this->http['firstNamedServer']->requests->latest();
         self::assertSame('GET', $request->getMethod());
@@ -74,7 +79,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
         self::assertSame('GET', $request->getMethod());
         self::assertSame($path, $request->getRequestUri());
 
-        self::assertSame($path . ' body', (string) $this->http['firstNamedServer']->client->get($path)->getBody());
+        self::assertSame($path . ' body', (string) $this->http['firstNamedServer']->client->sendRequest($this->getRequestFactory()->createRequest('GET', $path))->getBody());
 
         $request = $this->http['firstNamedServer']->requests->shift();
         self::assertSame('GET', $request->getMethod());
@@ -95,20 +100,22 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
             ->end();
         $this->http['firstNamedServer']->setUp();
 
-        $this->http['firstNamedServer']->client->get('/foo');
+        $this->http['firstNamedServer']->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/foo'));
 
         // Should fail during tear down as we have an error_log() on the server side
         try {
             $this->tearDown();
             self::fail('Exception expected');
         } catch (\Exception $e) {
-            self::assertTrue(strpos($e->getMessage(), 'HTTP mock server standard error output should be empty') !== false);
+            self::assertNotFalse(strpos($e->getMessage(), 'HTTP mock server standard error output should be empty'));
         }
     }
 
     public function testFailedRequest(): void
     {
-        $response = $this->http['firstNamedServer']->client->get('/foo');
+        $response = $this->http['firstNamedServer']->client->sendRequest(
+            $this->getRequestFactory()->createRequest('GET', '/foo')
+        );
         self::assertSame(404, $response->getStatusCode());
         self::assertSame('No matching expectation found', (string) $response->getBody());
     }
@@ -121,7 +128,9 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
     /** @depends testStopServer */
     public function testHttpServerIsRestartedIfATestStopsIt(): void
     {
-        $response = $this->http['firstNamedServer']->client->get('/');
+        $response = $this->http['firstNamedServer']->client->sendRequest(
+            $this->getRequestFactory()->createRequest('GET', '/')
+        );
         self::assertSame(404, $response->getStatusCode());
     }
 
@@ -135,9 +144,13 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
                 ->body('POST METHOD')
             ->end();
         $this->http['firstNamedServer']->setUp();
-        $firstResponse = $this->http['firstNamedServer']->client->post('/');
+        $firstResponse = $this->http['firstNamedServer']->client->sendRequest(
+            $this->getRequestFactory()->createRequest('POST', '/')
+        );
         self::assertSame(200, $firstResponse->getStatusCode());
-        $secondResponse = $this->http['firstNamedServer']->client->post('/');
+        $secondResponse = $this->http['firstNamedServer']->client->sendRequest(
+            $this->getRequestFactory()->createRequest('POST', '/')
+        );
         self::assertSame(410, $secondResponse->getStatusCode());
         self::assertSame('Expectation not met', (string) $secondResponse->getBody());
 
@@ -149,11 +162,17 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
                 ->body('POST METHOD')
             ->end();
         $this->http['firstNamedServer']->setUp();
-        $firstResponse = $this->http['firstNamedServer']->client->post('/');
+        $firstResponse = $this->http['firstNamedServer']->client->sendRequest(
+            $this->getRequestFactory()->createRequest('POST', '/')
+        );
         self::assertSame(200, $firstResponse->getStatusCode());
-        $secondResponse = $this->http['firstNamedServer']->client->post('/');
+        $secondResponse = $this->http['firstNamedServer']->client->sendRequest(
+            $this->getRequestFactory()->createRequest('POST', '/')
+        );
         self::assertSame(200, $secondResponse->getStatusCode());
-        $thirdResponse = $this->http['firstNamedServer']->client->post('/');
+        $thirdResponse = $this->http['firstNamedServer']->client->sendRequest(
+            $this->getRequestFactory()->createRequest('POST', '/')
+        );
         self::assertSame(410, $thirdResponse->getStatusCode());
         self::assertSame('Expectation not met', (string) $thirdResponse->getBody());
 
@@ -165,11 +184,17 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
                 ->body('POST METHOD')
             ->end();
         $this->http['firstNamedServer']->setUp();
-        $firstResponse = $this->http['firstNamedServer']->client->post('/');
+        $firstResponse = $this->http['firstNamedServer']->client->sendRequest(
+            $this->getRequestFactory()->createRequest('POST', '/')
+        );
         self::assertSame(200, $firstResponse->getStatusCode());
-        $secondResponse = $this->http['firstNamedServer']->client->post('/');
+        $secondResponse = $this->http['firstNamedServer']->client->sendRequest(
+            $this->getRequestFactory()->createRequest('POST', '/')
+        );
         self::assertSame(200, $secondResponse->getStatusCode());
-        $thirdResponse = $this->http['firstNamedServer']->client->post('/');
+        $thirdResponse = $this->http['firstNamedServer']->client->sendRequest(
+            $this->getRequestFactory()->createRequest('POST', '/')
+        );
         self::assertSame(200, $thirdResponse->getStatusCode());
     }
 
@@ -182,7 +207,12 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
                 ->callback(static function(Response $response): void {$response->setContent('CALLBACK');})
             ->end();
         $this->http['firstNamedServer']->setUp();
-        self::assertSame('CALLBACK', (string) $this->http['firstNamedServer']->client->post('/')->getBody());
+        self::assertSame(
+            'CALLBACK',
+            (string) $this->http['firstNamedServer']->client->sendRequest(
+                $this->getRequestFactory()->createRequest('POST', '/')
+            )->getBody()
+        );
     }
 
     public function testComplexResponse(): void
@@ -196,11 +226,15 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
                 ->header('X-Foo', 'Bar')
             ->end();
         $this->http['firstNamedServer']->setUp();
-        $response = $this->http['firstNamedServer']->client
-            ->post(
-                '/',
-                ['headers' => ['x-client-header' => 'header-value'], 'form_params' => ['post-key' => 'post-value']]
-            );
+        $response = $this->http['firstNamedServer']->client->sendRequest(
+            $this->getRequestFactory()
+                ->createRequest('POST', '/')
+                ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                ->withHeader('x-client-header', 'header-value')
+                ->withBody(
+                    $this->getStreamFactory()->createStream(http_build_query(['post-key' => 'post-value']))
+                )
+        );
         self::assertSame('BODY', (string) $response->getBody());
         self::assertSame(201, $response->getStatusCode());
         self::assertSame('Bar', $response->getHeaderLine('X-Foo'));
@@ -218,11 +252,13 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
                 ->header('X-Foo', 'Bar')
             ->end();
         $this->http['firstNamedServer']->setUp();
-        $response = $this->http['firstNamedServer']->client
-            ->put(
-                '/',
-                ['headers' => ['x-client-header' => 'header-value'], 'form_params' => ['put-key' => 'put-value']]
-            );
+        $response = $this->http['firstNamedServer']->client->sendRequest(
+            $this->getRequestFactory()
+                ->createRequest('PUT', '/')
+                ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                ->withHeader('x-client-header', 'header-value')
+                ->withBody($this->getStreamFactory()->createStream(http_build_query(['put-key' => 'put-value'])))
+        );
         self::assertSame('BODY', (string) $response->getBody());
         self::assertSame(201, $response->getStatusCode());
         self::assertSame('Bar', (string) $response->getHeaderLine('X-Foo'));
@@ -240,11 +276,13 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
                 ->header('X-Foo', 'Bar')
             ->end();
         $this->http['firstNamedServer']->setUp();
-        $response = $this->http['firstNamedServer']->client
-            ->post(
-                '/',
-                ['headers' => ['x-client-header' => 'header-value'], 'form_params' => ['post-key' => 'post-value']]
-            );
+        $response = $this->http['firstNamedServer']->client->sendRequest(
+            $this->getRequestFactory()
+                ->createRequest('POST', '/')
+                ->withHeader('x-client-header', 'header-value')
+                ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                ->withBody($this->getStreamFactory()->createStream(http_build_query(['post-key' => 'post-value'])))
+        );
         self::assertSame('BODY', (string) $response->getBody());
         self::assertSame(201, $response->getStatusCode());
         self::assertSame('Bar', $response->getHeaderLine('X-Foo'));

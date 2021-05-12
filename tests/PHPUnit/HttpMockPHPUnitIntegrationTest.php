@@ -2,13 +2,13 @@
 namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
 use InterNations\Component\HttpMock\PHPUnit\HttpMock;
-use InterNations\Component\Testing\AbstractTestCase;
+use InterNations\Component\HttpMock\Tests\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use PHPUnit\Framework\TestCase;
+use function http_build_query;
 
 /** @large */
-class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
+class HttpMockPHPUnitIntegrationTest extends TestCase
 {
     use HttpMock;
 
@@ -52,7 +52,12 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             ->end();
         $this->http->setUp();
 
-        self::assertSame($path . ' body', (string) $this->http->client->get($path)->getBody());
+        self::assertSame(
+            $path . ' body',
+            (string) $this->http->client->sendRequest(
+                $this->getRequestFactory()->createRequest('GET', $path)
+            )->getBody()
+        );
 
         $request = $this->http->requests->latest();
         self::assertSame('GET', $request->getMethod());
@@ -74,7 +79,12 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         self::assertSame('GET', $request->getMethod());
         self::assertSame($path, $request->getRequestUri());
 
-        self::assertSame($path . ' body', (string) $this->http->client->get($path)->getBody());
+        self::assertSame(
+            $path . ' body',
+            (string) $this->http->client->sendRequest(
+                $this->getRequestFactory()->createRequest('GET', $path)
+            )->getBody()
+        );
 
         $request = $this->http->requests->shift();
         self::assertSame('GET', $request->getMethod());
@@ -95,7 +105,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             ->end();
         $this->http->setUp();
 
-        $this->http->client->get('/foo');
+        $this->http->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/foo'));
 
         // Should fail during tear down as we have an error_log() on the server side
         try {
@@ -108,7 +118,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
 
     public function testFailedRequest(): void
     {
-        $response = $this->http->client->get('/foo');
+        $response = $this->http->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/foo'));
         self::assertSame(404, $response->getStatusCode());
         self::assertSame('No matching expectation found', (string) $response->getBody());
     }
@@ -121,7 +131,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
     /** @depends testStopServer */
     public function testHttpServerIsRestartedIfATestStopsIt(): void
     {
-        $response = $this->http->client->get('/');
+        $response = $this->http->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/foo'));
         self::assertSame(404, $response->getStatusCode());
     }
 
@@ -135,9 +145,9 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
                 ->body('POST METHOD')
             ->end();
         $this->http->setUp();
-        $firstResponse = $this->http->client->post('/');
+        $firstResponse = $this->http->client->sendRequest($this->getRequestFactory()->createRequest('POST', '/'));
         self::assertSame(200, $firstResponse->getStatusCode());
-        $secondResponse = $this->http->client->post('/');
+        $secondResponse = $this->http->client->sendRequest($this->getRequestFactory()->createRequest('POST', '/'));
         self::assertSame(410, $secondResponse->getStatusCode());
         self::assertSame('Expectation not met', (string) $secondResponse->getBody());
 
@@ -149,11 +159,11 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
                 ->body('POST METHOD')
             ->end();
         $this->http->setUp();
-        $firstResponse = $this->http->client->post('/');
+        $firstResponse = $this->http->client->sendRequest($this->getRequestFactory()->createRequest('POST', '/'));
         self::assertSame(200, $firstResponse->getStatusCode());
-        $secondResponse = $this->http->client->post('/');
+        $secondResponse = $this->http->client->sendRequest($this->getRequestFactory()->createRequest('POST', '/'));
         self::assertSame(200, $secondResponse->getStatusCode());
-        $thirdResponse = $this->http->client->post('/');
+        $thirdResponse = $this->http->client->sendRequest($this->getRequestFactory()->createRequest('POST', '/'));
         self::assertSame(410, $thirdResponse->getStatusCode());
         self::assertSame('Expectation not met', (string) $thirdResponse->getBody());
 
@@ -165,11 +175,11 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
                 ->body('POST METHOD')
             ->end();
         $this->http->setUp();
-        $firstResponse = $this->http->client->post('/');
+        $firstResponse = $this->http->client->sendRequest($this->getRequestFactory()->createRequest('POST', '/'));
         self::assertSame(200, $firstResponse->getStatusCode());
-        $secondResponse = $this->http->client->post('/');
+        $secondResponse = $this->http->client->sendRequest($this->getRequestFactory()->createRequest('POST', '/'));
         self::assertSame(200, $secondResponse->getStatusCode());
-        $thirdResponse = $this->http->client->post('/');
+        $thirdResponse = $this->http->client->sendRequest($this->getRequestFactory()->createRequest('POST', '/'));
         self::assertSame(200, $thirdResponse->getStatusCode());
     }
 
@@ -182,7 +192,12 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
                 ->callback(static function(Response $response): void {$response->setContent('CALLBACK');})
             ->end();
         $this->http->setUp();
-        self::assertSame('CALLBACK', (string) $this->http->client->post('/')->getBody());
+        self::assertSame(
+            'CALLBACK',
+            (string) $this->http->client->sendRequest(
+                $this->getRequestFactory()->createRequest('POST', '/')
+            )->getBody()
+        );
     }
 
     public function testComplexResponse(): void
@@ -196,14 +211,16 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
                 ->body('BODY')
             ->end();
         $this->http->setUp();
-        $response = $this->http->client
-            ->post(
-                '/',
-                ['headers' => ['x-client-header' => 'header-value'], 'form_params' => ['post-key' => 'post-value']]
-            );
+        $response = $this->http->client->sendRequest(
+            $this->getRequestFactory()
+                ->createRequest('POST', '/')
+                ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                ->withHeader('x-client-header', 'header-value')
+                ->withBody($this->getStreamFactory()->createStream(http_build_query(['post-key' => 'post-value'])))
+        );
         self::assertSame('BODY', (string) $response->getBody());
         self::assertSame(201, $response->getStatusCode());
-        self::assertSame('Bar', (string) $response->getHeaderLine('X-Foo'));
+        self::assertSame('Bar', $response->getHeaderLine('X-Foo'));
         self::assertSame('post-value', $this->http->requests->latest()->request->get('post-key'));
     }
 
@@ -218,11 +235,13 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
                 ->header('X-Foo', 'Bar')
             ->end();
         $this->http->setUp();
-        $response = $this->http->client
-            ->put(
-                '/',
-                ['headers' => ['x-client-header' => 'header-value'], 'form_params' => ['put-key' => 'put-value']]
-            );
+        $response = $this->http->client->sendRequest(
+            $this->getRequestFactory()
+                ->createRequest('PUT', '/')
+                ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                ->withHeader('x-client-header', 'header-value')
+                ->withBody($this->getStreamFactory()->createStream(http_build_query(['put-key' => 'put-value'])))
+        );
         self::assertSame('BODY', (string) $response->getBody());
         self::assertSame(201, $response->getStatusCode());
         self::assertSame('Bar', $response->getHeaderLine('X-Foo'));
@@ -240,11 +259,13 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
                 ->header('X-Foo', 'Bar')
             ->end();
         $this->http->setUp();
-        $response = $this->http->client
-            ->post(
-                '/',
-                ['headers' => ['x-client-header' => 'header-value'], 'form_params' => ['post-key' => 'post-value']]
-            );
+        $response = $this->http->client->sendRequest(
+            $this->getRequestFactory()
+                ->createRequest('POST', '/')
+                ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                ->withHeader('x-client-header', 'header-value')
+                ->withBody($this->getStreamFactory()->createStream(http_build_query(['post-key' => 'post-value'])))
+        );
         self::assertSame('BODY', (string) $response->getBody());
         self::assertSame(201, $response->getStatusCode());
         self::assertSame('Bar', $response->getHeaderLine('X-Foo'));
@@ -262,7 +283,12 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
         $this->http->setUp();
 
         self::assertCount(0, $this->http->requests);
-        self::assertSame('resource body', (string) $this->http->client->get('/resource')->getBody());
+        self::assertSame(
+            'resource body',
+            (string) $this->http->client->sendRequest(
+                $this->getRequestFactory()->createRequest('GET', '/resource')
+            )->getBody()
+        );
         self::assertCount(1, $this->http->requests);
     }
 
@@ -281,10 +307,18 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             ->end();
         $this->http->setUp();
 
-        self::assertSame('query string', (string) $this->http->client->get('/?key1=')->getBody());
-
-        self::assertSame(Response::HTTP_NOT_FOUND, $this->http->client->get('/')->getStatusCode());
-        self::assertSame(Response::HTTP_NOT_FOUND, $this->http->client->post('/')->getStatusCode());
+        self::assertSame(
+            'query string', (string) $this->http->client->sendRequest(
+            $this->getRequestFactory()->createRequest('GET', '/?key1='))->getBody()
+        );
+        self::assertSame(
+            Response::HTTP_NOT_FOUND,
+            $this->http->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/'))->getStatusCode()
+        );
+        self::assertSame(
+            Response::HTTP_NOT_FOUND,
+            $this->http->client->sendRequest($this->getRequestFactory()->createRequest('POST', '/'))->getStatusCode()
+        );
     }
 
     public function testMatchRegex(): void
@@ -297,8 +331,14 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             ->end();
         $this->http->setUp();
 
-        self::assertSame('response', (string) $this->http->client->get('/')->getBody());
-        self::assertSame('response', (string) $this->http->client->get('/')->getBody());
+        self::assertSame(
+            'response',
+            (string) $this->http->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/'))->getBody()
+        );
+        self::assertSame(
+            'response',
+            (string) $this->http->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/'))->getBody()
+        );
     }
 
     public function testMatchQueryParams(): void
@@ -318,19 +358,22 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
 
         self::assertSame(
             'response',
-            (string) $this->http->client->get('/?p1=&p2=v2&p4=any&p5=v5&p6=v6')->getBody()
+            (string) $this->http->client->sendRequest(
+                $this->getRequestFactory()->createRequest('GET', '/?p1=&p2=v2&p4=any&p5=v5&p6=v6'))->getBody()
+            );
+        self::assertSame(
+            Response::HTTP_NOT_FOUND,
+            $this->http->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/?p1=&p2=v2&p3=foo'))
+                ->getStatusCode()
         );
         self::assertSame(
             Response::HTTP_NOT_FOUND,
-            $this->http->client->get('/?p1=&p2=v2&p3=foo')->getStatusCode()
+            $this->http->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/?p1='))->getStatusCode()
         );
         self::assertSame(
             Response::HTTP_NOT_FOUND,
-            $this->http->client->get('/?p1=')->getStatusCode()
-        );
-        self::assertSame(
-            Response::HTTP_NOT_FOUND,
-            $this->http->client->get('/?p3=foo')->getStatusCode()
+            $this->http->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/?p3=foo'))
+                ->getStatusCode()
         );
     }
 

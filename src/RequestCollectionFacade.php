@@ -4,16 +4,21 @@ namespace InterNations\Component\HttpMock;
 use Countable;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Request;
 use UnexpectedValueException;
 
 class RequestCollectionFacade implements Countable
 {
-    private Client $client;
+    private ClientInterface $client;
+    private RequestFactoryInterface $requestFactory;
 
-    public function __construct(Client $client)
+    public function __construct(ClientInterface $client, RequestFactoryInterface $requestFactory)
     {
         $this->client = $client;
+        $this->requestFactory = $requestFactory;
     }
 
     public function latest(): Request
@@ -48,10 +53,9 @@ class RequestCollectionFacade implements Countable
 
     public function count(): int
     {
-        $response = $this->client
-            ->get('/_request/count');
-
-        return (int) (string) $response->getBody();
+        return (int) (string) $this->client->sendRequest(
+            $this->requestFactory->createRequest('GET', '/_request/count')
+        )->getBody();
     }
 
     /**
@@ -72,16 +76,18 @@ class RequestCollectionFacade implements Countable
 
     private function getRecordedRequest(string $path): Request
     {
-        $response = $this->client->get($path);
-
-        return $this->parseResponse($response, $path);
+        return $this->parseResponse(
+            $this->client->sendRequest($this->requestFactory->createRequest('GET', $path)),
+            $path
+        );
     }
 
     private function deleteRecordedRequest(string $path): Request
     {
-        $response = $this->client->delete($path);
-
-        return $this->parseResponse($response, $path);
+        return $this->parseResponse(
+            $this->client->sendRequest($this->requestFactory->createRequest('DELETE', $path)),
+            $path
+        );
     }
 
     private function parseResponse(Response $response, string $path): Request
@@ -94,9 +100,7 @@ class RequestCollectionFacade implements Countable
             );
         }
 
-        $contentType = $response->hasHeader('content-type')
-            ? $response->getHeaderLine('content-type')
-            : '';
+        $contentType = $response->getHeaderLine('content-type');
 
         if (strpos($contentType, 'text/plain') !== 0) {
             throw new UnexpectedValueException(

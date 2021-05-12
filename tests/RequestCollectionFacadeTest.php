@@ -2,14 +2,14 @@
 namespace InterNations\Component\HttpMock\Tests;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
-use InterNations\Component\Testing\AbstractTestCase;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
+use function serialize;
 
-class RequestCollectionFacadeTest extends AbstractTestCase
+class RequestCollectionFacadeTest extends TestCase
 {
     /** @var Client|MockObject */
     private $client;
@@ -18,8 +18,8 @@ class RequestCollectionFacadeTest extends AbstractTestCase
 
     public function setUp(): void
     {
-        $this->client = $this->createMock(Client::class);
-        $this->facade = new RequestCollectionFacade($this->client);
+        $this->client = $this->createMock(ClientInterface::class);
+        $this->facade = new RequestCollectionFacade($this->client, $this->getRequestFactory());
     }
 
     /** @return array<array{0:string,1:string,2:array<mixed>,3:string}> */
@@ -98,7 +98,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         $this->expectException('UnexpectedValueException');
 
         $this->expectExceptionMessage('Expected status code 200 from "' . $path . '", got 404');
-        call_user_func_array([$this->facade, $method], $args);
+        $this->facade->{$method}(...$args);
     }
 
     /**
@@ -117,7 +117,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         $this->expectException('UnexpectedValueException');
 
         $this->expectExceptionMessage('Expected content type "text/plain" from "' . $path . '", got ""');
-        call_user_func_array([$this->facade, $method], $args);
+        $this->facade->{$method}(...$args);
     }
 
     /**
@@ -136,7 +136,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         $this->expectException('UnexpectedValueException');
 
         $this->expectExceptionMessage('Expected content type "text/plain" from "' . $path . '", got "text/html"');
-        call_user_func_array([$this->facade, $method], $args);
+        $this->facade->{$method}(...$args);
     }
 
     /**
@@ -155,15 +155,15 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         $this->expectException('UnexpectedValueException');
 
         $this->expectExceptionMessage('Cannot deserialize response from "' . $path . '": "invalid response"');
-        call_user_func_array([$this->facade, $method], $args);
+        $this->facade->{$method}(...$args);
     }
 
     private function mockClient(string $path, ResponseInterface $response, string $method): void
     {
         $this->client
             ->expects(self::once())
-            ->method($method)
-            ->with($path)
+            ->method('sendRequest')
+            ->with($this->getRequestFactory()->createRequest($method, $path))
             ->willReturn($response);
     }
 
@@ -174,11 +174,10 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         $recordedRequest->setRequestUri('/foo');
         $recordedRequest->setContent('RECORDED=1');
 
-        return new Response(
-            '200',
-            ['Content-Type' => 'text/plain'],
-            serialize($recordedRequest)
-        );
+        return $this->getResponseFactory()
+            ->createResponse()
+            ->withHeader('Content-Type', 'text/plain')
+            ->withBody($this->getStreamFactory()->createStream(serialize($recordedRequest)));
     }
 
     private function createComplexResponse(): ResponseInterface
@@ -194,30 +193,36 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         $recordedRequest->headers->set('User-Agent', 'CUSTOM UA');
 
 
-        return new Response(
-            '200',
-            ['Content-Type' => 'text/plain; charset=UTF-8'],
-            serialize($recordedRequest)
-        );
+        return $this->getResponseFactory()
+            ->createResponse()
+            ->withHeader('Content-Type', 'text/plain; charset=UTF-8')
+            ->withBody($this->getStreamFactory()->createStream(serialize($recordedRequest)));
     }
 
     private function createResponseWithInvalidStatusCode(): ResponseInterface
     {
-        return new Response(404);
+        return $this->getResponseFactory()
+            ->createResponse(404);
     }
 
     private function createResponseWithInvalidContentType(): ResponseInterface
     {
-        return new Response(200, ['Content-Type' => 'text/html']);
+        return $this->getResponseFactory()
+            ->createResponse()
+            ->withHeader('Content-Type', 'text/html');
     }
 
     private function createResponseWithEmptyContentType(): ResponseInterface
     {
-        return new Response(200, []);
+        return $this->getResponseFactory()
+            ->createResponse();
     }
 
     private function createResponseThatCannotBeDeserialized(): ResponseInterface
     {
-        return new Response(200, ['Content-Type' => 'text/plain'], 'invalid response');
+        return $this->getResponseFactory()
+            ->createResponse()
+            ->withHeader('Content-Type', 'text/plain; charset=UTF-8')
+            ->withBody($this->getStreamFactory()->createStream('invalid response'));
     }
 }

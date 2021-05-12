@@ -1,11 +1,12 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
+use InterNations\Component\HttpMock\Tests\TestCase;
 use InterNations\Component\Testing\AbstractTestCase;
 use InterNations\Component\HttpMock\PHPUnit\HttpMock;
 
 /** @large */
-class HttpMockPHPUnitIntegrationBasePathTest extends AbstractTestCase
+class HttpMockPHPUnitIntegrationBasePathTest extends TestCase
 {
     use HttpMock;
 
@@ -39,7 +40,12 @@ class HttpMockPHPUnitIntegrationBasePathTest extends AbstractTestCase
             ->end();
         $this->http->setUp();
 
-        self::assertSame('/foo body', (string) $this->http->client->get('/custom-base-path/foo')->getBody());
+        self::assertSame(
+            '/foo body',
+            (string) $this->http->client->sendRequest(
+                $this->getRequestFactory()->createRequest('GET', '/custom-base-path/foo')
+            )->getBody()
+        );
 
         $request = $this->http->requests->latest();
         self::assertSame('GET', $request->getMethod());

@@ -3,6 +3,18 @@ namespace InterNations\Component\HttpMock;
 
 use GuzzleHttp\Client;
 use hmmmath\Fibonacci\FibonacciFactory;
+use Http\Discovery\Psr17FactoryDiscovery;
+use Http\Discovery\Psr18ClientDiscovery;
+use InterNations\Component\HttpMock\Http\BaseUriMiddleware;
+use InterNations\Component\HttpMock\Http\MiddlewareSupportingClient;
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
+use Psr\Http\Message\UriInterface;
 use Symfony\Component\Process\Process;
 use RuntimeException;
 
@@ -12,7 +24,7 @@ class Server extends Process
 
     private string $host;
 
-    private ?Client $client = null;
+    private ?ClientInterface $client = null;
 
     public function __construct(int $port, string $host)
     {
@@ -49,19 +61,37 @@ class Server extends Process
         return parent::stop($timeout, $signal);
     }
 
-    public function getClient(): Client
+    public function getClient(): ClientInterface
     {
         return $this->client ?: $this->client = $this->createClient();
     }
 
-    private function createClient(): Client
+    private function createClient(): ClientInterface
     {
-        return new Client(['base_uri' => $this->getBaseUrl(), 'http_errors' => false]);
+        return new MiddlewareSupportingClient(
+            Psr18ClientDiscovery::find(),
+            new BaseUriMiddleware($this->getBaseUrl())
+        );
     }
 
-    public function getBaseUrl(): string
+    public function getBaseUrl(): UriInterface
     {
-        return sprintf('http://%s', $this->getConnectionString());
+        return $this->getUriFactory()->createUri(sprintf('http://%s', $this->getConnectionString()));
+    }
+
+    private function getUriFactory(): UriFactoryInterface
+    {
+        return Psr17FactoryDiscovery::findUriFactory();
+    }
+
+    private function getRequestFactory(): RequestFactoryInterface
+    {
+        return Psr17FactoryDiscovery::findRequestFactory();
+    }
+
+    private function getStreamFactory(): StreamFactoryInterface
+    {
+        return Psr17FactoryDiscovery::findStreamFactory();
     }
 
     public function getConnectionString(): string
@@ -76,15 +106,21 @@ class Server extends Process
     public function setUp(array $expectations): void
     {
         foreach ($expectations as $expectation) {
-            $response = $this->getClient()->post(
-                '/_expectation',
-                [
-                    'form_params' => [
-                        'matcher' => serialize($expectation->getMatcherClosures()),
-                        'limiter' => serialize($expectation->getLimiter()),
-                        'response' => serialize($expectation->getResponse()),
-                    ],
-                ]
+            $response = $this->getClient()->sendRequest(
+                $this->getRequestFactory()
+                    ->createRequest('POST', '/_expectation')
+                    ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
+                    ->withBody(
+                        $this->getStreamFactory()->createStream(
+                            http_build_query(
+                                [
+                                    'matcher' => serialize($expectation->getMatcherClosures()),
+                                    'limiter' => serialize($expectation->getLimiter()),
+                                    'response' => serialize($expectation->getResponse()),
+                                ]
+                            )
+                        )
+                    )
             );
 
             if ($response->getStatusCode() !== 201) {
@@ -99,7 +135,7 @@ class Server extends Process
             $this->start();
         }
 
-        $this->getClient()->delete('/_all');
+        $this->getClient()->sendRequest($this->getRequestFactory()->createRequest('DELETE', '/_all'));
     }
 
     private function pollWait(): void
@@ -107,9 +143,9 @@ class Server extends Process
         foreach (FibonacciFactory::sequence(50000, 10000) as $sleepTime) {
             try {
                 usleep($sleepTime);
-                $this->getClient()->head('/_me');
+                $this->getClient()->sendRequest($this->getRequestFactory()->createRequest('HEAD', '/_me'));
                 break;
-            } catch (CurlException $e) {
+            } catch (ClientExceptionInterface $e) {
                 continue;
             }
         }

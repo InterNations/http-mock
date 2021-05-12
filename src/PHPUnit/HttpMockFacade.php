@@ -2,11 +2,13 @@
 namespace InterNations\Component\HttpMock\PHPUnit;
 
 use Guzzle\Http\Client;
+use Http\Discovery\Psr17FactoryDiscovery;
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
 use InterNations\Component\HttpMock\Server;
+use Psr\Http\Client\ClientInterface;
 use RuntimeException;
 
 /**
@@ -14,7 +16,7 @@ use RuntimeException;
  * @property-read MatcherFactory $matches An instance of the matcher factory
  * @property-read MockBuilder $mock An instance of the mock builder
  * @property-read RequestCollectionFacade $requests Convenient access to recorded requests
- * @property-read Client $client A pre configured HTTP for client for the currently running server
+ * @property-read ClientInterface $client A pre configured HTTP for client for the currently running server
  */
 class HttpMockFacade
 {
@@ -60,7 +62,7 @@ class HttpMockFacade
                 return $this->server->getClient();
 
             case 'requests':
-                return new RequestCollectionFacade($this->client);
+                return new RequestCollectionFacade($this->client, Psr17FactoryDiscovery::findRequestFactory());
 
             default:
                 throw new RuntimeException(sprintf('Invalid property "%s" read', $property));
