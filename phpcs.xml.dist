@@ -3,9 +3,21 @@
     <config name="installed_paths" value="../../slevomat/coding-standard"/>
     <file>./src</file>
     <file>./tests</file>
-    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint"/>
-    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint"/>
-    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint"/>
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint">
+        <properties>
+            <property name="enableUnionTypeHint" value="false" type="bool"/>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
+        <properties>
+            <property name="enableUnionTypeHint" value="false" type="bool"/>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint">
+        <properties>
+            <property name="enableUnionTypeHint" value="false" type="bool"/>
+        </properties>
+    </rule>
     <rule ref="SlevomatCodingStandard.Arrays.DisallowImplicitArrayCreation"/>
     <rule ref="SlevomatCodingStandard.Classes.DisallowLateStaticBindingForConstants"/>
     <rule ref="SlevomatCodingStandard.Classes.ForbiddenPublicProperty"/>
