@@ -1,14 +1,14 @@
 <?php
 namespace InterNations\Component\HttpMock\PHPUnit;
 
-use InterNations\Component\HttpMock\Server;
+use InterNations\Component\HttpMock\ServerProcess;
 use SplObjectStorage;
 
 // @codingStandardsIgnoreStart
 final class ServerManager
 // @codingStandardsIgnoreEnd
 {
-    /** @var SplObjectStorage|iterable<Server> */
+    /** @var SplObjectStorage|iterable<ServerProcess> */
     private SplObjectStorage $servers;
 
     private static ?self $instance = null;
@@ -18,12 +18,12 @@ final class ServerManager
         return self::$instance ?: (self::$instance = new self());
     }
 
-    public function add(Server $server): void
+    public function add(ServerProcess $server): void
     {
         $this->servers->attach($server);
     }
 
-    public function remove(Server $server): void
+    public function remove(ServerProcess $server): void
     {
         $this->servers->detach($server);
     }

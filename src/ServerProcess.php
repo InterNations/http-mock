@@ -1,7 +1,6 @@
 <?php
 namespace InterNations\Component\HttpMock;
 
-use GuzzleHttp\Client;
 use hmmmath\Fibonacci\FibonacciFactory;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
@@ -10,15 +9,14 @@ use InterNations\Component\HttpMock\Http\MiddlewareSupportingClient;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use Symfony\Component\Process\Process;
 use RuntimeException;
+use function getenv;
 
-class Server extends Process
+class ServerProcess extends Process
 {
     private int $port;
 
@@ -40,7 +38,7 @@ class Server extends Process
             $packageRoot . 'public/index.php',
         ];
 
-        parent::__construct($command, $packageRoot);
+        parent::__construct($command, $packageRoot, ['HTTP_MOCK_TESTSUITE' => getenv('HTTP_MOCK_TESTSUITE')]);
         $this->setTimeout(null);
     }
 
@@ -175,6 +173,10 @@ class Server extends Process
             }
 
             if (strpos($line, 'JIT is incompatible with third party extensions') !== false) {
+                continue;
+            }
+
+            if (strpos($line, '[info]') !== false) {
                 continue;
             }
 

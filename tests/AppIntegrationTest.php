@@ -3,7 +3,7 @@ namespace InterNations\Component\HttpMock\Tests;
 
 use Closure;
 use Guzzle\Http\Message\RequestInterface;
-use InterNations\Component\HttpMock\Server;
+use InterNations\Component\HttpMock\ServerProcess;
 use InterNations\Component\HttpMock\Util;
 use Guzzle\Http\Message\RequestFactory;
 use Opis\Closure\SerializableClosure;
@@ -19,13 +19,13 @@ use function http_build_query;
  */
 class AppIntegrationTest extends TestCase
 {
-    private static Server $server1;
+    private static ServerProcess $server1;
 
     private ClientInterface $client;
 
     public static function setUpBeforeClass(): void
     {
-        static::$server1 = new Server(HTTP_MOCK_PORT, HTTP_MOCK_HOST);
+        static::$server1 = new ServerProcess(HTTP_MOCK_PORT, HTTP_MOCK_HOST);
         static::$server1->start();
     }
 
@@ -81,7 +81,7 @@ class AppIntegrationTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('fake body', (string) $response->getBody());
 
-        $response = $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/latest'));
+        $response = $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/last'));
 
         $request = $this->parseRequestFromResponse($response);
         self::assertSame('1', $request->headers->get('X-Special'));
@@ -92,7 +92,6 @@ class AppIntegrationTest extends TestCase
     {
         $this->client->sendRequest($this->getRequestFactory()->createRequest('DELETE', '/_all'));
 
-        self::assertSame(404, $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/latest'))->getStatusCode());
         self::assertSame(404, $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/0'))->getStatusCode());
         self::assertSame(404, $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/first'))->getStatusCode());
         self::assertSame(404, $this->client->sendRequest($this->getRequestFactory()->createRequest('GET', '/_request/last'))->getStatusCode());

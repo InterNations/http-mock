@@ -7,12 +7,12 @@ use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
-use InterNations\Component\HttpMock\Server;
+use InterNations\Component\HttpMock\ServerProcess;
 use Psr\Http\Client\ClientInterface;
 use RuntimeException;
 
 /**
- * @property-read Server $server The HTTP mock server that is currently running
+ * @property-read ServerProcess $server The HTTP mock server that is currently running
  * @property-read MatcherFactory $matches An instance of the matcher factory
  * @property-read MockBuilder $mock An instance of the mock builder
  * @property-read RequestCollectionFacade $requests Convenient access to recorded requests
@@ -27,7 +27,7 @@ class HttpMockFacade
 
     public function __construct(int $port, string $host, ?string $basePath = null)
     {
-        $server = new Server($port, $host);
+        $server = new ServerProcess($port, $host);
         $server->start();
         $this->services['server'] = $server;
         $this->basePath = $basePath;

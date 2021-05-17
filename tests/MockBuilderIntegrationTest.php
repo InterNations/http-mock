@@ -4,7 +4,7 @@ namespace InterNations\Component\HttpMock\Tests;
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\MockBuilder;
-use InterNations\Component\HttpMock\Server;
+use InterNations\Component\HttpMock\ServerProcess;
 use DateTime;
 use DateTimeZone;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
@@ -20,13 +20,13 @@ class MockBuilderIntegrationTest extends TestCase
 
     private MatcherFactory $matches;
 
-    private Server $server;
+    private ServerProcess $server;
 
     public function setUp(): void
     {
         $this->matches = new MatcherFactory();
         $this->builder = new MockBuilder($this->matches, new ExtractorFactory());
-        $this->server = new Server(HTTP_MOCK_PORT, HTTP_MOCK_HOST);
+        $this->server = new ServerProcess(HTTP_MOCK_PORT, HTTP_MOCK_HOST);
         $this->server->start();
         $this->server->clean();
     }

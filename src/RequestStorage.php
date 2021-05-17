@@ -11,6 +11,10 @@ class RequestStorage
 
     public function __construct(int $pid, string $directory)
     {
+        if (!is_dir($directory)) {
+            mkdir($directory);
+        }
+
         $this->pid = $pid;
         $this->directory = $directory;
     }

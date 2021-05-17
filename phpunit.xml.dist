@@ -31,5 +31,6 @@
         <ini name="date.timezone" value="Europe/Berlin"/>
         <const name="HTTP_MOCK_PORT" value="38080"/>
         <const name="HTTP_MOCK_HOST" value="localhost"/>
+        <env name="HTTP_MOCK_TESTSUITE" value="true" verbatim="true"/>
     </php>
 </phpunit>
