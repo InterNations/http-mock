@@ -5,3 +5,4 @@ var/
 build/*
 phpunit.xml
 .phpunit.result.cache
+.deptrac.cache

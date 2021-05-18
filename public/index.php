@@ -2,6 +2,7 @@
 namespace InterNations\Component\HttpMock;
 
 use InterNations\Component\HttpMock\Request\SerializableRequest;
+use InterNations\Component\HttpMock\Server\ServerApplication;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use function file_exists;

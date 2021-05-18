@@ -5,6 +5,7 @@ use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\Matcher\Matcher;
 use Closure;
+use InterNations\Component\HttpMock\Response\ResponseBuilder;
 use Opis\Closure\SerializableClosure;
 use Symfony\Component\HttpFoundation\Response;
 

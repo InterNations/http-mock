@@ -2,9 +2,9 @@
 namespace InterNations\Component\HttpMock;
 
 use Countable;
-use GuzzleHttp\Psr7\Response;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Request;
 use UnexpectedValueException;
 
@@ -59,7 +59,7 @@ class RequestCollectionFacade implements Countable
     /**
      * @throws UnexpectedValueException
      */
-    private function parseRequestFromResponse(Response $response, string $path): Request
+    private function parseRequestFromResponse(ResponseInterface $response, string $path): Request
     {
         try {
             return Util::deserialize($response->getBody());
@@ -88,7 +88,7 @@ class RequestCollectionFacade implements Countable
         );
     }
 
-    private function parseResponse(Response $response, string $path): Request
+    private function parseResponse(ResponseInterface $response, string $path): Request
     {
         $statusCode = $response->getStatusCode();
 

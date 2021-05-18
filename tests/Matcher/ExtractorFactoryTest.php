@@ -2,11 +2,11 @@
 namespace InterNations\Component\HttpMock\Tests\Matcher;
 
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
-use InterNations\Component\Testing\AbstractTestCase;
+use InterNations\Component\HttpMock\Tests\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 
-class ExtractorFactoryTest extends AbstractTestCase
+class ExtractorFactoryTest extends TestCase
 {
     private ExtractorFactory $extractorFactory;
 

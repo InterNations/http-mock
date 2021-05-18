@@ -1,6 +1,7 @@
 <?php
-namespace InterNations\Component\HttpMock;
+namespace InterNations\Component\HttpMock\Server;
 
+use InterNations\Component\HttpMock\Util;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use function array_filter;
 use function base64_encode;
+use function count;
 use function getmypid;
 use function is_array;
 use function is_callable;

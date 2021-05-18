@@ -1,5 +1,5 @@
 <?php
-namespace InterNations\Component\HttpMock;
+namespace InterNations\Component\HttpMock\Server;
 
 use Symfony\Component\HttpFoundation\Request;
 

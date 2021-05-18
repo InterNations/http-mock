@@ -31,8 +31,8 @@
         "symfony/framework-bundle": "~4|~5"
      },
     "require-dev": {
-        "internations/testing-component": "1.0.1",
-        "phpunit/phpunit": "^9"
+        "phpunit/phpunit": "^9",
+        "qossmic/deptrac-shim": "^0.13.0"
     },
     "autoload": {
         "psr-4": {"InterNations\\Component\\HttpMock\\": "src/"}
@@ -42,6 +42,7 @@
     },
     "scripts": {
         "tests": "phpunit",
-        "coding-style": "phpcs"
+        "coding-style": "phpcs",
+        "dependencies": "deptrac"
     }
 }

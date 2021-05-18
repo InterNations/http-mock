@@ -1,6 +1,7 @@
 <?php
-namespace InterNations\Component\HttpMock;
+namespace InterNations\Component\HttpMock\Server;
 
+use InterNations\Component\HttpMock\Util;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use function array_unshift;

@@ -56,3 +56,7 @@ jobs:
             - name: Check coding style
               run: composer coding-style
               continue-on-error: ${{ matrix.experimental }}
+
+            - name: Check dependencies
+              run: composer dependencies
+              continue-on-error: ${{ matrix.experimental }}

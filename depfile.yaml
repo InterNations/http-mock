@@ -1,0 +1,114 @@
+paths:
+  - ./src
+  - ./tests
+  - ./vendor/psr
+  - ./vendor/guzzlehttp
+  - ./vendor/phpunit
+  - ./vendor/opis
+layers:
+  - name: "HTTP Mock Client"
+    collectors:
+      - type: className
+        regex: ^InterNations\\Component\\HttpMock\\(?!Tests\\|Server\\|Util||ServerProcess).*
+  - name: "HTTP Mock Server Process"
+    collectors:
+      - type: className
+        regex: ^InterNations\\Component\\HttpMock\\ServerProcess$
+  - name: "HTTP Mock Server"
+    collectors:
+      - type: className
+        regex: ^InterNations\\Component\\HttpMock\\Server\\.+
+  - name: "HTTP Mock Util"
+    collectors:
+      - type: className
+        regex: ^InterNations\\Component\\HttpMock\\Util$
+  - name: "HTTP Mock Tests"
+    collectors:
+      - type: className
+        regex: ^InterNations\\Component\\HttpMock\\Tests\\.+
+  - name: "PSR HTTP"
+    collectors:
+      - type: className
+        regex: ^Psr\\Http\\.*
+  - name: "PSR Logger"
+    collectors:
+      - type: className
+        regex: ^Psr\\Log\\.*
+  - name: "PSR HTTP Discovery"
+    collectors:
+      - type: className
+        regex: ^Http\\Discovery\\*
+  - name: Guzzle
+    collectors:
+      - type: className
+        regex: ^GuzzleHttp\\.*
+  - name: PHPUnit
+    collectors:
+      - type: className
+        regex: ^(PHPUnit|SebastianBergmann|DeepCopy|Prophecy|TheSeer|PharIo|Doctrine|Webmozart|PhpParser|phpDocumentor|Composer|Symfony\\Polyfill)\\.*
+  - name: "Symfony HttpFoundation Component"
+    collectors:
+      - type: className
+        regex: ^Symfony\\Component\\HttpFoundation\\.*
+  - name: "Symfony Framework Bundle"
+    collectors:
+      - type: className
+        regex: ^Symfony\\Bundle\\FrameworkBundle\\.*
+  - name: "Symfony HttpKernel Component"
+    collectors:
+      - type: className
+        regex: ^Symfony\\Component\\HttpKernel\\.*
+  - name: "Symfony DependencyInjection Component"
+    collectors:
+      - type: className
+        regex: ^Symfony\\Component\\DependencyInjection\\.*
+  - name: "Symfony Routing Component"
+    collectors:
+      - type: className
+        regex: ^Symfony\\Component\\Routing\\.*
+  - name: "Symfony Process Component"
+    collectors:
+      - type: className
+        regex: ^Symfony\\Component\\Process\\.*
+  - name: "Opis Serializable Closure"
+    collectors:
+      - type: className
+        regex: ^(Opis\\Closure|SuperClosure)
+  - name: "hmmmath Fibonacci"
+    collectors:
+      - type: className
+        regex: ^hmmmath\\Fibonacci\\.*
+ruleset:
+  "HTTP Mock Client":
+    - "Opis Serializable Closure"
+    - "Symfony HttpFoundation Component"
+    - "HTTP Mock Util"
+    - "HTTP Mock Server Process"
+  "HTTP Mock Server Process":
+    - "hmmmath Fibonacci"
+    - "Symfony Process Component"
+    - "PSR HTTP"
+    - "PSR HTTP Discovery"
+  "HTTP Mock Server":
+    - "Symfony HttpFoundation Component"
+    - "Symfony HttpKernel Component"
+    - "Symfony DependencyInjection Component"
+    - "Symfony Routing Component"
+    - "Symfony Framework Bundle"
+    - "HTTP Mock Util"
+  "HTTP Mock Tests":
+    - "HTTP Mock Client"
+    - "HTTP Mock Server Process"
+    - "Symfony HttpFoundation Component"
+    - "Opis Serializable Closure"
+    - "HTTP Mock Util"
+    - "PSR HTTP"
+    - "PSR HTTP Discovery"
+    - PHPUnit
+  "HTTP Mock Util": ~
+  Guzzle:
+    - "PSR HTTP"
+    - "PSR Logger"
+  PHPUnit: ~
+  "PSR Logger":
+    - PHPUnit

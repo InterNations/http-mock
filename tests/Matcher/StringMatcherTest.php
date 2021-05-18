@@ -2,10 +2,10 @@
 namespace InterNations\Component\HttpMock\Tests\Matcher;
 
 use InterNations\Component\HttpMock\Matcher\StringMatcher;
-use InterNations\Component\Testing\AbstractTestCase;
+use InterNations\Component\HttpMock\Tests\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class StringMatcherTest extends AbstractTestCase
+class StringMatcherTest extends TestCase
 {
     public function testConversionToString(): void
     {

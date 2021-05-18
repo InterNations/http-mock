@@ -1,7 +1,7 @@
 <?php
-namespace InterNations\Component\HttpMock;
+namespace InterNations\Component\HttpMock\Response;
 
-use InterNations\Component\HttpMock\Response\CallbackResponse;
+use InterNations\Component\HttpMock\MockBuilder;
 use Closure;
 use Opis\Closure\SerializableClosure;
 use Symfony\Component\HttpFoundation\Response;
