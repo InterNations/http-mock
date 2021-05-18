@@ -293,7 +293,7 @@ class MockBuilderIntegrationTest extends TestCase
             )->getBody()
         );
         self::assertSame(
-            'Expectation not met',
+            'No matching expectation found',
             (string) $this->server->getClient()->sendRequest(
                 $this->getRequestFactory()->createRequest('POST', '/resource')
             )->getBody()

@@ -151,8 +151,8 @@ class HttpMockMultiPHPUnitIntegrationTest extends \InterNations\Component\HttpMo
         $secondResponse = $this->http['firstNamedServer']->client->sendRequest(
             $this->getRequestFactory()->createRequest('POST', '/')
         );
-        self::assertSame(410, $secondResponse->getStatusCode());
-        self::assertSame('Expectation not met', (string) $secondResponse->getBody());
+        self::assertSame(404, $secondResponse->getStatusCode());
+        self::assertSame('No matching expectation found', (string) $secondResponse->getBody());
 
         $this->http['firstNamedServer']->mock
             ->exactly(2)
@@ -173,8 +173,8 @@ class HttpMockMultiPHPUnitIntegrationTest extends \InterNations\Component\HttpMo
         $thirdResponse = $this->http['firstNamedServer']->client->sendRequest(
             $this->getRequestFactory()->createRequest('POST', '/')
         );
-        self::assertSame(410, $thirdResponse->getStatusCode());
-        self::assertSame('Expectation not met', (string) $thirdResponse->getBody());
+        self::assertSame(404, $thirdResponse->getStatusCode());
+        self::assertSame('No matching expectation found', (string) $thirdResponse->getBody());
 
         $this->http['firstNamedServer']->mock
             ->any()

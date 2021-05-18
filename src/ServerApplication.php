@@ -32,8 +32,10 @@ final class ServerApplication extends Kernel
     {
         $container->extension('framework', ['secret' => base64_encode(random_bytes(8))]);
 
-        $container->services()
-            ->set(RequestStorage::class)
+        $container
+            ->services()
+            ->set(RequestStorage::class, FileBasedStorage::class)
+                ->autowire()
                 ->args([getmypid(), $this->getCacheDir() . '/state/']);
     }
 
@@ -45,7 +47,7 @@ final class ServerApplication extends Kernel
                 ->methods(['GET'])
 
             ->add('reset_all', '/_all')
-                ->controller([$this, 'resetAll'])
+                ->controller([$this, 'deleteAll'])
                 ->methods(['DELETE'])
 
             ->add('request_delete_all', '/_request')
@@ -87,82 +89,65 @@ final class ServerApplication extends Kernel
 
     public function meAction(): Response
     {
-        return new Response('O RLY?', Response::HTTP_I_AM_A_TEAPOT, ['Content-Type' => 'text/plain']);
+        return self::createResponse(Response::HTTP_I_AM_A_TEAPOT, 'O RLY?');
     }
 
-    public function resetAll(Request $currentRequest, RequestStorage $requestStorage): Response
+    public function deleteAll(RequestStorage $requestStorage): Response
     {
-        $requestStorage->store($currentRequest, 'requests', []);
-        $requestStorage->store($currentRequest, 'expectations', []);
+        $requestStorage->storeRequests([]);
+        $requestStorage->storeExpectations([]);
 
-        return new Response('', Response::HTTP_OK);
+        return self::createResponse(Response::HTTP_OK);
     }
 
-    public function deleteRequests(Request $currentRequest, RequestStorage $requestStorage): Response
+    public function deleteRequests(RequestStorage $requestStorage): Response
     {
-        $requestStorage->store($currentRequest, 'requests', []);
+        $requestStorage->storeRequests([]);
 
-        return new Response('', Response::HTTP_OK);
+        return self::createResponse(Response::HTTP_OK);
     }
 
-    public function getRequestByIndex(
-        int $index,
-        Request $currentRequest,
-        RequestStorage $requestStorage
-
-    ): Response
+    public function getRequestByIndex(int $index, RequestStorage $requestStorage): Response
     {
-        $requests = $requestStorage->read($currentRequest, 'requests');
+        $requests = $requestStorage->readRequests();
 
         if (!isset($requests[$index])) {
-            return new Response('Index ' . $index . ' not found', Response::HTTP_NOT_FOUND);
+            return self::createResponse(Response::HTTP_NOT_FOUND, 'Index ' . $index . ' not found');
         }
 
-        return new Response($requests[$index], Response::HTTP_OK, ['Content-Type' => 'text/plain']);
+        return self::createResponse(Response::HTTP_OK, serialize($requests[$index]));
     }
 
-    public function getRequestByPosition(
-        string $position,
-        Request $currentRequest,
-        RequestStorage $requestStorage
-    ): Response
+    public function getRequestByPosition(string $position, RequestStorage $requestStorage): Response
     {
-        $requestData = $requestStorage->read($currentRequest, 'requests');
+        $requestData = $requestStorage->readRequests();
         $fn = 'array_' . ($position === 'last' ? 'pop': 'shift');
         $request = $fn($requestData);
 
         if (!$request) {
-            return new Response($position . ' not available', Response::HTTP_NOT_FOUND);
+            return self::createResponse(Response::HTTP_NOT_FOUND, $position . ' not available');
         }
 
-        return new Response($request, Response::HTTP_OK, ['Content-Type' => 'text/plain']);
+        return self::createResponse(Response::HTTP_OK, serialize($request));
     }
 
-    public function deleteRequestByPosition(
-        string $position,
-        Request $currentRequest,
-        RequestStorage $requestStorage
-    ): Response
+    public function deleteRequestByPosition(string $position, RequestStorage $requestStorage): Response
     {
-        $requests = $requestStorage->read($currentRequest, 'requests');
+        $requests = $requestStorage->readRequests();
         $fn = 'array_' . ($position === 'last' ? 'pop' : 'shift');
         $request = $fn($requests);
-        $requestStorage->store($currentRequest, 'requests', $requests);
+        $requestStorage->storeRequests($requests);
 
         if (!$request) {
-            return new Response($position . ' not possible', Response::HTTP_NOT_FOUND);
+            return self::createResponse(Response::HTTP_NOT_FOUND, $position . ' not possible');
         }
 
-        return new Response($request, Response::HTTP_OK, ['Content-Type' => 'text/plain']);
+        return self::createResponse(Response::HTTP_OK, serialize($request));
     }
 
-    public function countRequests(Request $currentRequest, RequestStorage $requestStorage): Response
+    public function countRequests(RequestStorage $requestStorage): Response
     {
-        return new Response(
-            count($requestStorage->read($currentRequest, 'requests')),
-            Response::HTTP_OK,
-            ['Content-Type' => 'text/plain']
-        );
+        return self::createResponse(Response::HTTP_OK, count($requestStorage->readRequests()));
     }
 
     public function postExpectations(Request $currentRequest, RequestStorage $requestStorage): Response
@@ -172,9 +157,9 @@ final class ServerApplication extends Kernel
         if ($currentRequest->request->has('matcher')) {
             $matcherParameter = $currentRequest->request->get('matcher');
             if (!is_string($matcherParameter)) {
-                return new Response(
-                    'POST data key "matcher" must be a serialized list of closures',
-                    Response::HTTP_EXPECTATION_FAILED
+                return self::createResponse(
+                    Response::HTTP_EXPECTATION_FAILED,
+                    'POST data key "matcher" must be a serialized list of closures'
                 );
             }
 
@@ -184,9 +169,9 @@ final class ServerApplication extends Kernel
             };
 
             if (!is_array($matcher) || count(array_filter($matcher, $validator)) !== count($matcher)) {
-                return new Response(
-                    'POST data key "matcher" must be a serialized list of closures',
-                    Response::HTTP_EXPECTATION_FAILED
+                return self::createResponse(
+                    Response::HTTP_EXPECTATION_FAILED,
+                    'POST data key "matcher" must be a serialized list of closures'
                 );
             }
         }
@@ -217,51 +202,42 @@ final class ServerApplication extends Kernel
             }
         }
 
-        $requestStorage->prepend(
-            $currentRequest,
-            'expectations',
-            ['matcher' => $matcher, 'response' => $response, 'limiter' => $limiter, 'runs' => 0]
-        );
+        $requestStorage->prependExpectation(new ServerExpectation($matcher, $response, $limiter, 0));
 
-        return new Response('', Response::HTTP_CREATED);
+        return self::createResponse(Response::HTTP_CREATED);
     }
 
     public function record(Request $currentRequest, RequestStorage $requestStorage): Response
     {
-        $requestStorage->append($currentRequest, 'requests', serialize($currentRequest));
+        $requestStorage->appendRequest($currentRequest);
+        $expectations = $requestStorage->readExpectations();
 
-        $notFoundResponse = new Response('No matching expectation found', Response::HTTP_NOT_FOUND);
+        try {
+            foreach ($expectations as $expectation) {
+                $response = $expectation->matchRequest($currentRequest);
 
-        $expectations = $requestStorage->read($currentRequest, 'expectations');
-
-        foreach ($expectations as $pos => $expectation) {
-            foreach ($expectation['matcher'] as $matcher) {
-                if (!$matcher($currentRequest)) {
-                    continue 2;
+                if (!$response) {
+                    continue;
                 }
+
+                return $response;
             }
 
-            $applicable = !isset($expectation['limiter']) || $expectation['limiter']($expectation['runs']);
-
-            ++$expectations[$pos]['runs'];
-            $requestStorage->store($currentRequest, 'expectations', $expectations);
-
-            if (!$applicable) {
-                $notFoundResponse = new Response('Expectation not met', Response::HTTP_GONE);
-                continue;
-            }
-
-            return $expectation['response'];
+            return self::createResponse(Response::HTTP_NOT_FOUND, 'No matching expectation found');
+        } finally {
+            $requestStorage->storeExpectations($expectations);
         }
-
-        return $notFoundResponse;
     }
 
-    public function deleteExpectations(Request $currentRequest, RequestStorage $requestStorage): Response
+    public function deleteExpectations(RequestStorage $requestStorage): Response
     {
-        $requestStorage->clear($currentRequest, 'expectations');
+        $requestStorage->storeExpectations([]);
 
-        return new Response('', Response::HTTP_OK);
+        return self::createResponse(Response::HTTP_OK);
+    }
 
+    private static function createResponse(int $statusCode, string $body = ''): Response
+    {
+        return new Response($body, $statusCode, ['Content-Type' => 'text/plain']);
     }
 }

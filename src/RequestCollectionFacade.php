@@ -2,11 +2,9 @@
 namespace InterNations\Component\HttpMock;
 
 use Countable;
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\HttpFoundation\Request;
 use UnexpectedValueException;
 

@@ -148,8 +148,8 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
         $firstResponse = $this->http->client->sendRequest($this->getRequestFactory()->createRequest('POST', '/'));
         self::assertSame(200, $firstResponse->getStatusCode());
         $secondResponse = $this->http->client->sendRequest($this->getRequestFactory()->createRequest('POST', '/'));
-        self::assertSame(410, $secondResponse->getStatusCode());
-        self::assertSame('Expectation not met', (string) $secondResponse->getBody());
+        self::assertSame(404, $secondResponse->getStatusCode());
+        self::assertSame('No matching expectation found', (string) $secondResponse->getBody());
 
         $this->http->mock
             ->exactly(2)
@@ -164,8 +164,8 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
         $secondResponse = $this->http->client->sendRequest($this->getRequestFactory()->createRequest('POST', '/'));
         self::assertSame(200, $secondResponse->getStatusCode());
         $thirdResponse = $this->http->client->sendRequest($this->getRequestFactory()->createRequest('POST', '/'));
-        self::assertSame(410, $thirdResponse->getStatusCode());
-        self::assertSame('Expectation not met', (string) $thirdResponse->getBody());
+        self::assertSame(404, $thirdResponse->getStatusCode());
+        self::assertSame('No matching expectation found', (string) $thirdResponse->getBody());
 
         $this->http->mock
             ->any()
