@@ -2,10 +2,8 @@
 namespace InterNations\Component\HttpMock\Tests;
 
 use Closure;
-use Guzzle\Http\Message\RequestInterface;
 use InterNations\Component\HttpMock\ServerProcess;
 use InterNations\Component\HttpMock\Util;
-use Guzzle\Http\Message\RequestFactory;
 use Opis\Closure\SerializableClosure;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;

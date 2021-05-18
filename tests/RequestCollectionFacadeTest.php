@@ -1,7 +1,6 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests;
 
-use GuzzleHttp\Client;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -11,7 +10,7 @@ use function serialize;
 
 class RequestCollectionFacadeTest extends TestCase
 {
-    /** @var Client|MockObject */
+    /** @var ClientInterface|MockObject */
     private $client;
 
     private RequestCollectionFacade $facade;

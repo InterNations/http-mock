@@ -1,7 +1,6 @@
 <?php
 namespace InterNations\Component\HttpMock\PHPUnit;
 
-use Guzzle\Http\Client;
 use Http\Discovery\Psr17FactoryDiscovery;
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
