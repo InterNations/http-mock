@@ -6,12 +6,16 @@ paths:
   - ./vendor/phpunit
   - ./vendor/opis
 exclude_files:
-  - '#.*test.*#'
+  - '#vendor/.*test.*#'
 layers:
   - name: "HTTP Mock Client"
     collectors:
       - type: className
-        regex: ^InterNations\\Component\\HttpMock\\(?!Tests\\|Server\\|Util||ServerProcess).*
+        regex: ^InterNations\\Component\\HttpMock\\(?!Tests\\|Server\\|Util|Http|ServerProcess).*
+  - name: "HTTP Mock PSR Middleware"
+    collectors:
+      - type: className
+        regex: ^InterNations\\Component\\HttpMock\\Http\\.*
   - name: "HTTP Mock Server Process"
     collectors:
       - type: className
@@ -83,14 +87,18 @@ layers:
 ruleset:
   "HTTP Mock Client":
     - "Opis Serializable Closure"
-    - "Symfony HttpFoundation Component"
     - "HTTP Mock Util"
     - "HTTP Mock Server Process"
+    - "PSR HTTP"
+    - "PSR HTTP Discovery"
+    - "Symfony HttpFoundation Component"
   "HTTP Mock Server Process":
     - "hmmmath Fibonacci"
     - "Symfony Process Component"
     - "PSR HTTP"
     - "PSR HTTP Discovery"
+    - "HTTP Mock PSR Middleware"
+    - "HTTP Mock Client"
   "HTTP Mock Server":
     - "Symfony HttpFoundation Component"
     - "Symfony HttpKernel Component"
@@ -108,6 +116,8 @@ ruleset:
     - "PSR HTTP Discovery"
     - PHPUnit
   "HTTP Mock Util": ~
+  "HTTP Mock PSR Middleware":
+    - "PSR HTTP"
   Guzzle:
     - "PSR HTTP"
     - "PSR Logger"
