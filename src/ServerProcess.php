@@ -172,15 +172,17 @@ class ServerProcess extends Process
                 continue;
             }
 
-            if (strpos($line, 'JIT is incompatible with third party extensions') !== false) {
-                continue;
-            }
-
-            if (strpos($line, '[info]') !== false) {
-                continue;
-            }
-
-            if (self::stringEndsWithAny($line, ['Accepted', 'Closing', ' started'])) {
+            if (self::stringContainsAny(
+                $line,
+                [
+                    'Accepted',
+                    'Closing',
+                    'Development Server',
+                    'JIT is incompatible with third party extensions',
+                    ' [info] ',
+                    ' [debug] ',
+                ]
+            )) {
                 continue;
             }
 
@@ -191,10 +193,10 @@ class ServerProcess extends Process
     }
 
     /** @param list<string> $needles */
-    private static function stringEndsWithAny(string $haystack, array $needles): bool
+    private static function stringContainsAny(string $haystack, array $needles): bool
     {
         foreach ($needles as $needle) {
-            if (substr($haystack, (-1 * strlen($needle))) === $needle) {
+            if (strpos($haystack, $needle) !== false) {
                 return true;
             }
         }

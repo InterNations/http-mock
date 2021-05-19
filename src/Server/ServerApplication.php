@@ -3,7 +3,6 @@ namespace InterNations\Component\HttpMock\Server;
 
 use InterNations\Component\HttpMock\Util;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +21,7 @@ use function serialize;
 
 final class ServerApplication extends Kernel
 {
-    use MicroKernelTrait;
+    use UpwardsCompatibleMicroKernelTrait;
 
     /** @return list<Bundle> */
     public function registerBundles(): array

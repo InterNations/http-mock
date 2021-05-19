@@ -5,6 +5,8 @@ paths:
   - ./vendor/guzzlehttp
   - ./vendor/phpunit
   - ./vendor/opis
+exclude_files:
+  - '#.*test.*#'
 layers:
   - name: "HTTP Mock Client"
     collectors:
