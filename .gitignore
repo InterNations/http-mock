@@ -4,3 +4,4 @@ composer.lock
 state/*-*
 build/*
 phpunit.xml
+.phpunit.result.cache
