@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
     test:
-        name: PHP ${{ matrix.php-version }} (${{ matrix.experimental && 'experimental' || 'full support' }})
+        name: PHP ${{ matrix.php-version }} (${{ matrix.experimental && 'experimental' || 'full support' }}, ${{ matrix.dependencies }} dependencies)
 
         runs-on: ubuntu-18.04
 
@@ -12,11 +12,17 @@ jobs:
             fail-fast: false
             matrix:
                 php-version:
-                    - 7.1
-                    - 7.2
-                    - 7.3
                     - 7.4
+                    - 8.0
                 experimental: [false]
+                dependencies: [lowest, stable]
+                include:
+                    - php-version: 8.1
+                      experimental: true
+                      dependencies: lowest
+                    - php-version: 8.1
+                      experimental: true
+                      dependencies: stable
 
         continue-on-error: ${{ matrix.experimental }}
         steps:
@@ -34,6 +40,7 @@ jobs:
               uses: ramsey/composer-install@v1
               with:
                   composer-options: --prefer-dist
+                  dependency-versions: ${{ matrix.dependencies }}
               continue-on-error: ${{ matrix.experimental }}
 
             - name: Setup PCOV
@@ -44,4 +51,12 @@ jobs:
 
             - name: Run Tests
               run: composer tests
+              continue-on-error: ${{ matrix.experimental }}
+
+            - name: Check coding style
+              run: composer coding-style
+              continue-on-error: ${{ matrix.experimental }}
+
+            - name: Check dependencies
+              run: composer dependencies
               continue-on-error: ${{ matrix.experimental }}

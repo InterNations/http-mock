@@ -8,14 +8,19 @@ use OutOfBoundsException;
 /** @property-read HttpMockFacade */
 class HttpMockFacadeMap implements ArrayAccess
 {
-    /** @var HttpMockFacade[] */
-    private $facadeMap;
+    /** @var array<string,HttpMockFacade> */
+    private array $facadeMap;
 
+    /** @param array<string,HttpMockFacade> $facadeMap */
     public function __construct(array $facadeMap)
     {
         $this->facadeMap = $facadeMap;
     }
 
+    /**
+     * @param int|string $offset
+     * @return mixed
+     */
     public function offsetGet($offset)
     {
         if (!$this->offsetExists($offset)) {
@@ -25,17 +30,23 @@ class HttpMockFacadeMap implements ArrayAccess
         return $this->facadeMap[$offset];
     }
 
-    public function offsetExists($offset)
+    /** @param int|string $offset */
+    public function offsetExists($offset): bool
     {
         return isset($this->facadeMap[$offset]);
     }
 
-    public function offsetSet($offset, $value)
+    /**
+     * @param int|string $offset
+     * @param mixed $value
+     */
+    public function offsetSet($offset, $value): void // @codingStandardsIgnoreLine
     {
         throw new BadMethodCallException(__METHOD__);
     }
 
-    public function offsetUnset($offset)
+    /** @param int|string $offset */
+    public function offsetUnset($offset): void // @codingStandardsIgnoreLine
     {
         throw new BadMethodCallException(__METHOD__);
     }
@@ -50,12 +61,12 @@ class HttpMockFacadeMap implements ArrayAccess
         );
     }
 
-    public function each(callable $callback)
+    public function each(callable $callback): void
     {
         array_map($callback, $this->facadeMap);
     }
 
-    public function __get($property)
+    public function __get(string $property): void
     {
         if (in_array($property, HttpMockFacade::getProperties(), true)) {
             throw new OutOfBoundsException(
@@ -77,7 +88,8 @@ class HttpMockFacadeMap implements ArrayAccess
         );
     }
 
-    public function all()
+    /** @return array<string,HttpMockFacade> */
+    public function all(): array
     {
         return $this->facadeMap;
     }

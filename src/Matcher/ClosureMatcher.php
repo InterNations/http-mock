@@ -3,16 +3,16 @@ namespace InterNations\Component\HttpMock\Matcher;
 
 use Closure;
 
-class ClosureMatcher extends AbstractMatcher
+class ClosureMatcher extends ExtractorBasedMatcher
 {
-    private $closure;
+    private Closure $closure;
 
     public function __construct(Closure $closure)
     {
         $this->closure = $closure;
     }
 
-    protected function createMatcher()
+    protected function createMatcher(): Closure
     {
         return $this->closure;
     }

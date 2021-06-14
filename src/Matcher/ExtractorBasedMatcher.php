@@ -2,19 +2,19 @@
 namespace InterNations\Component\HttpMock\Matcher;
 
 use Closure;
-use SuperClosure\SerializableClosure;
+use Opis\Closure\SerializableClosure;
 use Symfony\Component\HttpFoundation\Request;
 
-abstract class AbstractMatcher implements MatcherInterface
+abstract class ExtractorBasedMatcher implements Matcher
 {
-    protected $extractor;
+    protected ?Closure $extractor = null;
 
-    public function setExtractor(Closure $extractor)
+    public function setExtractor(Closure $extractor): void
     {
         $this->extractor = $extractor;
     }
 
-    protected function createExtractor()
+    protected function createExtractor(): Closure
     {
         if (!$this->extractor) {
             return static function (Request $request) {
@@ -25,9 +25,9 @@ abstract class AbstractMatcher implements MatcherInterface
         return $this->extractor;
     }
 
-    abstract protected function createMatcher();
+    abstract protected function createMatcher(): Closure;
 
-    public function getMatcher()
+    public function getMatcher(): SerializableClosure
     {
         $matcher = new SerializableClosure($this->createMatcher());
         $extractor = new SerializableClosure($this->createExtractor());

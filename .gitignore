@@ -1,6 +1,8 @@
 vendor/
 composer.lock
 .idea/
-state/*-*
+var/
 build/*
 phpunit.xml
+.phpunit.result.cache
+.deptrac.cache

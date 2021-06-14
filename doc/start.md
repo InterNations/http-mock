@@ -7,33 +7,34 @@ server in `setUpBeforeClass()` and `tearDownAfterClass()` respectively.
 ```php
 namespace Acme\Tests;
 
-use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
+use PHPUnit\Framework\TestCase;
+use InterNations\Component\HttpMock\PHPUnit\HttpMock;
 
-class ExampleTest extends PHPUnit_Framework_TestCase
+class ExampleTest extends TestCase
 {
-    use HttpMockTrait;
+    use HttpMock;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         static::setUpHttpMockBeforeClass('8082', 'localhost');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         static::tearDownHttpMockAfterClass();
     }
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->setUpHttpMock();
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->tearDownHttpMock();
     }
 
-    public function testSimpleRequest()
+    public function testSimpleRequest(): void
     {
         $this->http->mock
             ->when()
@@ -44,10 +45,10 @@ class ExampleTest extends PHPUnit_Framework_TestCase
             ->end();
         $this->http->setUp();
 
-        $this->assertSame('mocked body', file_get_contents('http://localhost:8082/foo'));
+        self::assertSame('mocked body', file_get_contents('http://localhost:8082/foo'));
     }
 
-    public function testAccessingRecordedRequests()
+    public function testAccessingRecordedRequests(): void
     {
         $this->http->mock
             ->when()
@@ -58,10 +59,10 @@ class ExampleTest extends PHPUnit_Framework_TestCase
             ->end();
         $this->http->setUp();
 
-        $this->assertSame('mocked body', $this->http->client->post('http://localhost:8082/foo')->send()->getBody(true));
+        self::assertSame('mocked body', $this->http->client->post('http://localhost:8082/foo')->send()->getBody(true));
 
-        $this->assertSame('POST', $this->http->requests->latest()->getMethod());
-        $this->assertSame('/foo', $this->http->requests->latest()->getPath());
+        self::assertSame('POST', $this->http->requests->latest()->getMethod());
+        self::assertSame('/foo', $this->http->requests->latest()->getPath());
     }
 }
  ```

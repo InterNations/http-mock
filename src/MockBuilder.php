@@ -11,20 +11,16 @@ class MockBuilder
     private const PRIORITY_EXACTLY = 10;
     private const PRIORITY_NTH = 100;
 
-    /** @var Expectation[] */
-    private $expectations = [];
+    /** @var array<Expectation> */
+    private array $expectations = [];
 
-    /** @var MatcherFactory */
-    private $matcherFactory;
+    private MatcherFactory $matcherFactory;
 
-    /** @var Closure */
-    private $limiter;
+    private Closure $limiter;
 
-    /** @var ExtractorFactory */
-    private $extractorFactory;
+    private ExtractorFactory $extractorFactory;
 
-    /** @var int */
-    private $priority;
+    private int $priority;
 
     public function __construct(MatcherFactory $matcherFactory, ExtractorFactory $extractorFactory)
     {
@@ -33,22 +29,22 @@ class MockBuilder
         $this->any();
     }
 
-    public function once()
+    public function once(): self
     {
         return $this->exactly(1);
     }
 
-    public function twice()
+    public function twice(): self
     {
         return $this->exactly(2);
     }
 
-    public function thrice()
+    public function thrice(): self
     {
         return $this->exactly(3);
     }
 
-    public function exactly($times)
+    public function exactly(int $times): self
     {
         $this->limiter = static function ($runs) use ($times) {
             return $runs < $times;
@@ -58,32 +54,32 @@ class MockBuilder
         return $this;
     }
 
-    public function first()
+    public function first(): self
     {
         return $this->nth(1);
     }
 
-    public function second()
+    public function second(): self
     {
         return $this->nth(2);
     }
 
-    public function third()
+    public function third(): self
     {
         return $this->nth(3);
     }
 
-    public function nth($position)
+    public function nth(int $position): self
     {
         $this->limiter = static function ($runs) use ($position) {
-            return $runs === ($position - 1);
+            return $runs === $position - 1;
         };
         $this->priority = $position * self::PRIORITY_NTH;
 
         return $this;
     }
 
-    public function any()
+    public function any(): self
     {
         $this->limiter = static function () {
             return true;
@@ -93,8 +89,8 @@ class MockBuilder
         return $this;
     }
 
-    /** @return Expectation */
-    public function when()
+    /***/
+    public function when(): Expectation
     {
         $this->expectations[] = new Expectation(
             $this,
@@ -109,7 +105,8 @@ class MockBuilder
         return end($this->expectations);
     }
 
-    public function flushExpectations()
+    /** @return list<Expectation> */
+    public function flushExpectations(): array
     {
         $expectations = $this->expectations;
         $this->expectations = [];

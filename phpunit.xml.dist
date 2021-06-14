@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/7.4/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
          backupGlobals="false"
          convertErrorsToExceptions="true"
          convertWarningsToExceptions="true"
@@ -10,6 +10,12 @@
          colors="true"
          timeoutForLargeTests="100">
 
+    <coverage>
+        <report>
+            <clover outputFile="build/logs/clover.xml"/>
+        </report>
+    </coverage>
+
     <testsuites>
         <testsuite name="internations/http-mock">
             <directory>./tests/</directory>
@@ -17,8 +23,7 @@
     </testsuites>
 
     <logging>
-        <log type="coverage-clover" target="build/logs/clover.xml"/>
-        <log type="junit" target="build/logs/junit.xml" />
+        <junit outputFile="build/logs/junit.xml"/>
     </logging>
 
     <php>
@@ -26,5 +31,6 @@
         <ini name="date.timezone" value="Europe/Berlin"/>
         <const name="HTTP_MOCK_PORT" value="38080"/>
         <const name="HTTP_MOCK_HOST" value="localhost"/>
+        <env name="HTTP_MOCK_TESTSUITE" value="true" verbatim="true"/>
     </php>
 </phpunit>

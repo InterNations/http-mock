@@ -2,91 +2,67 @@
 namespace InterNations\Component\HttpMock;
 
 use Countable;
-use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\EntityEnclosingRequestInterface;
-use Guzzle\Http\Message\RequestFactory;
-use Guzzle\Http\Message\RequestInterface;
-use Guzzle\Http\Message\Response;
-use InterNations\Component\HttpMock\Request\UnifiedRequest;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\HttpFoundation\Request;
 use UnexpectedValueException;
 
 class RequestCollectionFacade implements Countable
 {
-    private $client;
+    private ClientInterface $client;
+    private RequestFactoryInterface $requestFactory;
 
-    public function __construct(ClientInterface $client)
+    public function __construct(ClientInterface $client, RequestFactoryInterface $requestFactory)
     {
         $this->client = $client;
+        $this->requestFactory = $requestFactory;
     }
 
-    /**
-     * @return UnifiedRequest
-     */
-    public function latest()
+    public function latest(): Request
     {
         return $this->getRecordedRequest('/_request/last');
     }
 
-    /**
-     * @return UnifiedRequest
-     */
-    public function last()
+    public function last(): Request
     {
         return $this->getRecordedRequest('/_request/last');
     }
 
-    /**
-     * @return UnifiedRequest
-     */
-    public function first()
+    public function first(): Request
     {
         return $this->getRecordedRequest('/_request/first');
     }
 
-    /**
-     * @param int $position
-     * @return UnifiedRequest
-     */
-    public function at($position)
+    public function at(int $position): Request
     {
        return $this->getRecordedRequest('/_request/' . $position);
     }
 
-    /**
-     * @return UnifiedRequest
-     */
-    public function pop()
+    public function pop(): Request
     {
         return $this->deleteRecordedRequest('/_request/last');
     }
 
-    /**
-     * @return UnifiedRequest
-     */
-    public function shift()
+    public function shift(): Request
     {
         return $this->deleteRecordedRequest('/_request/first');
     }
 
-    public function count()
+    public function count(): int
     {
-        $response = $this->client
-            ->get('/_request/count')
-            ->send();
-
-        return (int) $response->getBody(true);
+        return (int) (string) $this->client->sendRequest(
+            $this->requestFactory->createRequest('GET', '/_request/count')
+        )->getBody();
     }
 
     /**
-     * @param Response $response
-     * @param string $path
      * @throws UnexpectedValueException
-     * @return UnifiedRequest
      */
-    private function parseRequestFromResponse(Response $response, $path)
+    private function parseRequestFromResponse(ResponseInterface $response, string $path): Request
     {
         try {
-            $requestInfo = Util::deserialize($response->getBody());
+            return Util::deserialize($response->getBody());
         } catch (UnexpectedValueException $e) {
             throw new UnexpectedValueException(
                 sprintf('Cannot deserialize response from "%s": "%s"', $path, $response->getBody()),
@@ -94,63 +70,25 @@ class RequestCollectionFacade implements Countable
                 $e
             );
         }
+    }
 
-        $request = RequestFactory::getInstance()->fromMessage($requestInfo['request']);
-        $params = $this->configureRequest(
-            $request,
-            $requestInfo['server'],
-            isset($requestInfo['enclosure']) ? $requestInfo['enclosure'] : []
+    private function getRecordedRequest(string $path): Request
+    {
+        return $this->parseResponse(
+            $this->client->sendRequest($this->requestFactory->createRequest('GET', $path)),
+            $path
         );
-
-        return new UnifiedRequest($request, $params);
     }
 
-    private function configureRequest(RequestInterface $request, array $server, array $enclosure)
+    private function deleteRecordedRequest(string $path): Request
     {
-        if (isset($server['HTTP_HOST'])) {
-            $request->setHost($server['HTTP_HOST']);
-        }
-
-        if (isset($server['HTTP_PORT'])) {
-            $request->setPort($server['HTTP_PORT']);
-        }
-
-        if (isset($server['PHP_AUTH_USER'])) {
-            $request->setAuth($server['PHP_AUTH_USER'], isset($server['PHP_AUTH_PW']) ? $server['PHP_AUTH_PW'] : null);
-        }
-
-        $params = [];
-
-        if (isset($server['HTTP_USER_AGENT'])) {
-            $params['userAgent'] = $server['HTTP_USER_AGENT'];
-        }
-
-        if ($request instanceof EntityEnclosingRequestInterface) {
-            $request->addPostFields($enclosure);
-        }
-
-        return $params;
+        return $this->parseResponse(
+            $this->client->sendRequest($this->requestFactory->createRequest('DELETE', $path)),
+            $path
+        );
     }
 
-    private function getRecordedRequest($path)
-    {
-        $response = $this->client
-            ->get($path)
-            ->send();
-
-        return $this->parseResponse($response, $path);
-    }
-
-    private function deleteRecordedRequest($path)
-    {
-        $response = $this->client
-            ->delete($path)
-            ->send();
-
-        return $this->parseResponse($response, $path);
-    }
-
-    private function parseResponse(Response $response, $path)
+    private function parseResponse(ResponseInterface $response, string $path): Request
     {
         $statusCode = $response->getStatusCode();
 
@@ -160,11 +98,9 @@ class RequestCollectionFacade implements Countable
             );
         }
 
-        $contentType = $response->hasHeader('content-type')
-            ? $response->getContentType()
-            : '';
+        $contentType = $response->getHeaderLine('content-type');
 
-        if (substr($contentType, 0, 10) !== 'text/plain') {
+        if (strpos($contentType, 'text/plain') !== 0) {
             throw new UnexpectedValueException(
                 sprintf('Expected content type "text/plain" from "%s", got "%s"', $path, $contentType)
             );

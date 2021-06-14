@@ -1,35 +1,35 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
-use InterNations\Component\Testing\AbstractTestCase;
-use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
+use InterNations\Component\HttpMock\Tests\TestCase;
+use InterNations\Component\HttpMock\PHPUnit\HttpMock;
 
 /** @large */
-class HttpMockPHPUnitIntegrationBasePathTest extends AbstractTestCase
+class HttpMockPHPUnitIntegrationBasePathTest extends TestCase
 {
-    use HttpMockTrait;
+    use HttpMock;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         static::setUpHttpMockBeforeClass(null, null, '/custom-base-path');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         static::tearDownHttpMockAfterClass();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->setUpHttpMock();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->tearDownHttpMock();
     }
 
-    public function testSimpleRequest()
+    public function testSimpleRequest(): void
     {
         $this->http->mock
             ->when()
@@ -39,10 +39,15 @@ class HttpMockPHPUnitIntegrationBasePathTest extends AbstractTestCase
             ->end();
         $this->http->setUp();
 
-        $this->assertSame('/foo body', (string) $this->http->client->get('/custom-base-path/foo')->send()->getBody());
+        self::assertSame(
+            '/foo body',
+            (string) $this->http->client->sendRequest(
+                $this->getRequestFactory()->createRequest('GET', '/custom-base-path/foo')
+            )->getBody()
+        );
 
         $request = $this->http->requests->latest();
-        $this->assertSame('GET', $request->getMethod());
-        $this->assertSame('/custom-base-path/foo', $request->getPath());
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('/custom-base-path/foo', $request->getRequestUri());
     }
 }

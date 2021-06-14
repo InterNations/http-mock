@@ -1,34 +1,28 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests;
 
-use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Message\Request;
-use Guzzle\Http\Message\Response;
 use InterNations\Component\HttpMock\RequestCollectionFacade;
-use InterNations\Component\Testing\AbstractTestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use InterNations\Component\HttpMock\Tests\Fixtures\Request as TestRequest;
+use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\ResponseInterface;
+use function serialize;
 
-class RequestCollectionFacadeTest extends AbstractTestCase
+class RequestCollectionFacadeTest extends TestCase
 {
     /** @var ClientInterface|MockObject */
     private $client;
 
-    /** @var Request */
-    private $request;
+    private RequestCollectionFacade $facade;
 
-    /** @var RequestCollectionFacade */
-    private $facade;
-
-    public function setUp()
+    public function setUp(): void
     {
-        $this->client = $this->createMock('Guzzle\Http\ClientInterface');
-        $this->facade = new RequestCollectionFacade($this->client);
-        $this->request = new Request('GET', '/_request/last');
-        $this->request->setClient($this->client);
+        $this->client = $this->createMock(ClientInterface::class);
+        $this->facade = new RequestCollectionFacade($this->client, $this->getRequestFactory());
     }
 
-    public static function provideMethodAndUrls()
+    /** @return array<array{0:string,1:string,2:array<mixed>,3:string}> */
+    public static function getMethodAndUrls(): array
     {
         return [
             ['latest', '/_request/last'],
@@ -40,158 +34,194 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         ];
     }
 
-    /** @dataProvider provideMethodAndUrls */
-    public function testRequestingLatestRequest($method, $path, array $args = [], $httpMethod = 'get')
+    /**
+     * @dataProvider getMethodAndUrls
+     * @param array<mixed> $args
+     */
+    public function testRequestingLatestRequest(
+        string $method,
+        string $path,
+        array $args = [],
+        string $httpMethod = 'get'
+    ): void
     {
         $this->mockClient($path, $this->createSimpleResponse(), $httpMethod);
 
-        $request = call_user_func_array([$this->facade, $method], $args);
+        /** @var \Symfony\Component\HttpFoundation\Request $request */
+        $request = $this->facade->{$method}(...$args);
 
-        $this->assertSame('POST', $request->getMethod());
-        $this->assertSame('/foo', $request->getPath());
-        $this->assertSame('RECORDED=1', (string) $request->getBody());
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('/foo', $request->getRequestUri());
+        self::assertSame('RECORDED=1', $request->getContent());
     }
 
-    /** @dataProvider provideMethodAndUrls */
-    public function testRequestLatestResponseWithHttpAuth($method, $path, array $args = [], $httpMethod = 'get')
+    /**
+     * @dataProvider getMethodAndUrls
+     * @param array<mixed> $args
+     */
+    public function testRequestLatestResponseWithHttpAuth(
+        string $method,
+        string $path,
+        array $args = [],
+        string $httpMethod = 'get'
+    ): void
     {
         $this->mockClient($path, $this->createComplexResponse(), $httpMethod);
 
-        $request = call_user_func_array([$this->facade, $method], $args);
+        /** @var \Symfony\Component\HttpFoundation\Request $request */
+        $request = $this->facade->{$method}(...$args);
 
-        $this->assertSame('POST', $request->getMethod());
-        $this->assertSame('/foo', $request->getPath());
-        $this->assertSame('RECORDED=1', (string) $request->getBody());
-        $this->assertSame('host', $request->getHost());
-        $this->assertSame(1234, $request->getPort());
-        $this->assertSame('username', $request->getUsername());
-        $this->assertSame('password', $request->getPassword());
-        $this->assertSame('CUSTOM UA', $request->getUserAgent());
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('/foo', $request->getRequestUri());
+        self::assertSame('RECORDED=1', $request->getContent());
+        self::assertSame('host', $request->getHost());
+        self::assertSame(1234, $request->getPort());
+        self::assertSame('username', $request->getUser());
+        self::assertSame('password', $request->getPassword());
+        self::assertSame('CUSTOM UA', $request->headers->get('User-Agent'));
     }
 
-    /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_InvalidStatusCode($method, $path, array $args = [], $httpMethod = 'get')
+    /**
+     * @dataProvider getMethodAndUrls
+     * @param array<mixed> $args
+     */
+    public function testRequestResponseWithInvalidStatusCode(
+        string $method,
+        string $path,
+        array $args = [],
+        string $httpMethod = 'get'
+    ): void
     {
         $this->mockClient($path, $this->createResponseWithInvalidStatusCode(), $httpMethod);
 
         $this->expectException('UnexpectedValueException');
 
         $this->expectExceptionMessage('Expected status code 200 from "' . $path . '", got 404');
-        call_user_func_array([$this->facade, $method], $args);
+        $this->facade->{$method}(...$args);
     }
 
-    /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_EmptyContentType($method, $path, array $args = [], $httpMethod = 'get')
+    /**
+     * @dataProvider getMethodAndUrls
+     * @param array<mixed> $args
+     */
+    public function testRequestResponseWithEmptyContentType(
+        string $method,
+        string $path,
+        array $args = [],
+        string $httpMethod = 'get'
+    ): void
     {
         $this->mockClient($path, $this->createResponseWithEmptyContentType(), $httpMethod);
 
         $this->expectException('UnexpectedValueException');
 
         $this->expectExceptionMessage('Expected content type "text/plain" from "' . $path . '", got ""');
-        call_user_func_array([$this->facade, $method], $args);
+        $this->facade->{$method}(...$args);
     }
 
-    /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_InvalidContentType($method, $path, array $args = [], $httpMethod = 'get')
+    /**
+     * @dataProvider getMethodAndUrls
+     * @param array<mixed> $args
+     */
+    public function testRequestResponseWithInvalidContentType(
+        string $method,
+        string $path,
+        array $args = [],
+        string $httpMethod = 'get'
+    ): void
     {
         $this->mockClient($path, $this->createResponseWithInvalidContentType(), $httpMethod);
 
         $this->expectException('UnexpectedValueException');
 
         $this->expectExceptionMessage('Expected content type "text/plain" from "' . $path . '", got "text/html"');
-        call_user_func_array([$this->facade, $method], $args);
+        $this->facade->{$method}(...$args);
     }
 
-    /** @dataProvider provideMethodAndUrls */
-    public function testRequestResponse_DeserializationError($method, $path, array $args = [], $httpMethod = 'get')
+    /**
+     * @dataProvider getMethodAndUrls
+     * @param array<mixed> $args
+     */
+    public function testRequestResponseWithDeserializationError(
+        string $method,
+        string $path,
+        array $args = [],
+        string $httpMethod = 'get'
+    ): void
     {
         $this->mockClient($path, $this->createResponseThatCannotBeDeserialized(), $httpMethod);
 
         $this->expectException('UnexpectedValueException');
 
         $this->expectExceptionMessage('Cannot deserialize response from "' . $path . '": "invalid response"');
-        call_user_func_array([$this->facade, $method], $args);
+        $this->facade->{$method}(...$args);
     }
 
-    private function mockClient($path, Response $response, $method)
+    private function mockClient(string $path, ResponseInterface $response, string $method): void
     {
         $this->client
-            ->expects($this->once())
-            ->method($method)
-            ->with($path)
-            ->will($this->returnValue($this->request));
-
-        $this->client
-            ->expects($this->once())
-            ->method('send')
-            ->with($this->request)
-            ->will($this->returnValue($response));
+            ->expects(self::once())
+            ->method('sendRequest')
+            ->with($this->getRequestFactory()->createRequest($method, $path))
+            ->willReturn($response);
     }
 
-    private function createSimpleResponse()
+    private function createSimpleResponse(): ResponseInterface
     {
         $recordedRequest = new TestRequest();
         $recordedRequest->setMethod('POST');
         $recordedRequest->setRequestUri('/foo');
         $recordedRequest->setContent('RECORDED=1');
 
-        return new Response(
-            '200',
-            ['Content-Type' => 'text/plain'],
-            serialize(
-                [
-                    'server' => [],
-                    'request' => (string) $recordedRequest,
-                ]
-            )
-        );
+        return $this->getResponseFactory()
+            ->createResponse()
+            ->withHeader('Content-Type', 'text/plain')
+            ->withBody($this->getStreamFactory()->createStream(serialize($recordedRequest)));
     }
 
-    private function createComplexResponse()
+    private function createComplexResponse(): ResponseInterface
     {
         $recordedRequest = new TestRequest();
         $recordedRequest->setMethod('POST');
         $recordedRequest->setRequestUri('/foo');
         $recordedRequest->setContent('RECORDED=1');
-        $recordedRequest->headers->set('Php-Auth-User', 'ignored');
-        $recordedRequest->headers->set('Php-Auth-Pw', 'ignored');
-        $recordedRequest->headers->set('User-Agent', 'ignored');
+        $recordedRequest->server->set('SERVER_NAME', 'host');
+        $recordedRequest->server->set('SERVER_PORT', 1234);
+        $recordedRequest->headers->set('Php-Auth-User', 'username');
+        $recordedRequest->headers->set('Php-Auth-Pw', 'password');
+        $recordedRequest->headers->set('User-Agent', 'CUSTOM UA');
 
-        return new Response(
-            '200',
-            ['Content-Type' => 'text/plain; charset=UTF-8'],
-            serialize(
-                [
-                    'server' => [
-                        'HTTP_HOST'       => 'host',
-                        'HTTP_PORT'       => 1234,
-                        'PHP_AUTH_USER'   => 'username',
-                        'PHP_AUTH_PW'     => 'password',
-                        'HTTP_USER_AGENT' => 'CUSTOM UA',
-                    ],
-                    'request' => (string) $recordedRequest,
-                ]
-            )
-        );
+
+        return $this->getResponseFactory()
+            ->createResponse()
+            ->withHeader('Content-Type', 'text/plain; charset=UTF-8')
+            ->withBody($this->getStreamFactory()->createStream(serialize($recordedRequest)));
     }
 
-    private function createResponseWithInvalidStatusCode()
+    private function createResponseWithInvalidStatusCode(): ResponseInterface
     {
-        return new Response(404);
+        return $this->getResponseFactory()
+            ->createResponse(404);
     }
 
-    private function createResponseWithInvalidContentType()
+    private function createResponseWithInvalidContentType(): ResponseInterface
     {
-        return new Response(200, ['Content-Type' => 'text/html']);
+        return $this->getResponseFactory()
+            ->createResponse()
+            ->withHeader('Content-Type', 'text/html');
     }
 
-    private function createResponseWithEmptyContentType()
+    private function createResponseWithEmptyContentType(): ResponseInterface
     {
-        return new Response(200, []);
+        return $this->getResponseFactory()
+            ->createResponse();
     }
 
-    private function createResponseThatCannotBeDeserialized()
+    private function createResponseThatCannotBeDeserialized(): ResponseInterface
     {
-        return new Response(200, ['Content-Type' => 'text/plain'], 'invalid response');
+        return $this->getResponseFactory()
+            ->createResponse()
+            ->withHeader('Content-Type', 'text/plain; charset=UTF-8')
+            ->withBody($this->getStreamFactory()->createStream('invalid response'));
     }
 }
