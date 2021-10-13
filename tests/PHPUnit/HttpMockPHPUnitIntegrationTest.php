@@ -1,6 +1,9 @@
 <?php
 namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
+use GuzzleHttp\Psr7\FnStream;
+use GuzzleHttp\Psr7\MultipartStream;
+use GuzzleHttp\Psr7\Utils;
 use InterNations\Component\HttpMock\PHPUnit\HttpMock;
 use InterNations\Component\HttpMock\Tests\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -270,6 +273,107 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
         self::assertSame(201, $response->getStatusCode());
         self::assertSame('Bar', $response->getHeaderLine('X-Foo'));
         self::assertSame('post-value', $this->http->requests->latest()->request->get('post-key'));
+    }
+
+    public function testPostRequestWithFile(): void
+    {
+        $this->http->mock
+            ->when()
+                ->methodIs('POST')
+            ->then()
+                ->body('BODY')
+            ->statusCode(201)
+                ->header('X-Foo', 'Bar')
+            ->end();
+        $this->http->setUp();
+
+        $f1 = FnStream::decorate(Utils::streamFor('file-content'), [
+            'getMetadata' => function () {
+                return '/foo/bar.txt';
+            }
+        ]);
+
+        $multipartStream = new MultipartStream([
+            [
+                'name'     => 'post-key',
+                'contents' => 'post-value'
+            ],
+            [
+                'name'     => 'foo',
+                'contents' => $f1
+            ]
+        ]);
+        $boundary = $multipartStream->getBoundary();
+
+        $response = $this->http->client->sendRequest(
+            $this->getServerRequestFactory()
+                ->createServerRequest('POST', '/')
+                ->withHeader('Content-Type', 'multipart/form-data; boundary=' . $boundary)
+                ->withBody($multipartStream)
+        );
+
+        $latestRequest = $this->http->requests->latest();
+        self::assertSame('BODY', (string) $response->getBody());
+        self::assertSame(201, $response->getStatusCode());
+        self::assertSame('Bar', $response->getHeaderLine('X-Foo'));
+        self::assertSame('post-value', $latestRequest->request->get('post-key'));
+        self::assertSame('file-content', $latestRequest->files->get('foo')->getContent());
+    }
+
+    public function testPostRequestWithMultipleFiles(): void
+    {
+        $this->http->mock
+            ->when()
+            ->methodIs('POST')
+            ->then()
+            ->body('BODY')
+            ->statusCode(201)
+            ->header('X-Foo', 'Bar')
+            ->end();
+        $this->http->setUp();
+
+        $f1 = FnStream::decorate(Utils::streamFor('first-file-content'), [
+            'getMetadata' => function () {
+                return '/foo/bar.txt';
+            }
+        ]);
+
+        $f2 = FnStream::decorate(Utils::streamFor('second-file-content'), [
+            'getMetadata' => function () {
+                return '/foo/baz.txt';
+            }
+        ]);
+
+        $multipartStream = new MultipartStream([
+            [
+                'name'     => 'post-key',
+                'contents' => 'post-value'
+            ],
+            [
+                'name'     => 'foo',
+                'contents' => $f1
+            ],
+            [
+                'name'     => 'bar',
+                'contents' => $f2
+            ]
+        ]);
+        $boundary = $multipartStream->getBoundary();
+
+        $response = $this->http->client->sendRequest(
+            $this->getServerRequestFactory()
+                ->createServerRequest('POST', '/')
+                ->withHeader('Content-Type', 'multipart/form-data; boundary=' . $boundary)
+                ->withBody($multipartStream)
+        );
+
+        $latestRequest = $this->http->requests->latest();
+        self::assertSame('BODY', (string) $response->getBody());
+        self::assertSame(201, $response->getStatusCode());
+        self::assertSame('Bar', $response->getHeaderLine('X-Foo'));
+        self::assertSame('post-value', $latestRequest->request->get('post-key'));
+        self::assertSame('first-file-content', $latestRequest->files->get('foo')->getContent());
+        self::assertSame('second-file-content', $latestRequest->files->get('bar')->getContent());
     }
 
     public function testCountRequests(): void
