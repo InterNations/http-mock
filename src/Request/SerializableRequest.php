@@ -20,7 +20,7 @@ class SerializableRequest extends Request implements Serializable
                 $file->move(sys_get_temp_dir(), md5($file->getPathname()));
                 $files[$key] = [
                     'originalName' => $file->getClientOriginalName(),
-                    'pathName' => $path
+                    'pathName' => $path,
                 ];
             }
         }

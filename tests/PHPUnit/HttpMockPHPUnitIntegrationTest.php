@@ -288,20 +288,20 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
         $this->http->setUp();
 
         $f1 = FnStream::decorate(Utils::streamFor('file-content'), [
-            'getMetadata' => function () {
+            'getMetadata' => static function () {
                 return '/foo/bar.txt';
-            }
+            },
         ]);
 
         $multipartStream = new MultipartStream([
             [
                 'name'     => 'post-key',
-                'contents' => 'post-value'
+                'contents' => 'post-value',
             ],
             [
                 'name'     => 'foo',
-                'contents' => $f1
-            ]
+                'contents' => $f1,
+            ],
         ]);
         $boundary = $multipartStream->getBoundary();
 
@@ -333,30 +333,30 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
         $this->http->setUp();
 
         $f1 = FnStream::decorate(Utils::streamFor('first-file-content'), [
-            'getMetadata' => function () {
+            'getMetadata' => static function () {
                 return '/foo/bar.txt';
-            }
+            },
         ]);
 
         $f2 = FnStream::decorate(Utils::streamFor('second-file-content'), [
-            'getMetadata' => function () {
+            'getMetadata' => static function () {
                 return '/foo/baz.txt';
-            }
+            },
         ]);
 
         $multipartStream = new MultipartStream([
             [
                 'name'     => 'post-key',
-                'contents' => 'post-value'
+                'contents' => 'post-value',
             ],
             [
                 'name'     => 'foo',
-                'contents' => $f1
+                'contents' => $f1,
             ],
             [
                 'name'     => 'bar',
-                'contents' => $f2
-            ]
+                'contents' => $f2,
+            ],
         ]);
         $boundary = $multipartStream->getBoundary();
 
