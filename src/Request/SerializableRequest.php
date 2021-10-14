@@ -16,7 +16,7 @@ class SerializableRequest extends Request implements Serializable
         if ($this->files) {
             foreach ($this->files as $key => $file) {
                 // Move the file in another directory
-                $path = sys_get_temp_dir() . '/' . md5($file->getPathname());
+                $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . md5($file->getPathname());
                 $file->move(sys_get_temp_dir(), md5($file->getPathname()));
                 $files[$key] = [
                     'originalName' => $file->getClientOriginalName(),
