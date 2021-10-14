@@ -3,7 +3,6 @@ namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
 use GuzzleHttp\Psr7\FnStream;
 use GuzzleHttp\Psr7\MultipartStream;
-use GuzzleHttp\Psr7\Utils;
 use InterNations\Component\HttpMock\PHPUnit\HttpMock;
 use InterNations\Component\HttpMock\Tests\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -287,7 +286,9 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
             ->end();
         $this->http->setUp();
 
-        $f1 = FnStream::decorate(Utils::streamFor('file-content'), [
+        $streamFactory = $this->getStreamFactory();
+
+        $f1 = FnStream::decorate($streamFactory->createStream('file-content'), [
             'getMetadata' => static function () {
                 return '/foo/bar.txt';
             },
@@ -332,13 +333,15 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
             ->end();
         $this->http->setUp();
 
-        $f1 = FnStream::decorate(Utils::streamFor('first-file-content'), [
+        $streamFactory = $this->getStreamFactory();
+
+        $f1 = FnStream::decorate($streamFactory->createStream('first-file-content'), [
             'getMetadata' => static function () {
                 return '/foo/bar.txt';
             },
         ]);
 
-        $f2 = FnStream::decorate(Utils::streamFor('second-file-content'), [
+        $f2 = FnStream::decorate($streamFactory->createStream('second-file-content'), [
             'getMetadata' => static function () {
                 return '/foo/baz.txt';
             },
