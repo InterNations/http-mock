@@ -5,6 +5,7 @@ use GuzzleHttp\Psr7\FnStream;
 use GuzzleHttp\Psr7\MultipartStream;
 use InterNations\Component\HttpMock\PHPUnit\HttpMock;
 use InterNations\Component\HttpMock\Tests\TestCase;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use function http_build_query;
@@ -32,6 +33,15 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
     public function tearDown(): void
     {
         $this->tearDownHttpMock();
+    }
+
+    /**
+     * Get the content of the file.
+     * @param $file File The file from which get the content
+     * @return false|string The file content or false on error.
+     */
+    private function getFileContent(File $file) {
+        return file_get_contents($file->getPathname());
     }
 
     /** @return array<array{0:string}> */
@@ -318,7 +328,7 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
         self::assertSame(201, $response->getStatusCode());
         self::assertSame('Bar', $response->getHeaderLine('X-Foo'));
         self::assertSame('post-value', $latestRequest->request->get('post-key'));
-        self::assertSame('file-content', $latestRequest->files->get('foo')->getContent());
+        self::assertSame('file-content', $this->getFileContent($latestRequest->files->get('foo')));
     }
 
     public function testPostRequestWithMultipleFiles(): void
@@ -375,8 +385,8 @@ class HttpMockPHPUnitIntegrationTest extends TestCase
         self::assertSame(201, $response->getStatusCode());
         self::assertSame('Bar', $response->getHeaderLine('X-Foo'));
         self::assertSame('post-value', $latestRequest->request->get('post-key'));
-        self::assertSame('first-file-content', $latestRequest->files->get('foo')->getContent());
-        self::assertSame('second-file-content', $latestRequest->files->get('bar')->getContent());
+        self::assertSame('first-file-content', $this->getFileContent($latestRequest->files->get('foo')));
+        self::assertSame('second-file-content', $this->getFileContent($latestRequest->files->get('bar')));
     }
 
     public function testCountRequests(): void
