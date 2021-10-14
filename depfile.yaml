@@ -48,6 +48,10 @@ layers:
     collectors:
       - type: className
         regex: ^GuzzleHttp\\.*
+  - name: "Guzzle Stream"
+      collectors:
+          - type: className
+            regex: ^(GuzzleHttp\\Psr7\\FnStream|GuzzleHttp\\Psr7\\MultipartStream)
   - name: PHPUnit
     collectors:
       - type: className
@@ -115,6 +119,7 @@ ruleset:
     - "PSR HTTP"
     - "PSR HTTP Discovery"
     - PHPUnit
+    - "Guzzle Stream"
   "HTTP Mock Util": ~
   "HTTP Mock PSR Middleware":
     - "PSR HTTP"
