@@ -2,6 +2,8 @@
 namespace InterNations\Component\HttpMock\Request;
 
 use Serializable;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\Request;
 
 class SerializableRequest extends Request implements Serializable
@@ -9,12 +11,26 @@ class SerializableRequest extends Request implements Serializable
     public function serialize(): string
     {
         $this->getContent();
+        $files = [];
+
+        if ($this->files) {
+            foreach ($this->files as $key => $file) {
+                // Move the file in another directory
+                $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . md5($file->getPathname());
+                $file->move(sys_get_temp_dir(), md5($file->getPathname()));
+                $files[$key] = [
+                    'originalName' => $file->getClientOriginalName(),
+                    'pathName' => $path,
+                ];
+            }
+        }
+
         return serialize([
             'attributes' => $this->attributes,
             'request' => $this->request,
             'query' => $this->query,
             'server' => $this->server,
-            'files' => $this->files,
+            'files' => $files,
             'cookies' => $this->cookies,
             'headers' => $this->headers,
             'content' => $this->content,
@@ -43,7 +59,16 @@ class SerializableRequest extends Request implements Serializable
         $this->request = $attributes['request'];
         $this->query = $attributes['query'];
         $this->server = $attributes['server'];
-        $this->files = $attributes['files'];
+        $files = $attributes['files'];
+        $this->files = [];
+
+        if ($files) {
+            foreach($files as $key => $file) {
+                $this->files[$key] = new UploadedFile($file['pathName'], $file['originalName'], null, null, true);
+            }
+        }
+
+        $this->files = new FileBag($this->files);
         $this->cookies = $attributes['cookies'];
         $this->headers = $attributes['headers'];
         $this->content = $attributes['content'];

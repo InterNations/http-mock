@@ -115,6 +115,7 @@ ruleset:
     - "PSR HTTP"
     - "PSR HTTP Discovery"
     - PHPUnit
+    - Guzzle
   "HTTP Mock Util": ~
   "HTTP Mock PSR Middleware":
     - "PSR HTTP"
