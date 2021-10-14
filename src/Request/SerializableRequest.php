@@ -1,8 +1,8 @@
 <?php
 namespace InterNations\Component\HttpMock\Request;
 
-use InterNations\Component\HttpMock\File\SerializableUploadedFile;
 use Serializable;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -64,7 +64,7 @@ class SerializableRequest extends Request implements Serializable
 
         if ($files) {
             foreach($files as $key => $file) {
-                $this->files[$key] = new SerializableUploadedFile($file['pathName'], $file['originalName']);
+                $this->files[$key] = new UploadedFile($file['pathName'], $file['originalName'], null, null, true);
             }
         }
 
