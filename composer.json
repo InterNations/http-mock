@@ -13,7 +13,7 @@
         }
     ],
      "require": {
-        "php": "~7.1",
+        "php": "~7.1|~8.1",
         "silex/silex": "~2.0",
         "guzzle/guzzle": ">=3.8",
         "symfony/process": "~3|~4|~5",
