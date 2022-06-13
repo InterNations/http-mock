@@ -75,7 +75,7 @@ class MockBuilderIntegrationTest extends TestCase
             $unserializedClosure = unserialize(serialize($closure));
             $this->assertTrue($unserializedClosure($request));
 
-            $run++;
+            ++$run;
         }
         ini_set('error_log', $oldValue);
         $this->assertSame(3, $run);
