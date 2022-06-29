@@ -127,7 +127,7 @@ $app->post(
 );
 
 $container['phpErrorHandler'] = function ($container) {
-    return function (Request $request, Response $response, Error $e) {
+    return function (Request $request, Response $response, Error $e) use ($container) {
         return $response->withStatus(500)
             ->withHeader('Content-Type', 'text/plain')
             ->write($e->getMessage() . "\n" . $e->getTraceAsString() . "\n");
@@ -166,7 +166,7 @@ $container['notFoundHandler'] = function ($container) {
                 continue;
             }
 
-            $expectations[$pos]['runs']++;
+            ++$expectations[$pos]['runs'];
             $container['storage']->store($request, 'expectations', $expectations);
 
             $r = Util::responseDeserialize($expectation['response']);
@@ -188,7 +188,7 @@ $container['notFoundHandler'] = function ($container) {
 };
 
 $container['errorHandler'] = function ($container) {
-    return function (Request $request, Response $response, Exception $e) {
+    return function (Request $request, Response $response, Exception $e) use ($container) {
         return $response->withStatus(StatusCode::HTTP_INTERNAL_SERVER_ERROR)->write(
             'Server error: ' . $e->getMessage());
     };
