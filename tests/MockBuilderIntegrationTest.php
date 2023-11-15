@@ -26,7 +26,7 @@ class MockBuilderIntegrationTest extends TestCase
     /** @var Server */
     private $server;
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->matches = new MatcherFactory();
         $this->builder = new MockBuilder($this->matches, new ExtractorFactory());
@@ -35,7 +35,7 @@ class MockBuilderIntegrationTest extends TestCase
         $this->server->clean();
     }
 
-    public function tearDown()
+    public function tearDown() : void
     {
         $this->server->stop();
     }

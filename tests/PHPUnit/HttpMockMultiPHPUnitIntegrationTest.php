@@ -12,23 +12,23 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
 {
     use HttpMockTrait;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass() : void
     {
         static::setUpHttpMockBeforeClass(null, null, null, 'firstNamedServer');
         static::setUpHttpMockBeforeClass(static::getHttpMockDefaultPort() + 1, null, null, 'secondNamedServer');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass() : void
     {
         static::tearDownHttpMockAfterClass();
     }
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->setUpHttpMock();
     }
 
-    public function tearDown()
+    public function tearDown() : void
     {
         $this->tearDownHttpMock();
     }

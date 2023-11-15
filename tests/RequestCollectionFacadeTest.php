@@ -22,7 +22,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     /** @var RequestCollectionFacade */
     private $facade;
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->client = $this->createMock(Client::class);
         $this->facade = new RequestCollectionFacade($this->client);

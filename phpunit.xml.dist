@@ -1,25 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/7.4/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
-         verbose="true"
-         colors="true"
-         timeoutForLargeTests="100">
-
-    <testsuites>
-        <testsuite name="internations/http-mock">
-            <directory>./tests/</directory>
-        </testsuite>
-    </testsuites>
-
-    <logging>
-        <log type="junit" target="build/logs/junit.xml" />
-    </logging>
-
-    <php>
-        <ini name="error_reporting" value="-1"/>
-        <ini name="date.timezone" value="America/Mexico_City"/>
-        <const name="HTTP_MOCK_PORT" value="38080"/>
-        <const name="HTTP_MOCK_HOST" value="localhost"/>
-    </php>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" bootstrap="vendor/autoload.php" verbose="true" colors="true" timeoutForLargeTests="100">
+  <coverage/>
+  <testsuites>
+    <testsuite name="internations/http-mock">
+      <directory>./tests/</directory>
+    </testsuite>
+  </testsuites>
+  <logging>
+    <junit outputFile="build/logs/junit.xml"/>
+  </logging>
+  <php>
+    <ini name="error_reporting" value="-1"/>
+    <ini name="date.timezone" value="America/Mexico_City"/>
+    <ini name="display_errors" value="true"/>
+    <const name="HTTP_MOCK_PORT" value="38080"/>
+    <const name="HTTP_MOCK_HOST" value="localhost"/>
+  </php>
 </phpunit>

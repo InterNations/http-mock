@@ -15,7 +15,7 @@ class ExtractorFactoryTest extends AbstractTestCase
     /** @var Request|MockObject */
     private $request;
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->extractorFactory = new ExtractorFactory();
     }

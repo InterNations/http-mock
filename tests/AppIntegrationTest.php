@@ -26,13 +26,13 @@ class AppIntegrationTest extends AbstractTestCase
      */
     private $client;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass() : void
     {
         static::$server1 = new Server(HTTP_MOCK_PORT, HTTP_MOCK_HOST);
         static::$server1->start();
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass() : void
     {
         $out = (string) static::$server1->getOutput();
         static::assertSame('', $out, $out);
@@ -44,13 +44,13 @@ class AppIntegrationTest extends AbstractTestCase
         static::$server1->stop();
     }
 
-    public function setUp()
+    public function setUp() : void
     {
         static::$server1->clean();
         $this->client = static::$server1->getClient();
     }
 
-    public function testSimpleUseCase()
+    public function testSimpleUseCase() : void
     {
         $params = $this->createExpectationParams(
             [

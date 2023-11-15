@@ -37,7 +37,7 @@ class HttpMockFacade
         return ['server', 'matches', 'mock', 'requests', 'client'];
     }
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->server->setUp($this->mock->flushExpectations());
     }
