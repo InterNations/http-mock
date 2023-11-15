@@ -3,12 +3,13 @@
 namespace InterNations\Component\HttpMock\Tests;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Response;
 use InterNations\Component\HttpMock\Server;
 use InterNations\Component\Testing\AbstractTestCase;
+use Opis\Closure\SerializableClosure;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use SuperClosure\SerializableClosure;
 
 /**
  * @large
@@ -147,7 +148,7 @@ class AppIntegrationTest extends AbstractTestCase
         $tester = function ($matcher, $response = null, $limiter = null) {
             $payload = [];
             if ($response === null) {
-                $payload['response'] = \GuzzleHttp\Psr7\str(new Response(200, [], 'foo'));
+                $payload['response'] = Message::toString(new Response(200, [], 'foo'));
             } elseif ($response !== false) {
                 $payload['response'] = $response;
             }
@@ -255,7 +256,7 @@ class AppIntegrationTest extends AbstractTestCase
     {
         $body = unserialize($response->getBody());
 
-        return \GuzzleHttp\Psr7\parse_request($body['request']);
+        return \GuzzleHttp\Psr7\Message::parseRequest($body['request']);
     }
 
     private function createExpectationParams(array $closures, Response $response)
@@ -266,7 +267,7 @@ class AppIntegrationTest extends AbstractTestCase
 
         return [
             'matcher' => serialize($closures),
-            'response' => \GuzzleHttp\Psr7\str($response),
+            'response' => \GuzzleHttp\Psr7\Message::toString($response),
         ];
     }
 }
