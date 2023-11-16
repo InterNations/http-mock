@@ -79,7 +79,6 @@ $app->post(
                 return is_callable($closure);
             };
 
-            //var_dump($matcher, $validator);
             if (!is_array($matcher) || count(array_filter($matcher, $validator)) !== count($matcher)) {
                 $response->getBody()->write('POST data key "matcher" must be a serialized list of closures');
 
@@ -330,7 +329,11 @@ $errorMiddleware->setDefaultErrorHandler(function (
     ?LoggerInterface $logger = null
 ) use ($app, $notfoundHandler, $phpErrorHandler) {
     if ($exception instanceof HttpNotFoundException) {
-        return $notfoundHandler($request, $app->getResponseFactory()->createResponse());
+        try {
+            return $notfoundHandler($request, $app->getResponseFactory()->createResponse());
+        } catch (Throwable $throwable) {
+            return $phpErrorHandler($request, $app->getResponseFactory()->createResponse(), $throwable);
+        }
     }
 
     return $phpErrorHandler($request, $app->getResponseFactory()->createResponse(), $exception);
