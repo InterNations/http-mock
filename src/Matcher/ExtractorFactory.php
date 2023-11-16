@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace InterNations\Component\HttpMock\Matcher;
 
 use Psr\Http\Message\RequestInterface as Request;
 
 class ExtractorFactory
 {
-    private $basePath;
+    private string $basePath;
 
     public function __construct(string $basePath = '')
     {
         $this->basePath = rtrim($basePath, '/');
     }
 
-    public function createPathExtractor()
+    public function createPathExtractor() : callable
     {
         $basePath = $this->basePath;
 
@@ -22,28 +24,36 @@ class ExtractorFactory
         };
     }
 
-    public function createMethodExtractor()
+    public function createMethodExtractor() : callable
     {
         return static function (Request $request) {
             return $request->getMethod();
         };
     }
 
-    public function createParamExtractor($param)
+    public function createParamExtractor($param) : callable
     {
         return static function (Request $request) use ($param) {
-            return $request->getParam($param);
+            $query = [];
+
+            parse_str($request->getUri()->getQuery(), $query);
+
+            return $query[$param] ?? null;
         };
     }
 
-    public function createParamExistsExtractor($param)
+    public function createParamExistsExtractor(string $param) : callable
     {
         return static function (Request $request) use ($param) {
-            return $request->getParam($param, false) !== false;
+            $query = [];
+
+            parse_str($request->getUri()->getQuery(), $query);
+
+            return isset($query[$param]);
         };
     }
 
-    public function createHeaderExtractor($header)
+    public function createHeaderExtractor($header) : callable
     {
         return static function (Request $request) use ($header) {
             $r = $request->getHeaderLine($header);
@@ -55,7 +65,7 @@ class ExtractorFactory
         };
     }
 
-    public function createHeaderExistsExtractor($header)
+    public function createHeaderExistsExtractor($header) : callable
     {
         return static function (Request $request) use ($header) {
             return $request->hasHeader($header);

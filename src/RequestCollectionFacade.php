@@ -4,8 +4,7 @@ namespace InterNations\Component\HttpMock;
 
 use Countable;
 use GuzzleHttp\Client;
-use function GuzzleHttp\Psr7\parse_request;
-use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Message;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use UnexpectedValueException;
@@ -49,7 +48,7 @@ class RequestCollectionFacade implements Countable
         return $this->deleteRecordedRequest('/_request/first');
     }
 
-    public function count()
+    public function count() : int
     {
         $response = $this->client
             ->get('/_request/count');
@@ -57,19 +56,19 @@ class RequestCollectionFacade implements Countable
         return (int) $response->getBody()->getContents();
     }
 
-    private function parseRequestFromResponse(ResponseInterface $response, $path) : Request
+    private function parseRequestFromResponse(ResponseInterface $response, $path) : RequestInterface
     {
         try {
             $contents = $response->getBody()->getContents();
             $requestInfo = Util::deserialize($contents);
         } catch (UnexpectedValueException $e) {
-            throw new UnexpectedValueException(sprintf('Cannot deserialize response from "%s": "%s"', $path, $contents), null, $e);
+            throw new UnexpectedValueException(sprintf('Cannot deserialize response from "%s": "%s"', $path, $contents), 0, $e);
         }
 
-        return parse_request($requestInfo['request']);
+        return Message::parseRequest($requestInfo['request']);
     }
 
-    private function getRecordedRequest($path)
+    private function getRecordedRequest($path) : RequestInterface
     {
         $response = $this->client
             ->get($path);
@@ -77,7 +76,7 @@ class RequestCollectionFacade implements Countable
         return $this->parseResponse($response, $path);
     }
 
-    private function deleteRecordedRequest($path)
+    private function deleteRecordedRequest($path) : RequestInterface
     {
         $response = $this->client
             ->delete($path);
@@ -85,7 +84,7 @@ class RequestCollectionFacade implements Countable
         return $this->parseResponse($response, $path);
     }
 
-    private function parseResponse(ResponseInterface $response, $path)
+    private function parseResponse(ResponseInterface $response, $path) : RequestInterface
     {
         $statusCode = $response->getStatusCode();
 

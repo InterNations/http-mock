@@ -68,11 +68,18 @@ $app->post(
         $matcher = [];
 
         if (!empty($data['matcher'])) {
+            if (!is_string($data['matcher'])) {
+                $response->getBody()->write('POST data key "matcher" must be a serialized list of closures');
+
+                return $response->withStatus(StatusCodeInterface::STATUS_EXPECTATION_FAILED);
+            }
+
             $matcher = Util::silentDeserialize($data['matcher']);
             $validator = function ($closure) {
                 return is_callable($closure);
             };
 
+            //var_dump($matcher, $validator);
             if (!is_array($matcher) || count(array_filter($matcher, $validator)) !== count($matcher)) {
                 $response->getBody()->write('POST data key "matcher" must be a serialized list of closures');
 

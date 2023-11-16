@@ -6,24 +6,22 @@ use Closure;
 use InterNations\Component\HttpMock\Matcher\ExtractorFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 use InterNations\Component\HttpMock\Matcher\MatcherInterface;
-use SuperClosure\SerializableClosure;
+use InterNations\Component\HttpMock\Matcher\RegexMatcher;
+use Opis\Closure\SerializableClosure;
+use Psr\Http\Message\ResponseInterface;
 
 class Expectation
 {
     /** @var MatcherInterface[] */
-    private $matcher = [];
+    private array $matcher = [];
 
-    /** @var MatcherFactory */
-    private $matcherFactory;
+    private MatcherFactory $matcherFactory;
 
-    /** @var ResponseBuilder */
-    private $responseBuilder;
+    private ResponseBuilder $responseBuilder;
 
-    /** @var Closure */
-    private $limiter;
+    private Closure $limiter;
 
-    /** @var ExtractorFactory */
-    private $extractorFactory;
+    private ExtractorFactory $extractorFactory;
 
     public function __construct(
         MockBuilder $mockBuilder,
@@ -37,42 +35,42 @@ class Expectation
         $this->limiter = $limiter;
     }
 
-    public function pathIs($matcher)
+    public function pathIs(string $matcher): Expectation
     {
         $this->appendMatcher($matcher, $this->extractorFactory->createPathExtractor());
 
         return $this;
     }
 
-    public function methodIs($matcher)
+    public function methodIs(mixed $matcher): Expectation
     {
         $this->appendMatcher($matcher, $this->extractorFactory->createMethodExtractor());
 
         return $this;
     }
 
-    public function queryParamIs($param, $matcher)
+    public function queryParamIs(string $param, string $matcher): Expectation
     {
         $this->appendMatcher($matcher, $this->extractorFactory->createParamExtractor($param));
 
         return $this;
     }
 
-    public function queryParamExists($param)
+    public function queryParamExists(string $param): Expectation
     {
         $this->appendMatcher(true, $this->extractorFactory->createParamExistsExtractor($param));
 
         return $this;
     }
 
-    public function queryParamNotExists($param)
+    public function queryParamNotExists(string $param): Expectation
     {
         $this->appendMatcher(false, $this->extractorFactory->createParamExistsExtractor($param));
 
         return $this;
     }
 
-    public function queryParamsAre(array $paramMap)
+    public function queryParamsAre(array $paramMap) : Expectation
     {
         foreach ($paramMap as $param => $value) {
             $this->queryParamIs($param, $value);
@@ -81,7 +79,7 @@ class Expectation
         return $this;
     }
 
-    public function queryParamsExist(array $params)
+    public function queryParamsExist(array $params) : Expectation
     {
         foreach ($params as $param) {
             $this->queryParamExists($param);
@@ -90,7 +88,7 @@ class Expectation
         return $this;
     }
 
-    public function queryParamsNotExist(array $params)
+    public function queryParamsNotExist(array $params) : Expectation
     {
         foreach ($params as $param) {
             $this->queryParamNotExists($param);
@@ -99,21 +97,21 @@ class Expectation
         return $this;
     }
 
-    public function headerIs($name, $value)
+    public function headerIs(string $name, string $value) : Expectation
     {
         $this->appendMatcher($value, $this->extractorFactory->createHeaderExtractor($name));
 
         return $this;
     }
 
-    public function headerExists($name)
+    public function headerExists(string $name) : Expectation
     {
         $this->appendMatcher(true, $this->extractorFactory->createHeaderExistsExtractor($name));
 
         return $this;
     }
 
-    public function callback(Closure $callback)
+    public function callback(Closure $callback) : Expectation
     {
         $this->appendMatcher($this->matcherFactory->closure($callback));
 
@@ -121,7 +119,7 @@ class Expectation
     }
 
     /** @return SerializableClosure[]  */
-    public function getMatcherClosures()
+    public function getMatcherClosures() : array
     {
         $closures = [];
 
@@ -132,27 +130,27 @@ class Expectation
         return $closures;
     }
 
-    public function then()
+    public function then() : ResponseBuilder
     {
         return $this->responseBuilder;
     }
 
-    public function getResponse()
+    public function getResponse() : ResponseInterface
     {
         return $this->responseBuilder->getResponse();
     }
 
-    public function getResponseCallback()
+    public function getResponseCallback() : ?callable
     {
         return $this->responseBuilder->getResponseCallback();
     }
 
-    public function getLimiter()
+    public function getLimiter(): SerializableClosure
     {
         return new SerializableClosure($this->limiter);
     }
 
-    private function appendMatcher($matcher, Closure $extractor = null)
+    private function appendMatcher(mixed $matcher, Closure $extractor = null): void
     {
         $matcher = $this->createMatcher($matcher);
 
@@ -163,7 +161,7 @@ class Expectation
         $this->matcher[] = $matcher;
     }
 
-    private function createMatcher($matcher)
+    private function createMatcher(mixed $matcher) : MatcherInterface
     {
         return $matcher instanceof MatcherInterface ? $matcher : $this->matcherFactory->str($matcher);
     }

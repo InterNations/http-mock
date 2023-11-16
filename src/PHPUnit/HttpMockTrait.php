@@ -4,23 +4,23 @@ namespace InterNations\Component\HttpMock\PHPUnit;
 
 trait HttpMockTrait
 {
-    public static function getHttpMockDefaultPort()
+    public static function getHttpMockDefaultPort() : int
     {
         return 28080;
     }
 
-    public static function getHttpMockDefaultHost()
+    public static function getHttpMockDefaultHost() : string
     {
         return 'localhost';
     }
 
     /** @var HttpMockFacade|HttpMockFacadeMap */
-    protected static $staticHttp;
+    protected static mixed $staticHttp = null;
 
     /** @var HttpMockFacade|HttpMockFacadeMap */
-    protected $http;
+    protected mixed $http = null;
 
-    protected static function setUpHttpMockBeforeClass($port = null, $host = null, $basePath = null, $name = null)
+    protected static function setUpHttpMockBeforeClass(?int $port = null, ?string $host = null, ?string $basePath = null, ?string $name = null) : void
     {
         $port = $port ?: static::getHttpMockDefaultPort();
         $host = $host ?: static::getHttpMockDefaultHost();
@@ -38,14 +38,14 @@ trait HttpMockTrait
         ServerManager::getInstance()->add($facade->server);
     }
 
-    protected function setUpHttpMock()
+    protected function setUpHttpMock() : void
     {
         static::assertHttpMockSetup();
 
         $this->http = clone static::$staticHttp;
     }
 
-    protected static function assertHttpMockSetup()
+    protected static function assertHttpMockSetup() : void
     {
         if (!static::$staticHttp) {
             static::fail(
@@ -58,7 +58,7 @@ trait HttpMockTrait
         }
     }
 
-    protected function tearDownHttpMock()
+    protected function tearDownHttpMock() : void
     {
         if (!$this->http) {
             return;
@@ -77,7 +77,7 @@ trait HttpMockTrait
         );
     }
 
-    protected static function tearDownHttpMockAfterClass()
+    protected static function tearDownHttpMockAfterClass() : void
     {
         static::$staticHttp->each(
             static function (HttpMockFacade $facade) {

@@ -6,17 +6,17 @@ use Closure;
 
 class MatcherFactory
 {
-    public function regex($regex)
+    public function regex(string $regex): RegexMatcher
     {
         return new RegexMatcher($regex);
     }
 
-    public function str($string)
+    public function str(string $string): StringMatcher
     {
         return new StringMatcher($string);
     }
 
-    public function closure(Closure $closure)
+    public function closure(Closure $closure): ClosureMatcher
     {
         return new ClosureMatcher($closure);
     }

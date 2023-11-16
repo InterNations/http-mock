@@ -2,12 +2,13 @@
 
 namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
+use Fig\Http\Message\StatusCodeInterface;
+use GuzzleHttp\Psr7\Utils;
 use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
 use InterNations\Component\Testing\AbstractTestCase;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Slim\Http\StatusCode;
 
 /** @large */
 class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
@@ -105,7 +106,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             $this->tearDown();
             $this->fail('Exception expected');
         } catch (\Exception $e) {
-            $this->assertContains('HTTP mock server standard error output should be empty', $e->getMessage());
+            $this->assertStringContainsString('HTTP mock server standard error output should be empty', $e->getMessage());
         }
     }
 
@@ -183,7 +184,7 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
                 ->methodIs('POST')
             ->then()
                 ->callback(static function (Response $response) {
-                    return $response->withBody(\GuzzleHttp\Psr7\stream_For('CALLBACK'));
+                    return $response->withBody(Utils::streamFor('CALLBACK'));
                 })
             ->end();
         $this->http->setUp();
@@ -293,8 +294,8 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
 
         $this->assertSame('query string', (string) $this->http->client->get('/?key1=')->getBody());
 
-        $this->assertEquals(StatusCode::HTTP_NOT_FOUND, (string) $this->http->client->get('/')->getStatusCode());
-        $this->assertEquals(StatusCode::HTTP_NOT_FOUND, (string) $this->http->client->post('/')->getStatusCode());
+        $this->assertEquals(StatusCodeInterface::STATUS_NOT_FOUND, (string) $this->http->client->get('/')->getStatusCode());
+        $this->assertEquals(StatusCodeInterface::STATUS_NOT_FOUND, (string) $this->http->client->post('/')->getStatusCode());
     }
 
     public function testMatchRegex()
@@ -331,15 +332,15 @@ class HttpMockPHPUnitIntegrationTest extends AbstractTestCase
             (string) $this->http->client->get('/?p1=&p2=v2&p4=any&p5=v5&p6=v6')->getBody()
         );
         $this->assertEquals(
-            StatusCode::HTTP_NOT_FOUND,
+            StatusCodeInterface::STATUS_NOT_FOUND,
             (string) $this->http->client->get('/?p1=&p2=v2&p3=foo')->getStatusCode()
         );
         $this->assertEquals(
-            StatusCode::HTTP_NOT_FOUND,
+            StatusCodeInterface::STATUS_NOT_FOUND,
             (string) $this->http->client->get('/?p1=')->getStatusCode()
         );
         $this->assertEquals(
-            StatusCode::HTTP_NOT_FOUND,
+            StatusCodeInterface::STATUS_NOT_FOUND,
             (string) $this->http->client->get('/?p3=foo')->getStatusCode()
         );
     }

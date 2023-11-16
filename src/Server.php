@@ -9,16 +9,13 @@ use Symfony\Component\Process\Process;
 
 class Server extends Process
 {
-    /** @var int */
-    private $port;
+    private int $port;
 
-    /** @var string */
-    private $host;
+    private string $host;
 
-    /** @var Client */
-    private $client;
+    private ?Client $client = null;
 
-    public function __construct($port, $host)
+    public function __construct(int $port, string $host)
     {
         $this->port = $port;
         $this->host = $host;
@@ -36,7 +33,7 @@ class Server extends Process
         $this->setTimeout(null);
     }
 
-    public function start(callable $callback = null, array $env = [])
+    public function start(callable $callback = null, array $env = []) : void
     {
         parent::start($callback, $env);
 
@@ -48,22 +45,22 @@ class Server extends Process
         return parent::stop($timeout, $signal);
     }
 
-    public function getClient()
+    public function getClient() : Client
     {
         return $this->client ?: $this->client = $this->createClient();
     }
 
-    private function createClient()
+    private function createClient() : Client
     {
         return new Client(['base_uri' => $this->getBaseUrl(), 'http_errors' => false]);
     }
 
-    public function getBaseUrl()
+    public function getBaseUrl() : string
     {
         return sprintf('http://%s', $this->getConnectionString());
     }
 
-    public function getConnectionString()
+    public function getConnectionString() : string
     {
         return sprintf('%s:%d', $this->host, $this->port);
     }
@@ -73,9 +70,8 @@ class Server extends Process
      *
      * @throws RuntimeException
      */
-    public function setUp(array $expectations)
+    public function setUp(array $expectations) : void
     {
-        /** @var Expectation $expectation */
         foreach ($expectations as $expectation) {
             $response = $this->getClient()->post(
                 '/_expectation',
@@ -93,7 +89,7 @@ class Server extends Process
         }
     }
 
-    public function clean()
+    public function clean() : void
     {
         if (!$this->isRunning()) {
             $this->start();
@@ -102,7 +98,7 @@ class Server extends Process
         $this->getClient()->delete('/_all');
     }
 
-    private function pollWait()
+    private function pollWait() : void
     {
         foreach (FibonacciFactory::sequence(50000, 10000) as $sleepTime) {
             try {
@@ -125,7 +121,7 @@ class Server extends Process
         return self::cleanErrorOutput(parent::getErrorOutput());
     }
 
-    private static function cleanErrorOutput($output)
+    private static function cleanErrorOutput(string $output) : string
     {
         if (!trim($output)) {
             return '';
@@ -146,7 +142,7 @@ class Server extends Process
         return $errorLines ? implode(PHP_EOL, $errorLines) : '';
     }
 
-    private static function stringEndsWithAny($haystack, array $needles)
+    private static function stringEndsWithAny(string $haystack, array $needles) : bool
     {
         foreach ($needles as $needle) {
             if (substr($haystack, (-1 * strlen($needle))) === $needle) {
