@@ -43,7 +43,7 @@ class Server extends Process
         $this->pollWait();
     }
 
-    public function stop($timeout = 10, $signal = null)
+    public function stop($timeout = 10, $signal = null): int|null
     {
         return parent::stop($timeout, $signal);
     }
@@ -115,12 +115,12 @@ class Server extends Process
         }
     }
 
-    public function getIncrementalErrorOutput()
+    public function getIncrementalErrorOutput(): string
     {
         return self::cleanErrorOutput(parent::getIncrementalErrorOutput());
     }
 
-    public function getErrorOutput()
+    public function getErrorOutput(): string
     {
         return self::cleanErrorOutput(parent::getErrorOutput());
     }
