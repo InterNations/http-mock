@@ -8,7 +8,7 @@ class ExtractorFactory
 {
     private $basePath;
 
-    public function __construct($basePath = '')
+    public function __construct(string $basePath = '')
     {
         $this->basePath = rtrim($basePath, '/');
     }
