@@ -13,7 +13,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class RequestCollectionFacadeTest extends AbstractTestCase
 {
-    /** @var ClientInterface|MockObject */
     private $client;
 
     /** @var Request */
@@ -22,7 +21,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     /** @var RequestCollectionFacade */
     private $facade;
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->client = $this->createMock(Client::class);
         $this->facade = new RequestCollectionFacade($this->client);
@@ -116,8 +115,8 @@ class RequestCollectionFacadeTest extends AbstractTestCase
     {
         $this->client
             ->expects($this->once())
-            ->method('__call')
-            ->with($method, [$path])
+            ->method($method)
+            ->with($path)
             ->will($this->returnValue($response));
     }
 
@@ -131,7 +130,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         );
 
         return new Response(
-            '200',
+            200,
             ['Content-Type' => 'text/plain'],
             serialize(
                 [
@@ -156,7 +155,7 @@ class RequestCollectionFacadeTest extends AbstractTestCase
         );
 
         return new Response(
-            '200',
+            200,
             ['Content-Type' => 'text/plain; charset=UTF-8'],
             serialize(
                 [

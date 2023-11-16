@@ -3,19 +3,19 @@
 namespace InterNations\Component\HttpMock\Matcher;
 
 use Closure;
+use Opis\Closure\SerializableClosure;
 use Psr\Http\Message\RequestInterface as Request;
-use SuperClosure\SerializableClosure;
 
 abstract class AbstractMatcher implements MatcherInterface
 {
-    protected $extractor;
+    protected ?Closure $extractor = null;
 
-    public function setExtractor(Closure $extractor)
+    public function setExtractor(Closure $extractor) : void
     {
         $this->extractor = $extractor;
     }
 
-    protected function createExtractor()
+    protected function createExtractor() : Closure
     {
         if (!$this->extractor) {
             return static function (Request $request) {
@@ -26,9 +26,9 @@ abstract class AbstractMatcher implements MatcherInterface
         return $this->extractor;
     }
 
-    abstract protected function createMatcher();
+    abstract protected function createMatcher(): callable;
 
-    public function getMatcher()
+    public function getMatcher() : SerializableClosure
     {
         $matcher = new SerializableClosure($this->createMatcher());
         $extractor = new SerializableClosure($this->createExtractor());

@@ -9,16 +9,13 @@ use InterNations\Component\HttpMock\Matcher\MatcherFactory;
 class MockBuilder
 {
     /** @var Expectation[] */
-    private $expectations = [];
+    private array $expectations = [];
 
-    /** @var MatcherFactory */
-    private $matcherFactory;
+    private MatcherFactory $matcherFactory;
 
-    /** @var Closure */
-    private $limiter;
+    private Closure $limiter;
 
-    /** @var ExtractorFactory */
-    private $extractorFactory;
+    private ExtractorFactory $extractorFactory;
 
     public function __construct(MatcherFactory $matcherFactory, ExtractorFactory $extractorFactory)
     {
@@ -27,22 +24,22 @@ class MockBuilder
         $this->any();
     }
 
-    public function once()
+    public function once() : MockBuilder
     {
         return $this->exactly(1);
     }
 
-    public function twice()
+    public function twice() : MockBuilder
     {
         return $this->exactly(2);
     }
 
-    public function thrice()
+    public function thrice() : MockBuilder
     {
         return $this->exactly(3);
     }
 
-    public function exactly($times)
+    public function exactly($times) : MockBuilder
     {
         $this->limiter = static function ($runs) use ($times) {
             return $runs < $times;
@@ -51,7 +48,7 @@ class MockBuilder
         return $this;
     }
 
-    public function any()
+    public function any() : MockBuilder
     {
         $this->limiter = static function () {
             return true;
@@ -60,8 +57,7 @@ class MockBuilder
         return $this;
     }
 
-    /** @return Expectation */
-    public function when()
+    public function when() : Expectation
     {
         $this->expectations[] = new Expectation($this, $this->matcherFactory, $this->extractorFactory, $this->limiter);
 
@@ -70,7 +66,8 @@ class MockBuilder
         return end($this->expectations);
     }
 
-    public function flushExpectations()
+    /** @return Expectation[] */
+    public function flushExpectations() : array
     {
         $expectations = $this->expectations;
         $this->expectations = [];

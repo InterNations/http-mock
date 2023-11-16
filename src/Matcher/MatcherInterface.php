@@ -3,14 +3,11 @@
 namespace InterNations\Component\HttpMock\Matcher;
 
 use Closure;
-use SuperClosure\SerializableClosure;
+use Opis\Closure\SerializableClosure;
 
 interface MatcherInterface
 {
-    /**
-     * @return SerializableClosure
-     */
-    public function getMatcher();
+    public function getMatcher(): SerializableClosure;
 
-    public function setExtractor(Closure $extractor);
+    public function setExtractor(Closure $extractor) : void;
 }

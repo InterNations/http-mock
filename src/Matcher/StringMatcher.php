@@ -4,14 +4,14 @@ namespace InterNations\Component\HttpMock\Matcher;
 
 class StringMatcher extends AbstractMatcher
 {
-    private $string;
+    private string $string;
 
-    public function __construct($string)
+    public function __construct(string $string)
     {
         $this->string = $string;
     }
 
-    protected function createMatcher()
+    protected function createMatcher(): callable
     {
         $string = $this->string;
 

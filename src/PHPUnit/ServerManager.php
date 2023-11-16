@@ -5,19 +5,14 @@ namespace InterNations\Component\HttpMock\PHPUnit;
 use InterNations\Component\HttpMock\Server;
 use SplObjectStorage;
 
-// @codingStandardsIgnoreStart
 final class ServerManager
-// @codingStandardsIgnoreEnd
 {
     /** @var SplObjectStorage|Server[] */
-    private $servers;
+    private mixed $servers;
 
-    private static $instance;
+    private static ?ServerManager $instance = null;
 
-    /**
-     * @return self
-     */
-    public static function getInstance()
+    public static function getInstance() : self
     {
         if (!static::$instance) {
             static::$instance = new static();
@@ -26,17 +21,17 @@ final class ServerManager
         return static::$instance;
     }
 
-    public function add(Server $server)
+    public function add(Server $server) : void
     {
         $this->servers->attach($server);
     }
 
-    public function remove(Server $server)
+    public function remove(Server $server) : void
     {
         $this->servers->detach($server);
     }
 
-    public function cleanup()
+    public function cleanup() : void
     {
         foreach ($this->servers as $server) {
             $server->stop();
@@ -49,7 +44,7 @@ final class ServerManager
         register_shutdown_function([$this, 'cleanup']);
     }
 
-    private function __clone()
+    private function __clone() : void
     {
     }
 }

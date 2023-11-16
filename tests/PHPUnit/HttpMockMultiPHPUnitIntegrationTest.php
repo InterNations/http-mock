@@ -2,6 +2,7 @@
 
 namespace InterNations\Component\HttpMock\Tests\PHPUnit;
 
+use GuzzleHttp\Psr7\Utils;
 use InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
 use InterNations\Component\Testing\AbstractTestCase;
 use PHPUnit\Framework\TestCase;
@@ -12,23 +13,23 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
 {
     use HttpMockTrait;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass() : void
     {
         static::setUpHttpMockBeforeClass(null, null, null, 'firstNamedServer');
         static::setUpHttpMockBeforeClass(static::getHttpMockDefaultPort() + 1, null, null, 'secondNamedServer');
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass() : void
     {
         static::tearDownHttpMockAfterClass();
     }
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->setUpHttpMock();
     }
 
-    public function tearDown()
+    public function tearDown() : void
     {
         $this->tearDownHttpMock();
     }
@@ -104,7 +105,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
             $this->tearDown();
             $this->fail('Exception expected');
         } catch (\Exception $e) {
-            $this->assertContains('HTTP mock server standard error output should be empty', $e->getMessage());
+            $this->assertStringContainsString('HTTP mock server standard error output should be empty', $e->getMessage());
         }
     }
 
@@ -181,7 +182,7 @@ class HttpMockMultiPHPUnitIntegrationTest extends AbstractTestCase
             ->when()
                 ->methodIs('POST')
             ->then()
-                ->callback(static function (Response $response) {return $response->withBody(\GuzzleHttp\Psr7\stream_for('CALLBACK')); })
+                ->callback(static function (Response $response) {return $response->withBody(Utils::streamFor('CALLBACK')); })
             ->end();
         $this->http['firstNamedServer']->setUp();
         $this->assertSame('CALLBACK', (string) $this->http['firstNamedServer']->client->post('/')->getBody());

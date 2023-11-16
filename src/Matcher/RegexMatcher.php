@@ -4,14 +4,14 @@ namespace InterNations\Component\HttpMock\Matcher;
 
 class RegexMatcher extends AbstractMatcher
 {
-    private $regex;
+    private string $regex;
 
-    public function __construct($regex)
+    public function __construct(string $regex)
     {
         $this->regex = $regex;
     }
 
-    protected function createMatcher()
+    protected function createMatcher(): callable
     {
         $regex = $this->regex;
 

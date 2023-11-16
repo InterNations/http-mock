@@ -19,30 +19,30 @@ use RuntimeException;
  */
 class HttpMockFacade
 {
-    /** @var array */
-    private $services = [];
+    private array $services = [];
 
-    private $basePath;
+    private string $basePath;
 
-    public function __construct($port, $host, $basePath)
+    public function __construct(int $port, string $host, ?string $basePath = '')
     {
         $server = new Server($port, $host);
         $server->start();
         $this->services['server'] = $server;
-        $this->basePath = $basePath;
+        $this->basePath = $basePath ?? '';
     }
 
-    public static function getProperties()
+    /** @return string[] */
+    public static function getProperties() : array
     {
         return ['server', 'matches', 'mock', 'requests', 'client'];
     }
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->server->setUp($this->mock->flushExpectations());
     }
 
-    public function __get($property)
+    public function __get(string $property) : mixed
     {
         if (isset($this->services[$property])) {
             return $this->services[$property];
@@ -51,37 +51,32 @@ class HttpMockFacade
         return $this->services[$property] = $this->createService($property);
     }
 
-    private function createService($property)
+    private function createService(string $property) : mixed
     {
         switch ($property) {
             case 'matches':
                 return new MatcherFactory();
-                break;
 
             case 'mock':
                 return new MockBuilder($this->matches, new ExtractorFactory($this->basePath));
-                break;
 
             case 'client':
                 return $this->server->getClient();
-                break;
 
             case 'requests':
                 return new RequestCollectionFacade($this->client);
-                break;
 
             default:
                 throw new RuntimeException(sprintf('Invalid property "%s" read', $property));
-                break;
         }
     }
 
-    public function __clone()
+    public function __clone() : void
     {
         $this->server->clean();
     }
 
-    public function each(callable $callback)
+    public function each(callable $callback) : void
     {
         $callback($this);
     }

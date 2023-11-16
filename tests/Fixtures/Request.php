@@ -6,6 +6,10 @@ use GuzzleHttp\Psr7\Request as BaseRequest;
 
 class Request extends BaseRequest
 {
+    private string $requestUri;
+
+    private string $content;
+
     public function __construct(
         $method = 'GET',
         $uri = '/',

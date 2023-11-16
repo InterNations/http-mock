@@ -4,20 +4,17 @@ namespace InterNations\Component\HttpMock;
 
 use Closure;
 use GuzzleHttp\Psr7\Response;
-use function GuzzleHttp\Psr7\stream_for;
+use GuzzleHttp\Psr7\Utils;
+use Opis\Closure\SerializableClosure;
 use Psr\Http\Message\ResponseInterface;
-use SuperClosure\SerializableClosure;
-use SuperClosure\SerializerInterface;
 
 class ResponseBuilder
 {
-    /** @var MockBuilder */
-    private $mockBuilder;
+    private MockBuilder $mockBuilder;
 
-    /** @var Response */
-    private $response;
+    private ResponseInterface $response;
 
-    /** @var SerializerInterface|null */
+    /** @var callable */
     private $responseCallback;
 
     public function __construct(MockBuilder $mockBuilder)
@@ -35,7 +32,7 @@ class ResponseBuilder
 
     public function body(string $body) : self
     {
-        $this->response = $this->response->withBody(stream_for($body));
+        $this->response = $this->response->withBody(Utils::streamFor($body));
 
         return $this;
     }
@@ -64,7 +61,7 @@ class ResponseBuilder
         return $this->response;
     }
 
-    public function getResponseCallback()
+    public function getResponseCallback() : ?callable
     {
         return $this->responseCallback;
     }
