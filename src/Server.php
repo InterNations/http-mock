@@ -134,7 +134,7 @@ class Server extends Process
                 continue;
             }
 
-            if (!self::stringEndsWithAny($line, ['Accepted', 'Closing', ' started']) || !str_contains($line, 'PHP Fatal error')) {
+            if (!self::stringEndsWithAny($line, ['Accepted', 'Closing', ' started'])) {
                 $errorLines[] = $line;
             }
         }
