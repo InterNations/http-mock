@@ -24,7 +24,6 @@
         "guzzlehttp/guzzle": "^7.8",
         "slim/slim": "^4.12",
         "friendsofphp/php-cs-fixer": "^3.16",
-        "sensiolabs/security-checker": "^6.0",
         "charescape/serialize-closure": "^3.8",
         "pimple/pimple": "^3.5",
         "fig/http-message-util": "^1.1"
