@@ -35,7 +35,7 @@ class Expectation
         $this->limiter = $limiter;
     }
 
-    public function pathIs(string $matcher): Expectation
+    public function pathIs(mixed $matcher): Expectation
     {
         $this->appendMatcher($matcher, $this->extractorFactory->createPathExtractor());
 
@@ -49,7 +49,7 @@ class Expectation
         return $this;
     }
 
-    public function queryParamIs(string $param, string $matcher): Expectation
+    public function queryParamIs(string $param, mixed $matcher): Expectation
     {
         $this->appendMatcher($matcher, $this->extractorFactory->createParamExtractor($param));
 
